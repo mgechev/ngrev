@@ -28,6 +28,18 @@ export class VisualizerComponent implements AfterViewInit {
     const formatter = new ModuleFormatter();
     const rootModule = this.project.getRootModule();
     const data = formatter.format(rootModule);
-    const network = new Network(this.container.nativeElement, data, {});
+    const network = new Network(this.container.nativeElement, data, {
+      nodes: {
+        shape: 'box',
+        fixed: true,
+        shapeProperties: {
+          borderRadius: 1,
+          interpolation: true,
+          borderDashes: false,
+          useImageSize: false,
+          useBorderWithImage: false
+        }
+      }
+    });
   }
 }

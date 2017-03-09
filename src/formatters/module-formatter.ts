@@ -7,11 +7,13 @@ export class ModuleFormatter extends ModelFormatter<Module> {
   format(module: Module) {
     const rawNodes = [{
         id: this.getId(module),
-        label: module.symbol.name
+        label: module.symbol.name,
+        title: module.symbol.filePath
       }].concat(module.dependencies.map(d => {
         return {
           id: this.getId(d),
-          label: d.symbol.name
+          label: d.symbol.name,
+          title: module.symbol.filePath
         };
       }));
     const nodes = new DataSet(rawNodes);
