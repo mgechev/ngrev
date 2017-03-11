@@ -4,11 +4,11 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { AppComponent } from './components/app.component';
 import { HomeComponent } from './components/home.component';
-import { VisualizerComponent } from './components/visualizer.component';
+import { VisualizerModule } from './components/visualizer/visualizer.module';
 
 @NgModule({
-  imports: [BrowserModule],
-  declarations: [AppComponent, VisualizerComponent, HomeComponent],
+  imports: [BrowserModule, VisualizerModule],
+  declarations: [AppComponent, HomeComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

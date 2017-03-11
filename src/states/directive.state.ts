@@ -3,7 +3,7 @@ import { State } from './state';
 import { Project } from '../model/project-loader';
 import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
 import { DataSet } from 'vis';
-import { Visualization } from '../formatters/data-format';
+import { VisualizationConfig, Metadata } from '../formatters/data-format';
 
 interface NodeMap {
   [id: string]: StaticSymbol;
@@ -15,8 +15,12 @@ const TemplateErrorId = 'template-error';
 export class DirectiveState extends State {
   private symbols: NodeMap = {};
 
-  constructor(project: Project, protected directive: DirectiveSymbol, protected context: ContextSymbols) {
-    super(project);
+  constructor(context: ContextSymbols, protected directive: DirectiveSymbol) {
+    super(context);
+  }
+
+  getMetadata(id: string): Metadata {
+    return null;
   }
 
   nextState(id: string) {
@@ -30,10 +34,10 @@ export class DirectiveState extends State {
         return s.name === symbol.name &&
             s.filePath === symbol.filePath;
       }).pop();
-    return new DirectiveState(this.project, dir, this.context);
+    return new DirectiveState(this.context, dir);
   }
 
-  getData(): Visualization<any> {
+  getData(): VisualizationConfig<any> {
     const s = this.directive.symbol;
     const nodeId = s.filePath + '#' + s.name;
     const nodes = [{

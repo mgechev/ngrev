@@ -3,8 +3,6 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { Network } from 'vis';
 import { remote } from 'electron';
 import { Project } from '../model/project-loader';
-import { Module } from '../model/module';
-import { ModuleFormatter } from '../formatters/module-formatter';
 
 @Component({
   selector: 'ngrev-home',

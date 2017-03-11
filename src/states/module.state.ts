@@ -1,14 +1,15 @@
 import { State } from './state';
 import { Project } from '../model/project-loader';
-import { Module } from '../model/module';
-import { StaticSymbol } from '@angular/compiler';
+import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
-import { Node, Edge } from '../formatters/data-format';
+import { Node, Edge, Metadata } from '../formatters/data-format';
+import { DirectiveSymbol, ModuleSymbol, ContextSymbols } from 'ngast';
 
 interface DataType {
   symbolType: SymbolType,
   symbol: StaticSymbol;
+  metadata: any;
 }
 
 interface NodeMap {
@@ -25,8 +26,16 @@ export class ModuleState extends State {
 
   private symbols: NodeMap;
 
-  constructor(project: Project, protected module: Module) {
-    super(project);
+  constructor(context: ContextSymbols, protected module: ModuleSymbol) {
+    super(context);
+  }
+
+  getMetadata(id: string): Metadata {
+    const symbol = this.symbols[id];
+    if (symbol && symbol.data.metadata) {
+      return symbol.data.metadata;
+    }
+    return null;
   }
 
   nextState(nodeId: string) {
@@ -36,11 +45,12 @@ export class ModuleState extends State {
     }
     switch (symbol.symbolType) {
       case SymbolType.Directive:
-      if (this.module.context) {
-        const directives = this.module.context.getDirectives();
-        return new DirectiveState(this.project,
-          directives.filter(d => d.symbol.filePath === symbol.symbol.filePath
-            && d.symbol.name === symbol.symbol.name).pop(), this.module.context);
+      if (this.module) {
+        const directives = this.module.getDeclaredDirectives();
+        return new DirectiveState(this.context,
+          directives
+            .filter(d => d.symbol.filePath === symbol.symbol.filePath
+            && d.symbol.name === symbol.symbol.name).pop());
       }
       break;
     }
@@ -54,7 +64,8 @@ export class ModuleState extends State {
         label: 'Exports',
         data: {
           symbol: null,
-          symbolType: SymbolType.Meta
+          symbolType: SymbolType.Meta,
+          metadata: null
         }
       },
       entry: {
@@ -62,7 +73,8 @@ export class ModuleState extends State {
         label: 'Entry',
         data: {
           symbol: null,
-          symbolType: SymbolType.Meta
+          symbolType: SymbolType.Meta,
+          metadata: null
         }
       },
       providers: {
@@ -70,7 +82,8 @@ export class ModuleState extends State {
         label: 'Providers',
         data: {
           symbol: null,
-          symbolType: SymbolType.Meta
+          symbolType: SymbolType.Meta,
+          metadata: null
         }
       },
       module: {
@@ -78,7 +91,8 @@ export class ModuleState extends State {
         label: this.module.symbol.name,
         data: {
           symbol: this.module.symbol,
-          symbolType: SymbolType.Meta
+          symbolType: SymbolType.Meta,
+          metadata: null
         }
       }
     };
@@ -87,22 +101,22 @@ export class ModuleState extends State {
       { from: 'module', to: 'entry' },
       { from: 'module', to: 'providers' },
     ];
-    this.module.entryComponents.forEach(s => {
-      const node = s.componentType as StaticSymbol;
+    this.module.getBootstrapComponents().forEach(s => {
+      const node = s.symbol;
       this._appendSet('entry', node, nodes, SymbolType.Directive, edges);
     });
-    this.module.exportedDirectives.forEach(d => {
-      const node = d.reference as StaticSymbol;
+    this.module.getExportedDirectives().forEach(d => {
+      const node = d.symbol;
       this._appendSet('exports', node, nodes, SymbolType.Provider, edges);
     });
-    const providers = this.module.providers.reduce((prev: any, p) => {
-      const id = p.symbol.filePath + '#' + p.symbol.name;
-      prev[id] = p;
-      return prev;
-    }, {});
-    Object.keys(providers).forEach(key => {
-      this._appendSet('providers', providers[key].symbol, nodes, SymbolType.Provider, edges);
-    });
+    // const providers = this.module.get.reduce((prev: any, p) => {
+    //   const id = p.symbol.filePath + '#' + p.symbol.name;
+    //   prev[id] = p;
+    //   return prev;
+    // }, {});
+    // Object.keys(providers).forEach(key => {
+    //   this._appendSet('providers', providers[key].symbol, nodes, SymbolType.Provider, edges);
+    // });
     this.symbols = nodes;
     return {
       graph: {
@@ -123,12 +137,20 @@ export class ModuleState extends State {
       label: node.name,
       data: {
         symbol: node,
-        symbolType
+        symbolType,
+        metadata: this._getModuleMetadata(node)
       }
     };
     edges.push({
       from: set,
       to: id
     });
+  }
+
+  private _getModuleMetadata(node: StaticSymbol): Metadata {
+    return [
+      { key: 'Name', value: node.name },
+      { key: 'Members', value: node.members.join('\n') }
+    ];
   }
 }
