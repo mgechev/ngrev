@@ -46,7 +46,7 @@ export class ModuleState extends State {
     switch (symbol.symbolType) {
       case SymbolType.Directive:
       if (this.module) {
-        const directives = this.module.getDeclaredDirectives();
+        const directives = this.context.getDirectives();
         return new DirectiveState(this.context,
           directives
             .filter(d => d.symbol.filePath === symbol.symbol.filePath

@@ -14,7 +14,7 @@ export class ModuleTreeState extends State {
   private data: VisualizationConfig<ModuleSymbol>;
   private symbols: NodeMap = {};
 
-  constructor(private rootContext: ContextSymbols, module: ModuleSymbol) {
+  constructor(private rootContext: ContextSymbols, private module: ModuleSymbol) {
     super(rootContext);
     const graph = this._getModuleGraph(module);
     graph.nodes.forEach(n => {
@@ -40,13 +40,12 @@ export class ModuleTreeState extends State {
 
   // Switch to binary search if gets too slow.
   nextState(id: string) {
-    let module: ModuleSymbol;
-    this.data.graph.nodes.forEach((node: Node<ModuleSymbol>) => {
-      if (id === node.id) {
-        module = node.data;
-      }
-    });
-    return new ModuleState(this.context, module);
+    const module = this.symbols[id];
+    if (module === this.module) {
+      return new ModuleState(this.context, module);
+    } else {
+      return new ModuleTreeState(this.context, module);
+    }
   }
 
   private _getModuleMetadata(node: StaticSymbol): Metadata {
@@ -59,7 +58,6 @@ export class ModuleTreeState extends State {
   private _getModuleGraph(module: ModuleSymbol): Graph<ModuleSymbol> {
     const imports = module.getImportedModules();
     const exports = module.getExportedModules();
-    // TODO: handle exports
     const nodes: Node<ModuleSymbol>[] = [{
         id: getId(module.symbol),
         label: module.symbol.name,
@@ -71,7 +69,7 @@ export class ModuleTreeState extends State {
           data: m,
         };
       }));
-    const edges = nodes.slice(1, nodes.length).map(n => {
+    const edges = nodes.slice(1, nodes.length).map((n, idx) => {
       return {
         from: nodes[0].id,
         to: n.id,

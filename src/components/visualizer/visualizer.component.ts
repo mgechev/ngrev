@@ -43,11 +43,11 @@ export class VisualizerComponent implements OnChanges {
     const edges = new DataSet(graph.edges.map(e => {
       const copy = Object.assign({}, e);
       if (e.direction === Direction.To) {
-        (e as any).arrow = 'to';
+        (e as any).arrows = 'to';
       } else if (e.direction === Direction.From) {
-        (e as any).arrow = 'from';
+        (e as any).arrows = 'from';
       } else if (e.direction === Direction.Both) {
-        (e as any).arrow = 'from to';
+        (e as any).arrows = 'from, to';
       }
       return e;
     }));

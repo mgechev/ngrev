@@ -19,9 +19,18 @@ import { Metadata } from '../../formatters/data-format';
   `,
   styles: [`
   table {
-    bottom: 0;
+    top: 0;
     right: 0;
     position: absolute;
+    background-color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+  }
+  td, th {
+    border: 1px solid #ccc;
+    padding: 8px;
+  }
+  thead {
+    font-weight: bold;
   }
   `]
 })

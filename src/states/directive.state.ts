@@ -46,16 +46,10 @@ export class DirectiveState extends State {
     }, {
       id: TemplateId,
       label: 'Template'
-    }, {
-      id: 'styles',
-      label: 'Styles'
     }];
     const edges = [{
       from: nodeId,
       to: 'template'
-    }, {
-      from: nodeId,
-      to: 'styles'
     }];
     this.addTemplateNodes(nodes, edges);
     this.addStyleNodes(nodes, edges);

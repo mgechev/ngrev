@@ -19,6 +19,23 @@ import { ContextSymbols } from 'ngast';
       height: 100%;
       display: block;
     }
+
+    button {
+      top: 0;
+      left: 0;
+      position: absolute;
+      z-index: 1;
+      width: 60px;
+      height: 30px;
+      background: #eee;
+      border: none;
+      outline: none;
+      border-bottom-right-radius: 7px;
+    }
+
+    button:active {
+      background: #ccc;
+    }
   `]
 })
 export class AppComponent {
