@@ -1,13 +1,9 @@
 import { DataSet } from 'vis';
 import { Model } from '../model/model';
-
-export interface RenderData {
-  nodes: DataSet<any>;
-  edges: DataSet<any>;
-}
+import { Graph } from './data-format';
 
 export abstract class ModelFormatter<T extends Model> {
-  abstract format(model: T): RenderData;
+  abstract format(model: T): Graph;
 
   getId(model: T) {
     return model.symbol.filePath + '#' + model.symbol.name;

@@ -3,6 +3,7 @@ import { State } from './state';
 import { Project } from '../model/project-loader';
 import { ElementAst, StaticSymbol } from '@angular/compiler';
 import { DataSet } from 'vis';
+import { Visualization } from '../formatters/data-format';
 
 interface NodeMap {
   [id: string]: StaticSymbol;
@@ -29,7 +30,7 @@ export class DirectiveState extends State {
     return new DirectiveState(this.project, dir, this.context);
   }
 
-  getData() {
+  getData(): Visualization<any> {
     const s = this.directive.symbol;
     const nodeId = s.filePath + '#' + s.name;
     const nodes = [{
@@ -54,8 +55,9 @@ export class DirectiveState extends State {
     this.addTemplateNodes(nodes, edges);
     this.addStyleNodes(nodes, edges);
     return {
-      nodes: new DataSet<any>(nodes),
-      edges: new DataSet<any>(edges)
+      graph: {
+        nodes, edges
+      }
     };
   }
 

@@ -4,15 +4,15 @@ import { Module } from '../model/module';
 import { StaticSymbol } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
+import { Node } from '../formatters/data-format';
 
-interface Node {
-  label: string;
-  symbol: any;
-  symbolType: SymbolType
+interface DataType {
+  symbolType: SymbolType,
+  symbol: StaticSymbol;
 }
 
 interface NodeMap {
-  [id: string]: Node;
+  [id: string]: Node<DataType>;
 }
 
 interface Edge {
@@ -36,7 +36,7 @@ export class ModuleState extends State {
   }
 
   nextState(nodeId: string) {
-    const symbol = this.symbols[nodeId];
+    const symbol = this.symbols[nodeId].data;
     if (!symbol) {
       return null;
     }
@@ -54,26 +54,38 @@ export class ModuleState extends State {
   }
 
   getData() {
-    const nodes = {
+    const nodes: NodeMap = {
       exports: {
+        id: 'exports',
         label: 'Exports',
-        symbol: null,
-        symbolType: SymbolType.Meta
+        data: {
+          symbol: null,
+          symbolType: SymbolType.Meta
+        }
       },
       entry: {
+        id: 'entry',
         label: 'Entry',
-        symbol: null,
-        symbolType: SymbolType.Meta
+        data: {
+          symbol: null,
+          symbolType: SymbolType.Meta
+        }
       },
       providers: {
+        id: 'providers',
         label: 'Providers',
-        symbol: null,
-        symbolType: SymbolType.Meta
+        data: {
+          symbol: null,
+          symbolType: SymbolType.Meta
+        }
       },
       module: {
+        id: 'module',
         label: this.module.symbol.name,
-        symbol: this.module,
-        symbolType: SymbolType.Meta
+        data: {
+          symbol: this.module.symbol,
+          symbolType: SymbolType.Meta
+        }
       }
     };
     const edges = [
@@ -99,21 +111,26 @@ export class ModuleState extends State {
     });
     this.symbols = nodes;
     return {
-      nodes: new DataSet<any>(Object.keys(nodes).map((key: string) => {
-        const node: any = Object.assign({}, nodes[key]);
-        node.id = key;
-        return node;
-      })),
-      edges: new DataSet<any>(edges)
+      graph: {
+        nodes: Object.keys(nodes).map((key: string) => {
+          const node: any = Object.assign({}, nodes[key]);
+          node.id = key;
+          return node;
+        }),
+        edges: edges
+      }
     };
   }
 
   private _appendSet(set: string, node: StaticSymbol, nodes: NodeMap, symbolType: SymbolType, edges: Edge[]) {
     const id = node.filePath + '#' + node.name;
     nodes[id] = {
+      id,
       label: node.name,
-      symbol: node,
-      symbolType
+      data: {
+        symbol: node,
+        symbolType
+      }
     };
     edges.push({
       id: set + '-' + id,

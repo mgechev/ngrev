@@ -1,8 +1,9 @@
 import { Component, Input, ViewChild, ElementRef, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { Project } from '../model/project-loader';
 import { ModuleFormatter } from '../formatters/module-formatter';
-import { Network } from 'vis';
-import { State, Graph } from '../states/state';
+import { Network, DataSet } from 'vis';
+import { State } from '../states/state';
+import { Visualization, Layout } from '../formatters/data-format';
 
 @Component({
   selector: 'ngrev-visualizer',
@@ -34,11 +35,26 @@ export class VisualizerComponent implements OnChanges {
     }
   }
 
-  updateData(data: Graph) {
+  updateData(data: Visualization) {
+    const graph = data.graph;
+    const nodes = new DataSet(graph.nodes);
+    const edges = new DataSet(graph.edges);
+    let layout: any = {
+      hierarchical: {
+        sortMethod: 'directed',
+        enabled: true
+      }
+    };
+    if (data.layout === Layout.Regular) {
+      layout = {
+        randomSeed: 2
+      };
+    }
     if (this.network) {
       this.network.destroy();
     }
-    this.network = new Network(this.container.nativeElement, data, {
+    this.network = new Network(this.container.nativeElement, { nodes, edges }, {
+      layout,
       nodes: {
         shape: 'box',
         fixed: true,
