@@ -35,7 +35,7 @@ export class VisualizerComponent implements OnChanges {
     }
   }
 
-  updateData(data: Visualization) {
+  updateData(data: Visualization<any>) {
     const graph = data.graph;
     const nodes = new DataSet(graph.nodes);
     const edges = new DataSet(graph.edges);

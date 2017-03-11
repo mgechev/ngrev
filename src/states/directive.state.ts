@@ -81,6 +81,7 @@ export class DirectiveState extends State {
     const dirMap = this.context.getDirectives().reduce((p, d) => {
       const s = d.symbol;
       p[s.filePath + '#' + s.name] = d;
+      return p;
     }, {} as any);
     const addNodes = (nodes: ElementAst[], parentNodeId: string) => {
       nodes.forEach(n => {

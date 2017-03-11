@@ -4,8 +4,8 @@ import { Graph, Node } from './data-format';
 
 export class ModuleFormatter extends ModelFormatter<Module> {
 
-  format(module: Module): Graph {
-    const nodes: Node[] = [{
+  format(module: Module): Graph<Module> {
+    const nodes: Node<Module>[] = [{
         id: this.getId(module),
         label: module.symbol.name,
         data: module

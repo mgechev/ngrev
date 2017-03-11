@@ -6,7 +6,7 @@ import { Visualization } from '../formatters/data-format';
 export abstract class State {
   constructor(protected project: Project) {} 
 
-  abstract getData(): Visualization;
+  abstract getData(): Visualization<any>;
 
   abstract nextState(id: string): State;
 }
