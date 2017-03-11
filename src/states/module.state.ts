@@ -3,10 +3,12 @@ import { Project } from '../model/project-loader';
 import { Module } from '../model/module';
 import { StaticSymbol } from '@angular/compiler';
 import { DataSet } from 'vis';
+import { DirectiveState } from './directive.state';
 
 interface Node {
   label: string;
   symbol: any;
+  symbolType: SymbolType
 }
 
 interface NodeMap {
@@ -19,13 +21,36 @@ interface Edge {
   to: string;
 }
 
+enum SymbolType {
+  Directive,
+  Provider,
+  Meta
+}
+
 export class ModuleState extends State {
+
+  private symbols: NodeMap;
 
   constructor(project: Project, protected module: Module) {
     super(project);
   }
 
-  nextState() {
+  nextState(nodeId: string) {
+    const symbol = this.symbols[nodeId];
+    if (!symbol) {
+      return null;
+    }
+    switch (symbol.symbolType) {
+      case SymbolType.Directive:
+      debugger;
+      if (this.module.context) {
+        const directives = this.module.context.getDirectives();
+        const s = symbol.symbol;
+        const dir = directives.filter(d => d.symbol.filePath === s.filePath && d.symbol.name === s.name).pop();
+        return new DirectiveState(this.project, dir);
+      }
+      break;
+    }
     return null;
   }
 
@@ -33,19 +58,23 @@ export class ModuleState extends State {
     const nodes = {
       exports: {
         label: 'Exports',
-        symbol: null
+        symbol: null,
+        symbolType: SymbolType.Meta
       },
       entry: {
         label: 'Entry',
-        symbol: null
+        symbol: null,
+        symbolType: SymbolType.Meta
       },
       providers: {
         label: 'Providers',
-        symbol: null
+        symbol: null,
+        symbolType: SymbolType.Meta
       },
       module: {
         label: this.module.symbol.name,
-        symbol: this.module
+        symbol: this.module,
+        symbolType: SymbolType.Meta
       }
     };
     const edges = [
@@ -55,11 +84,11 @@ export class ModuleState extends State {
     ];
     this.module.entryComponents.forEach(s => {
       const node = s.componentType as StaticSymbol;
-      this._appendSet('entry', node, nodes, edges);
+      this._appendSet('entry', node, nodes, SymbolType.Directive, edges);
     });
     this.module.exportedDirectives.forEach(d => {
       const node = d.reference as StaticSymbol;
-      this._appendSet('exports', node, nodes, edges);
+      this._appendSet('exports', node, nodes, SymbolType.Provider, edges);
     });
     const providers = this.module.providers.reduce((prev: any, p) => {
       const id = p.symbol.filePath + '#' + p.symbol.name;
@@ -67,8 +96,9 @@ export class ModuleState extends State {
       return prev;
     }, {});
     Object.keys(providers).forEach(key => {
-      this._appendSet('providers', providers[key].symbol, nodes, edges);
+      this._appendSet('providers', providers[key].symbol, nodes, SymbolType.Provider, edges);
     });
+    this.symbols = nodes;
     return {
       nodes: new DataSet<any>(Object.keys(nodes).map((key: string) => {
         const node: any = Object.assign({}, nodes[key]);
@@ -79,11 +109,12 @@ export class ModuleState extends State {
     };
   }
 
-  private _appendSet(set: string, node: StaticSymbol, nodes: NodeMap, edges: Edge[]) {
+  private _appendSet(set: string, node: StaticSymbol, nodes: NodeMap, symbolType: SymbolType, edges: Edge[]) {
     const id = node.filePath + '#' + node.name;
     nodes[id] = {
       label: node.name,
-      symbol: node
+      symbol: node,
+      symbolType
     };
     edges.push({
       id: set + '-' + id,

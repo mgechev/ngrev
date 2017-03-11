@@ -29,7 +29,7 @@ export class Project {
       }
     });
     this.rootContext = this.projectSymbols.getRootContext();
-    this.rootModule = Module.fromSummary(this.rootContext.getContextSummary());
+    this.rootModule = Module.fromContext(this.rootContext);
     return Promise.resolve(this.rootModule);
   }
 

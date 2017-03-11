@@ -5,7 +5,7 @@ import {
   StaticSymbol
 } from '@angular/compiler';
 
-import { Symbol } from 'ngast';
+import { Symbol, ContextSymbols } from 'ngast';
 import { Provider } from './provider';
 import { Model } from './model';
 
@@ -15,7 +15,8 @@ export class Module extends Model {
       private _dependencies: Module[],
       private _exportedDirectives: CompileIdentifierMetadata[],
       private _entryComponents: CompileEntryComponentMetadata[],
-      private _providers: Provider[]) {
+      private _providers: Provider[],
+      public context: ContextSymbols | null) {
     super(_symbol);
   }
 
@@ -39,13 +40,15 @@ export class Module extends Model {
     return this._entryComponents;
   }
 
-  static fromSummary(summary: CompileNgModuleSummary): Module {
+  static fromContext(context: ContextSymbols): Module {
+    const summary = context.getContextSummary();
     return new Module(summary.type.reference, summary.modules
       .filter(m => m.reference !== summary.type.reference)
-      .map(m =>  new Module(m.reference, [], [], [], [])),
+      .map(m =>  new Module(m.reference, [], [], [], [], null)),
         summary.exportedDirectives,
         summary.entryComponents,
         summary.providers.map(p =>
-          new Provider(p.provider.token.identifier.reference)));
+          new Provider(p.provider.token.identifier.reference)),
+          context);
   }
 }
