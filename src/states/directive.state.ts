@@ -1,7 +1,7 @@
 import { DirectiveSymbol, ContextSymbols } from 'ngast';
 import { State } from './state';
 import { Project } from '../model/project-loader';
-import { ElementAst, StaticSymbol } from '@angular/compiler';
+import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { Visualization } from '../formatters/data-format';
 
@@ -78,6 +78,10 @@ export class DirectiveState extends State {
       })
     }
     let currentNode = 0;
+    const dirMap = this.context.getDirectives().reduce((p, d) => {
+      const s = d.symbol;
+      p[s.filePath + '#' + s.name] = d;
+    }, {} as any);
     const addNodes = (nodes: ElementAst[], parentNodeId: string) => {
       nodes.forEach(n => {
         currentNode += 1;
@@ -90,7 +94,7 @@ export class DirectiveState extends State {
           id: nodeId,
           label: n.name
         });
-        const component = n.directives.filter(d => d.directive.selector === n.name).pop();
+        const component = this.tryGetMatchingComponent(dirMap, n.directives);
         if (component) {
           const ref = component.directive.type.reference
           this.symbols[nodeId] = ref;
@@ -99,6 +103,17 @@ export class DirectiveState extends State {
       })
     };
     addNodes(rootNodes.filter(c => c instanceof ElementAst) as ElementAst[], TemplateId);
+  }
+
+  private tryGetMatchingComponent(dirMap: {[id: string]: DirectiveSymbol}, componentDirs: DirectiveAst[]) {
+    return componentDirs.filter(d => {
+      const ref = d.directive.type.reference;
+      const symbol = dirMap[ref.filePath + '#' + ref.name];
+      if (symbol && symbol.isComponent) {
+        return true;
+      }
+      return false;
+    }).pop();
   }
 
   private addStyleNodes(nodes: any[], edges: any[]) {
