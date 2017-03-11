@@ -42,12 +42,11 @@ export class ModuleState extends State {
     }
     switch (symbol.symbolType) {
       case SymbolType.Directive:
-      debugger;
       if (this.module.context) {
         const directives = this.module.context.getDirectives();
-        const s = symbol.symbol;
-        const dir = directives.filter(d => d.symbol.filePath === s.filePath && d.symbol.name === s.name).pop();
-        return new DirectiveState(this.project, dir);
+        return new DirectiveState(this.project,
+          directives.filter(d => d.symbol.filePath === symbol.symbol.filePath
+            && d.symbol.name === symbol.symbol.name).pop(), this.module.context);
       }
       break;
     }
