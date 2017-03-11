@@ -10,7 +10,6 @@ export interface Node<T> {
 }
 
 export interface Edge {
-  id: string;
   from: string;
   to: string;
   data?: any;

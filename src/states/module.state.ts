@@ -4,7 +4,7 @@ import { Module } from '../model/module';
 import { StaticSymbol } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
-import { Node } from '../formatters/data-format';
+import { Node, Edge } from '../formatters/data-format';
 
 interface DataType {
   symbolType: SymbolType,
@@ -13,12 +13,6 @@ interface DataType {
 
 interface NodeMap {
   [id: string]: Node<DataType>;
-}
-
-interface Edge {
-  id: string;
-  from: string;
-  to: string;
 }
 
 enum SymbolType {
@@ -89,9 +83,9 @@ export class ModuleState extends State {
       }
     };
     const edges = [
-      { id: 'exports-module', from: 'module', to: 'exports' },
-      { id: 'entry-module', from: 'module', to: 'entry' },
-      { id: 'providers-module', from: 'module', to: 'providers' },
+      { from: 'module', to: 'exports' },
+      { from: 'module', to: 'entry' },
+      { from: 'module', to: 'providers' },
     ];
     this.module.entryComponents.forEach(s => {
       const node = s.componentType as StaticSymbol;
@@ -133,7 +127,6 @@ export class ModuleState extends State {
       }
     };
     edges.push({
-      id: set + '-' + id,
       from: set,
       to: id
     });

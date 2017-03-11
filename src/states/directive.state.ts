@@ -9,6 +9,9 @@ interface NodeMap {
   [id: string]: StaticSymbol;
 }
 
+const TemplateId = 'template';
+const TemplateErrorId = 'template-error';
+
 export class DirectiveState extends State {
   private symbols: NodeMap = {};
 
@@ -37,18 +40,16 @@ export class DirectiveState extends State {
       id: nodeId,
       label: s.name
     }, {
-      id: 'template',
+      id: TemplateId,
       label: 'Template'
     }, {
       id: 'styles',
       label: 'Styles'
     }];
     const edges = [{
-      id: 'template-' + nodeId,
       from: nodeId,
       to: 'template'
     }, {
-      id: 'styles-' + nodeId,
       from: nodeId,
       to: 'styles'
     }];
@@ -68,13 +69,12 @@ export class DirectiveState extends State {
       const label = res.parseErrors.map(e => e.msg)
         .concat(res.errors.map(e => e.message)).join('\n');
       resNodes.push({
-        id: 'template-error',
+        id: TemplateErrorId,
         label
       })
       edges.push({
-        id: 'template-template-error',
-        from: 'template',
-        to: 'template-error'
+        from: TemplateId,
+        to: TemplateErrorId
       })
     }
     let currentNode = 0;
@@ -83,7 +83,6 @@ export class DirectiveState extends State {
         currentNode += 1;
         const nodeId = 'el-' + currentNode;
         edges.push({
-          id: 'template-edge-' + currentNode + '-' + parentNodeId,
           from: parentNodeId,
           to: nodeId
         });
@@ -99,7 +98,7 @@ export class DirectiveState extends State {
         addNodes(n.children.filter(c => c instanceof ElementAst) as ElementAst[], nodeId);
       })
     };
-    addNodes(rootNodes.filter(c => c instanceof ElementAst) as ElementAst[], 'template');
+    addNodes(rootNodes.filter(c => c instanceof ElementAst) as ElementAst[], TemplateId);
   }
 
   private addStyleNodes(nodes: any[], edges: any[]) {
