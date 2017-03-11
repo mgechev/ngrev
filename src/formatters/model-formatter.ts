@@ -1,11 +1,30 @@
-import { DataSet } from 'vis';
-import { Model } from '../model/model';
-import { Graph } from './data-format';
+import { ChangeDetectionStrategy } from '@angular/core';
+import { DirectiveSymbol } from 'ngast';
+import { Metadata } from './data-format';
+import { StaticSymbol } from '@angular/compiler';
 
-export abstract class ModelFormatter<T extends Model> {
-  abstract format(model: T): Graph<T>;
-
-  getId(model: T) {
-    return model.symbol.filePath + '#' + model.symbol.name;
+const _changeDetectionToString = (cd: ChangeDetectionStrategy) => {
+  switch (cd) {
+    case ChangeDetectionStrategy.Default:
+      return 'Default';
+    case ChangeDetectionStrategy.OnPush:
+      return 'OnPush';
   }
-}
+};
+
+export const getDirectiveMetadata = (dir: DirectiveSymbol) => {
+  const meta = dir.getNonResolvedMetadata();
+  return [
+    { key: 'Selector', value: meta.selector },
+    { key: 'Component', value: meta.isComponent },
+    { key: 'Change Cetection', value: _changeDetectionToString(meta.changeDetection) },
+    { key: 'Export', value: meta.exportAs }
+  ];
+};
+
+export const getModuleMetadata = (node: StaticSymbol): Metadata => {
+  return [
+    { key: 'Name', value: node.name },
+    { key: 'Members', value: node.members.join('\n') }
+  ];
+};
