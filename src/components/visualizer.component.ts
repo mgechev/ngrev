@@ -1,7 +1,8 @@
-import { Component, Input, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { Project } from '../model/project-loader';
 import { ModuleFormatter } from '../formatters/module-formatter';
 import { Network } from 'vis';
+import { State, Graph } from '../states/state';
 
 @Component({
   selector: 'ngrev-visualizer',
@@ -20,15 +21,24 @@ import { Network } from 'vis';
     }
   `]
 })
-export class VisualizerComponent implements AfterViewInit {
-  @Input() project: Project;
+export class VisualizerComponent implements OnChanges {
+  @Input() state: State;
+  @Output() select = new EventEmitter<string>();
   @ViewChild('container') container: ElementRef;
 
-  ngAfterViewInit() {
-    const formatter = new ModuleFormatter();
-    const rootModule = this.project.getRootModule();
-    const data = formatter.format(rootModule);
-    const network = new Network(this.container.nativeElement, data, {
+  private network: Network;
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.stateChanged(changes)) {
+      this.updateData(this.state.getData());
+    }
+  }
+
+  updateData(data: Graph) {
+    if (this.network) {
+      this.network.destroy();
+    }
+    this.network = new Network(this.container.nativeElement, data, {
       nodes: {
         shape: 'box',
         fixed: true,
@@ -41,5 +51,19 @@ export class VisualizerComponent implements AfterViewInit {
         }
       }
     });
+    this.network.on('click', this.handleClick.bind(this));
+  }
+
+  stateChanged(changes: SimpleChanges) {
+    if (changes && changes.state && changes.state.currentValue !== changes.state.previousValue) {
+      return true;
+    }
+    return false;
+  }
+
+  handleClick(e: any) {
+    if (e.nodes && e.nodes[0]) {
+      this.select.next(e.nodes[0]);
+    }
   }
 }
