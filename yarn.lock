@@ -2908,9 +2908,9 @@ next-tick@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
 
-ngast@^0.0.11:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/ngast/-/ngast-0.0.11.tgz#eb92a65b9cd3198deace7c590245e9ddaf9cb1e4"
+ngast@^0.0.12:
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/ngast/-/ngast-0.0.12.tgz#27250d0d45074a35e80505f94ba869aa8d430ee7"
 
 node-emoji@^1.4.1:
   version "1.5.1"

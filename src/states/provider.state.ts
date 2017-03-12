@@ -15,7 +15,7 @@ enum SymbolType {
 
 export class ProviderState extends State {
 
-  private symbols: NodeMap;
+  private symbols: NodeMap = {};
 
   constructor(context: ContextSymbols, protected provider: ProviderSymbol) {
     super(context);
@@ -40,7 +40,7 @@ export class ProviderState extends State {
       data: this.provider,
       label: symbol.name
     }];
-    this.provider.getDependencies()
+    (this.provider.getDependencies() || [])
       .forEach(p => {
         nodes.push({
           id: getId(p.symbol),
@@ -48,6 +48,9 @@ export class ProviderState extends State {
           label: p.symbol.name
         });
       });
+    nodes.forEach(n => {
+      this.symbols[n.id] = n.data;
+    });
     const edges = nodes.slice(1, nodes.length).map(n => {
       return {
         from: getId(symbol),
