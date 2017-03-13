@@ -5,11 +5,29 @@ import { ContextSymbols } from 'ngast';
 import { StateProxy } from '../states/state-proxy';
 import { VisualizationConfig, Metadata } from '../../shared/data-format';
 
+const SpinnerProps = {
+  project: {
+    left: '50%',
+    top: '50%',
+    size: 55
+  },
+  default: {
+    left: 15,
+    top: 8,
+    size: 35
+  }
+};
+
 @Component({
   selector: 'ngrev-app',
   template: `
-    <button [class.hidden]="loading" (click)="prevState()">Back</button>
-    <ngrev-spinner [class.hidden]="!loading" [left]="15" [top]="8" [size]="35"></ngrev-spinner>
+    <button [class.hidden]="loading" (click)="prevState()" *ngIf="state.active">Back</button>
+    <ngrev-spinner [class.hidden]="!loading"
+      [left]="spinner.left"
+      [top]="spinner.top"
+      [size]="spinner.size"
+      *ngIf="state.active"
+    ></ngrev-spinner>
     <ngrev-home *ngIf="!state.active" (project)="onProject($event)"></ngrev-home>
     <ngrev-visualizer
       *ngIf="state.active"
@@ -55,7 +73,9 @@ import { VisualizationConfig, Metadata } from '../../shared/data-format';
 export class AppComponent {
   currentMetadata: Metadata;
   currentData: VisualizationConfig<any>;
-  loading: boolean = false;
+  loading = false;
+
+  spinner = SpinnerProps.project;
 
   constructor(
     private ngZone: NgZone,
@@ -64,7 +84,7 @@ export class AppComponent {
     public state: StateProxy) {}
 
   ngAfterViewInit() {
-    this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
   }
 
   tryChangeState(nodeId: string) {
@@ -88,10 +108,16 @@ export class AppComponent {
 
   onProject(tsconfig: string) {
     this.ngZone.run(() => {
+      this.loading = true;
       this.project.load(tsconfig)
         .then((rootContext: ContextSymbols) => this.state = new StateProxy())
         .then((proxy: StateProxy) => proxy.getData())
-        .then(data => this.currentData = data);
+        .then(data => this.currentData = data)
+        .then(() => {
+          this.spinner = SpinnerProps.project;
+          this.loading = false;
+        })
+        .catch(() => this.loading = false);
     });
   }
 
