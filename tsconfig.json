@@ -12,8 +12,8 @@
     "lib": ["es2015", "dom"]
   },
   "files": [
-    "./src/app.ts",
-    "./src/background.ts"
+    "./src/ui/app.ts",
+    "./src/background/background.ts"
   ],
   "angularCompilerOptions": {
     "skipTemplateCodegen": true

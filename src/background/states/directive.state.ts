@@ -2,7 +2,7 @@ import { DirectiveSymbol, ContextSymbols } from 'ngast';
 import { State } from './state';
 import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
 import { DataSet } from 'vis';
-import { VisualizationConfig, Metadata, getId, Node } from '../formatters/data-format';
+import { VisualizationConfig, Metadata, getId, Node } from '../../shared/data-format';
 import { getDirectiveMetadata, getElementMetadata } from '../formatters/model-formatter';
 
 interface NodeMap {

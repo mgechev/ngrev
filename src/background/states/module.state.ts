@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy } from '@angular/core';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
-import { Node, Edge, Metadata, getId, Direction } from '../formatters/data-format';
+import { Node, Edge, Metadata, getId, Direction } from '../../shared/data-format';
 import { DirectiveSymbol, ModuleSymbol, ContextSymbols, Symbol, ProviderSymbol } from 'ngast';
 import { getDirectiveMetadata, getModuleMetadata } from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';

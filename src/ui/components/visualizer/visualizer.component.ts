@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild, ElementRef, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { Network, DataSet } from 'vis';
 import { StateProxy } from '../../states/state-proxy';
-import { VisualizationConfig, Layout, Metadata, Direction } from '../../formatters/data-format';
+import { VisualizationConfig, Layout, Metadata, Direction } from '../../../shared/data-format';
 
 @Component({
   selector: 'ngrev-visualizer',

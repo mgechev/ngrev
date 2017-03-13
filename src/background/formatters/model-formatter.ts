@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy } from '@angular/core';
 import { DirectiveSymbol } from 'ngast';
-import { Metadata } from './data-format';
+import { Metadata } from '../../shared/data-format';
 import { StaticSymbol, ElementAst } from '@angular/compiler';
 
 const _changeDetectionToString = (cd: ChangeDetectionStrategy) => {
@@ -17,7 +17,7 @@ export const getDirectiveMetadata = (dir: DirectiveSymbol) => {
   return [
     { key: 'Selector', value: meta.selector },
     { key: 'Component', value: meta.isComponent.toString() },
-    { key: 'Change Cetection', value: _changeDetectionToString(meta.changeDetection) },
+    { key: 'Change Detection', value: _changeDetectionToString(meta.changeDetection) },
     { key: 'Export', value: meta.exportAs }
   ];
 };

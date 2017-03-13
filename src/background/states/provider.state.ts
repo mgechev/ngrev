@@ -1,4 +1,4 @@
-import { Node, Metadata, getId, VisualizationConfig, Layout, Direction } from '../formatters/data-format';
+import { Node, Metadata, getId, VisualizationConfig, Layout, Direction } from '../../shared/data-format';
 import { StaticSymbol } from '@angular/compiler';
 import { ContextSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';

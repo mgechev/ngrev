@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron';
-import { Success } from './ipc-constants';
+import { Success } from '../../shared/ipc-constants';
 
-export class RPCBus {
+export class IPCBus {
   send(method: string, data?: any): Promise<any> {
     return new Promise((resolve, reject) => {
       ipcRenderer.once(method, (e, code, payload) => {

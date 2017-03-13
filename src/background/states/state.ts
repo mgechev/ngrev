@@ -1,6 +1,6 @@
 import { DataSet } from 'vis';
 import { StaticSymbol } from '@angular/compiler';
-import { VisualizationConfig, Metadata } from '../formatters/data-format';
+import { VisualizationConfig, Metadata } from '../../shared/data-format';
 import { ContextSymbols } from 'ngast';
 
 export abstract class State {

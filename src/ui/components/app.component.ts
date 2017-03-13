@@ -1,19 +1,17 @@
 import { Component, NgZone } from '@angular/core';
 import { ProjectProxy } from '../model/project-proxy';
 import { Network } from 'vis';
-import { State } from '../states/state';
-import { ModuleTreeState } from '../states/module-tree.state';
 import { ContextSymbols } from 'ngast';
 import { StateProxy } from '../states/state-proxy';
-import { VisualizationConfig, Metadata } from '../formatters/data-format';
+import { VisualizationConfig, Metadata } from '../../shared/data-format';
 
 @Component({
   selector: 'ngrev-app',
   template: `
     <button (click)="prevState()">Back</button>
-    <ngrev-home *ngIf="!state" (project)="onProject($event)"></ngrev-home>
+    <ngrev-home *ngIf="!state.active" (project)="onProject($event)"></ngrev-home>
     <ngrev-visualizer
-      *ngIf="state"
+      *ngIf="state.active"
       [data]="currentData"
       [metadata]="currentMetadata"
       (select)="tryChangeState($event)"
@@ -47,12 +45,10 @@ import { VisualizationConfig, Metadata } from '../formatters/data-format';
   `]
 })
 export class AppComponent {
-  state: StateProxy = null;
-
   currentMetadata: Metadata;
   currentData: VisualizationConfig<any>;
 
-  constructor(private ngZone: NgZone) {}
+  constructor(private ngZone: NgZone, private project: ProjectProxy, public state: StateProxy) {}
 
   ngAfterViewInit() {
     this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
@@ -73,8 +69,7 @@ export class AppComponent {
 
   onProject(tsconfig: string) {
     this.ngZone.run(() => {
-      let project = new ProjectProxy();
-      project.load(tsconfig)
+      this.project.load(tsconfig)
         .then((rootContext: ContextSymbols) => this.state = new StateProxy())
         .then((proxy: StateProxy) => proxy.getData())
         .then(data => this.currentData = data);
@@ -83,8 +78,7 @@ export class AppComponent {
 
   prevState() {
     this.currentMetadata = null;
-    this.state.prevState()
-      .then(() => this.updateNewState());
+    this.state.prevState().then(() => this.updateNewState());
   }
 
   private updateNewState() {

@@ -2,7 +2,7 @@ import { State } from './state';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { ModuleState } from './module.state';
-import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction } from '../formatters/data-format';
+import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction } from '../../shared/data-format';
 import { ContextSymbols, ModuleSymbol } from 'ngast';
 
 interface NodeMap {

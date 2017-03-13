@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { LoadProject, PrevState, GetMetadata, GetData, NextState, Success, Failure } from './ipc-constants';
+import { LoadProject, PrevState, GetMetadata, GetData, NextState, Success, Failure } from '../../shared/ipc-constants';
 import { Project } from './project';
 import { State } from '../states/state';
 import { ModuleTreeState } from '../states/module-tree.state';

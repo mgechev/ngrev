@@ -1,13 +1,13 @@
 import { ProjectSymbols, ContextSymbols } from 'ngast';
 import { createProgramFromTsConfig } from '../create-program';
 import { readFile, readFileSync } from 'fs';
-import { RPCBus } from './rpc-bus';
+import { IPCBus } from './ipc-bus';
 import { LoadProject } from './ipc-constants';
 
 export class ProjectProxy {
-  private rpcBus: RPCBus = new RPCBus();
+  private ipcBus: IPCBus = new IPCBus();
 
   load(tsconfig: string) {
-    return this.rpcBus.send(LoadProject, tsconfig);
+    return this.ipcBus.send(LoadProject, tsconfig);
   }
 }

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Metadata } from '../../formatters/data-format';
+import { Metadata } from '../../../shared/data-format';
 
 @Component({
   selector: 'ngrev-metadata-view',
