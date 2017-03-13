@@ -7,7 +7,7 @@ export type ColorLegend = Color[];
 @Component({
   selector: 'ngrev-color-legend',
   template: `
-    <section *ngIf="colors.length" [style.height]="(colors.length * 12 + 20) + 'px'">
+    <section [class.hidden]="!colors.length" [style.height]="(colors.length * 12 + 20) + 'px'">
       <h1>Legend</h1>
       <div *ngFor="let color of colors" class="colors-wrapper">
         <div class="color" [style.background-color]="color.color"></div>
@@ -35,6 +35,8 @@ export type ColorLegend = Color[];
       padding-left: 10px;
       padding-right: 10px;
       background-color: rgba(255, 255, 255, 0.8);
+      transition: 0.2s opacity;
+      opacity: 1;
     }
     .color {
       width: 18px;
@@ -48,6 +50,9 @@ export type ColorLegend = Color[];
     }
     .colors-wrapper {
       display: flex;
+    }
+    .hidden {
+      opacity: 0;
     }
   `]
 })

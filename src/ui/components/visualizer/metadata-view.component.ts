@@ -4,7 +4,7 @@ import { Metadata } from '../../../shared/data-format';
 @Component({
   selector: 'ngrev-metadata-view',
   template: `
-    <table *ngIf="metadata">
+    <table [class.hidden]="!metadata">
       <thead>
         <th>Name</th>
         <th>Value</th>
@@ -24,6 +24,8 @@ import { Metadata } from '../../../shared/data-format';
     position: absolute;
     background-color: rgba(255, 255, 255, 0.8);
     font-size: 13px;
+    transition: 0.2s opacity;
+    opacity: 1;
   }
   td, th {
     border: 1px solid #ccc;
@@ -31,6 +33,9 @@ import { Metadata } from '../../../shared/data-format';
   }
   thead {
     font-weight: bold;
+  }
+  .hidden {
+    opacity: 0;
   }
   `]
 })

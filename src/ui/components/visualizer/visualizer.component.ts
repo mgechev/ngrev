@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnDestroy, ViewChild, ElementRef, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { Network, DataSet } from 'vis';
 import { StateProxy } from '../../states/state-proxy';
 import { VisualizationConfig, Layout, Metadata, Direction, SymbolTypes } from '../../../shared/data-format';
@@ -37,7 +37,7 @@ export const TypeToNameMap = {
     }
   `]
 })
-export class VisualizerComponent implements OnChanges {
+export class VisualizerComponent implements OnChanges, OnDestroy {
   @Input() data: VisualizationConfig<any>;
   @Input() metadata: Metadata;
 
@@ -53,6 +53,13 @@ export class VisualizerComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (this.stateChanged(changes)) {
       this.updateData(this.data);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.network) {
+      this.network.destroy();
+      this.network = null;
     }
   }
 
@@ -95,28 +102,42 @@ export class VisualizerComponent implements OnChanges {
     };
     if (data.layout === Layout.Regular) {
       layout = {
+        hierarchical: {
+          enabled: false
+        },
         randomSeed: 2
       };
     }
-    if (this.network) {
-      this.network.destroy();
-    }
-    this.network = new Network(this.container.nativeElement, { nodes, edges }, {
-      layout,
-      nodes: {
-        shape: 'box',
-        fixed: true,
-        shapeProperties: {
-          borderRadius: 1,
-          interpolation: true,
-          borderDashes: false,
-          useImageSize: false,
-          useBorderWithImage: false
+    if (!this.network) {
+      this.network = new Network(this.container.nativeElement, { nodes, edges }, {
+        layout,
+        nodes: {
+          shape: 'box',
+          fixed: true,
+          shapeProperties: {
+            borderRadius: 1,
+            interpolation: true,
+            borderDashes: false,
+            useImageSize: false,
+            useBorderWithImage: false
+          }
         }
-      }
-    });
-    this.network.on('doubleClick', this.selectNode.bind(this));
-    this.network.on('click', this.highlightNode.bind(this));
+      });
+      this.network.on('doubleClick', this.selectNode.bind(this));
+      this.network.on('click', this.highlightNode.bind(this));
+    } else {
+      this.network.unselectAll();
+      this.network.setData({ nodes, edges });
+      this.network.setOptions({ layout })
+      this.network.fit({
+        nodes: nodes.map(n => n.id),
+        animation: {
+          duration: 1000,
+          easingFunction: 'linear'
+        }
+      });
+      this.network.redraw();
+    }
   }
 
   private stateChanged(changes: SimpleChanges) {

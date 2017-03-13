@@ -112,6 +112,7 @@ export class DirectiveState extends State {
             }
           };
           const component = this.tryGetMatchingComponent(dirMap, n.directives);
+          this.symbols[nodeId] = n;
           if (component) {
             this.symbols[nodeId] = component;
             node.type.type = SymbolTypes.Component;

@@ -72,7 +72,8 @@ export class AppComponent {
     this.cd.detectChanges();
     this.state.nextState(nodeId)
       .then(() => this.updateNewState())
-      .then(() => this.loading = false);
+      .then(() => this.loading = false)
+      .catch(() => this.loading = false);
   }
 
   updateMetadata(nodeId: string) {
@@ -81,7 +82,8 @@ export class AppComponent {
     this.currentMetadata = null;
     this.state.getMetadata(nodeId)
       .then((metadata: Metadata) => this.currentMetadata = metadata)
-      .then(() => this.loading = false);
+      .then(() => this.loading = false)
+      .catch(() => this.loading = false);
   }
 
   onProject(tsconfig: string) {
@@ -98,7 +100,8 @@ export class AppComponent {
     this.cd.detectChanges();
     this.currentMetadata = null;
     this.state.prevState().then(() => this.updateNewState())
-      .then(() => this.loading = false);
+      .then(() => this.loading = false)
+      .catch(() => this.loading = false);
   }
 
   private updateNewState() {
@@ -107,6 +110,7 @@ export class AppComponent {
     this.currentMetadata = null;
     this.state.getData()
       .then(data => this.currentData = data)
-      .then(() => this.loading = false);
+      .then(() => this.loading = false)
+      .catch(() => this.loading = false);
   }
 }
