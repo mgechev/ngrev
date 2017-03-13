@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ProjectProxy } from '../model/project-proxy';
 import { Network } from 'vis';
 import { ContextSymbols } from 'ngast';
@@ -8,7 +8,8 @@ import { VisualizationConfig, Metadata } from '../../shared/data-format';
 @Component({
   selector: 'ngrev-app',
   template: `
-    <button (click)="prevState()">Back</button>
+    <button [class.hidden]="loading" (click)="prevState()">Back</button>
+    <ngrev-spinner [class.hidden]="!loading" [left]="15" [top]="8" [size]="35"></ngrev-spinner>
     <ngrev-home *ngIf="!state.active" (project)="onProject($event)"></ngrev-home>
     <ngrev-visualizer
       *ngIf="state.active"
@@ -25,7 +26,9 @@ import { VisualizationConfig, Metadata } from '../../shared/data-format';
       height: 100%;
       display: block;
     }
-
+    .hidden {
+      opacity: 0;
+    }
     button {
       top: 0;
       left: 0;
@@ -37,8 +40,13 @@ import { VisualizationConfig, Metadata } from '../../shared/data-format';
       border: none;
       outline: none;
       border-bottom-right-radius: 7px;
+      transition: 0.2s opacity;
     }
-
+    ngrev-spinner {
+      transition: 0.2s opacity;
+      top: 8px;
+      left: 15px;
+    }
     button:active {
       background: #ccc;
     }
@@ -47,24 +55,33 @@ import { VisualizationConfig, Metadata } from '../../shared/data-format';
 export class AppComponent {
   currentMetadata: Metadata;
   currentData: VisualizationConfig<any>;
+  loading: boolean = false;
 
-  constructor(private ngZone: NgZone, private project: ProjectProxy, public state: StateProxy) {}
+  constructor(
+    private ngZone: NgZone,
+    private project: ProjectProxy,
+    private cd: ChangeDetectorRef,
+    public state: StateProxy) {}
 
   ngAfterViewInit() {
     this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
   }
 
   tryChangeState(nodeId: string) {
+    this.loading = true;
+    this.cd.detectChanges();
     this.state.nextState(nodeId)
-      .then(() => this.updateNewState());
+      .then(() => this.updateNewState())
+      .then(() => this.loading = false);
   }
 
   updateMetadata(nodeId: string) {
+    this.loading = true;
+    this.cd.detectChanges();
     this.currentMetadata = null;
     this.state.getMetadata(nodeId)
-    .then((metadata: Metadata) => {
-      this.currentMetadata = metadata;
-    });
+      .then((metadata: Metadata) => this.currentMetadata = metadata)
+      .then(() => this.loading = false);
   }
 
   onProject(tsconfig: string) {
@@ -77,13 +94,19 @@ export class AppComponent {
   }
 
   prevState() {
+    this.loading = true;
+    this.cd.detectChanges();
     this.currentMetadata = null;
-    this.state.prevState().then(() => this.updateNewState());
+    this.state.prevState().then(() => this.updateNewState())
+      .then(() => this.loading = false);
   }
 
   private updateNewState() {
+    this.loading = true;
+    this.cd.detectChanges();
     this.currentMetadata = null;
     this.state.getData()
-      .then(data => this.currentData = data);
+      .then(data => this.currentData = data)
+      .then(() => this.loading = false);
   }
 }

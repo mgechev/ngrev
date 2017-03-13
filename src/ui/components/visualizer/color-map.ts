@@ -3,93 +3,100 @@ import { SymbolTypes } from '../../../shared/data-format';
 export const NodeTypeColorMap = {
   [SymbolTypes.Component]: {
     color: {
-      background: '#f8f800',
-      border: '#fcda1e',
+      background: '#4D9F00',
+      border: '#4D9F00',
       highlight: {
-        background: '#f8f800',
-        border: '#fcda1e',
+        background: '#4D9F00',
+        border: '#4D9F00',
       }
     },
+    labelHighlightBold: false,
     font: {
-      color: '#000000'
+      color: '#FFFFFF'
     }
   },
   [SymbolTypes.ComponentWithDirective]: {
     color: {
-      background: '#FFC0CB',
-      border: '#FFB8C5',
+      background: '#64A303',
+      border: '#64A303',
       highlight: {
-        background: '#FFC0CB',
-        border: '#FFB8C5'
+        background: '#64A303',
+        border: '#64A303'
       }
     },
+    labelHighlightBold: false,
     font: {
-      color: '#000000'
+      color: '#FFFFFF'
     }
   },
   [SymbolTypes.HtmlElement]: {
     color: {
-      background: '#C2FABC',
-      border: '#000000',
+      background: '#ABC001',
+      border: '#ABC001',
       highlight: {
-        background: '#C2FABC',
-        border: '#000000'
+        background: '#ABC001',
+        border: '#ABC001'
       }
     },
+    labelHighlightBold: false,
     font: {
-      color: '#000000'
+      color: '#FFFFFF'
     }
   },
   [SymbolTypes.HtmlElementWithDirective]: {
     color: {
-      background: '#ffa807',
-      border: '#e5a124',
+      background: '#EDD503',
+      border: '#EDD503',
       highlight: {
-        background: '#ffa807',
-        border: '#e5a124'
+        background: '#EDD503',
+        border: '#EDD503'
       }
     },
+    labelHighlightBold: false,
     font: {
       color: '#000000'
     }
   },
   [SymbolTypes.Meta]: {
     color: {
-      background: '#c8c8c8',
-      border: '#000000',
+      background: '#3A3E91',
+      border: '#3A3E91',
       highlight: {
-        background: '#c8c8c8',
-        border: '#000000'
+        background: '#3A3E91',
+        border: '#3A3E91'
       }
     },
+    labelHighlightBold: false,
     font: {
-      color: '#000000'
+      color: '#FFFFFF'
     }
   },
   [SymbolTypes.Module]: {
     color: {
-      background: '#97C2FC',
-      border: '#000000',
+      background: '#F8B600',
+      border: '#F8B600',
       highlight: {
-        background: '#97C2FC',
-        border: '#000000'
+        background: '#F8B600',
+        border: '#F8B600'
       }
     },
+    labelHighlightBold: false,
     font: {
-      color: '#000000'
+      color: '#FFFFFF'
     }
   },
   [SymbolTypes.Provider]: {
     color: {
-      background: '#EB7DF4',
-      border: '#EA79F4',
+      background: '#FE7E01',
+      border: '#FE7E01',
       highlight: {
-        background: '#EB7DF4',
-        border: '#EA79F4'
+        background: '#FE7E01',
+        border: '#FE7E01'
       }
     },
+    labelHighlightBold: false,
     font: {
-      color: '#000000'
+      color: '#FFFFFF'
     }
   }
 };
@@ -103,6 +110,7 @@ export const DefaultColor = {
       border: '#000000'
     }
   },
+  labelHighlightBold: false,
   font: {
     color: '#000000'
   }

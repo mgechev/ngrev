@@ -7,10 +7,11 @@ import { HomeComponent } from './components/home.component';
 import { VisualizerModule } from './components/visualizer/visualizer.module';
 import { ProjectProxy } from './model/project-proxy';
 import { StateProxy } from './states/state-proxy';
+import { SpinnerComponent } from './components/shared/spinner.component';
 
 @NgModule({
   imports: [BrowserModule, VisualizerModule],
-  declarations: [AppComponent, HomeComponent],
+  declarations: [AppComponent, HomeComponent, SpinnerComponent],
   bootstrap: [AppComponent],
   providers: [ProjectProxy, StateProxy]
 })

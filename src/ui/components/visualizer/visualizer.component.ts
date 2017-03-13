@@ -79,6 +79,12 @@ export class VisualizerComponent implements OnChanges {
       } else if (e.direction === Direction.Both) {
         (e as any).arrows = 'from, to';
       }
+      (e as any).color = {
+        color: '#555555',
+        highlight: '#333333'
+      };
+      (e as any).labelHighlightBold = false;
+      (e as any).selectionWidth = 0.5;
       return e;
     }));
     let layout: any = {
