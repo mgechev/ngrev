@@ -61,21 +61,6 @@ export const NodeTypeColorMap = {
       color: '#FFFFFF'
     }
   },
-  [SymbolTypes.Meta]: {
-    margin: 10,
-    color: {
-      background: '#4CAF50',
-      border: '#4CAF50',
-      highlight: {
-        background: '#4CAF50',
-        border: '#4CAF50'
-      }
-    },
-    labelHighlightBold: false,
-    font: {
-      color: '#FFFFFF'
-    }
-  },
   [SymbolTypes.Module]: {
     margin: 10,
     color: {
@@ -94,11 +79,11 @@ export const NodeTypeColorMap = {
   [SymbolTypes.Provider]: {
     margin: 10,
     color: {
-      background: '#FFEB3B',
-      border: '#FBC02D',
+      background: '#CDDC39',
+      border: '#9E9D24',
       highlight: {
-        background: '#FFEB3B',
-        border: '#FBC02D'
+        background: '#CDDC39',
+        border: '#9E9D24'
       }
     },
     labelHighlightBold: false,
@@ -111,15 +96,15 @@ export const NodeTypeColorMap = {
 export const DefaultColor = {
   margin: 10,
   color: {
-    background: '#FFEB3B',
-    border: '#FDD835',
+    background: '#90A4AE',
+    border: '#607D8B',
     highlight: {
-      background: '#FFEB3B',
-      border: '#FDD835'
+      background: '#90A4AE',
+      border: '#607D8B'
     }
   },
   labelHighlightBold: false,
   font: {
-    color: '#000000'
+    color: '#FFFFFF'
   }
 };
