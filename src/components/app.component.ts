@@ -60,14 +60,11 @@ export class AppComponent {
 
   tryChangeState(nodeId: string) {
     this.state.nextState(nodeId)
-      .then(() => this.state.getData())
-      .then(data => {
-        this.currentData = data;
-        this.currentMetadata = null;
-      });
+      .then(() => this.updateNewState());
   }
 
   updateMetadata(nodeId: string) {
+    this.currentMetadata = null;
     this.state.getMetadata(nodeId)
     .then((metadata: Metadata) => {
       this.currentMetadata = metadata;
@@ -85,6 +82,14 @@ export class AppComponent {
   }
 
   prevState() {
-    this.state.prevState();
+    this.currentMetadata = null;
+    this.state.prevState()
+      .then(() => this.updateNewState());
+  }
+
+  private updateNewState() {
+    this.currentMetadata = null;
+    this.state.getData()
+      .then(data => this.currentData = data);
   }
 }

@@ -10,7 +10,6 @@ export class StateProxy {
   private currentMetadata: Metadata;
   private currentData: VisualizationConfig<any>;
   private dataDirty = true;
-  private metadataDirty = true;
 
   getData(): Promise<VisualizationConfig<any>> {
     if (this.dataDirty) {
@@ -29,25 +28,23 @@ export class StateProxy {
     return this.rpcBus.send(NextState, id)
       .then(state => {
         this.dataDirty = true;
-        this.metadataDirty = true;
         return state;
       });
   }
 
   getMetadata(id: string): Promise<Metadata> {
-    if (this.metadataDirty) {
-      return this.rpcBus.send(GetMetadata, id)
-        .then(metadata => {
-          this.metadataDirty = false;
-          this.currentMetadata = metadata;
-          return metadata;
-        })
-    } else {
-      return Promise.resolve(this.currentMetadata);
-    }
+    return this.rpcBus.send(GetMetadata, id)
+      .then(metadata => {
+        this.currentMetadata = metadata;
+        return metadata;
+      })
   }
 
   prevState(): Promise<void> {
-    return this.rpcBus.send(PrevState);
+    return this.rpcBus.send(PrevState)
+      .then(state => {
+        this.dataDirty = true;
+        return state;
+      });
   }
 }
