@@ -1,5 +1,4 @@
 import { State } from './state';
-import { Project } from '../model/project-loader';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';

@@ -1,6 +1,5 @@
 import { State } from './state';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
-import { Project } from '../model/project-loader';
 import { DataSet } from 'vis';
 import { ModuleState } from './module.state';
 import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction } from '../formatters/data-format';

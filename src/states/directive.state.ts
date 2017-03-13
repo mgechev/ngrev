@@ -1,6 +1,5 @@
 import { DirectiveSymbol, ContextSymbols } from 'ngast';
 import { State } from './state';
-import { Project } from '../model/project-loader';
 import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { VisualizationConfig, Metadata, getId, Node } from '../formatters/data-format';

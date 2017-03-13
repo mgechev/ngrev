@@ -2,7 +2,6 @@ import { Component, Output, EventEmitter } from '@angular/core';
 
 import { Network } from 'vis';
 import { remote } from 'electron';
-import { Project } from '../model/project-loader';
 
 @Component({
   selector: 'ngrev-home',
@@ -31,7 +30,7 @@ export class HomeComponent {
   @Output() project = new EventEmitter<string>();
 
   loadProject() {
-    const files = remote.dialog.showOpenDialog({properties: ['openFile', 'openDirectory', 'multiSelections']});
+    const files = remote.dialog.showOpenDialog({ properties: ['openFile', 'openDirectory', 'multiSelections'] });
     if (files && files[0]) {
       this.project.emit(files[0]);
     }

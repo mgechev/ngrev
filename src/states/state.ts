@@ -1,6 +1,5 @@
 import { DataSet } from 'vis';
 import { StaticSymbol } from '@angular/compiler';
-import { Project } from '../model/project-loader';
 import { VisualizationConfig, Metadata } from '../formatters/data-format';
 import { ContextSymbols } from 'ngast';
 

@@ -5,7 +5,7 @@ import { readFile, readFileSync } from 'fs';
 export class Project {
 
   private projectSymbols: ProjectSymbols;
-  private rootContext: ContextSymbols;
+  rootContext: ContextSymbols;
 
   load(tsconfig: string) {
     this.projectSymbols = new ProjectSymbols({

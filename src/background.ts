@@ -5,7 +5,7 @@
 
 import * as path from 'path';
 import * as url from 'url';
-import { app, dialog, Menu } from 'electron';
+import { app, dialog, Menu, ipcMain } from 'electron';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { editMenuTemplate } from './menu/edit_menu_template';
 import createWindow from './helpers/window';
@@ -13,11 +13,16 @@ import {ProjectSymbols, ProgramFactory} from 'ngast';
 import {createProgramFromTsConfig} from './create-program';
 import {readFileSync, readFile} from 'fs';
 
+import {BackgroundApp} from './model/background-app';
+
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from './env';
 
 var mainWindow;
+
+const backgroundApp = new BackgroundApp();
+backgroundApp.init();
 
 var setApplicationMenu = function () {
   var menus: any[] = [editMenuTemplate];

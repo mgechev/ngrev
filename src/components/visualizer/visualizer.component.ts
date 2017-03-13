@@ -1,7 +1,6 @@
 import { Component, Input, ViewChild, ElementRef, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { Project } from '../../model/project-loader';
 import { Network, DataSet } from 'vis';
-import { State } from '../../states/state';
+import { StateProxy } from '../../states/state-proxy';
 import { VisualizationConfig, Layout, Metadata, Direction } from '../../formatters/data-format';
 
 @Component({
@@ -24,16 +23,19 @@ import { VisualizationConfig, Layout, Metadata, Direction } from '../../formatte
   `]
 })
 export class VisualizerComponent implements OnChanges {
-  @Input() state: State;
+  @Input() data: VisualizationConfig<any>;
+  @Input() metadata: Metadata;
+
   @Output() select = new EventEmitter<string>();
+  @Output() highlight = new EventEmitter<string>();
+
   @ViewChild('container') container: ElementRef;
-  metadata: Metadata;
 
   private network: Network;
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.stateChanged(changes)) {
-      this.updateData(this.state.getData());
+      this.updateData(this.data);
     }
   }
 
@@ -79,27 +81,28 @@ export class VisualizerComponent implements OnChanges {
         }
       }
     });
-    this.network.on('doubleClick', this.tryChangeState.bind(this));
-    this.network.on('click', this.tryShowDetails.bind(this));
+    this.network.on('doubleClick', this.selectNode.bind(this));
+    this.network.on('click', this.highlightNode.bind(this));
   }
 
   private stateChanged(changes: SimpleChanges) {
-    if (changes && changes.state && changes.state.currentValue !== changes.state.previousValue) {
+    if (changes && changes.data && changes.data.currentValue !== changes.data.previousValue) {
       return true;
     }
     return false;
   }
 
-  private tryChangeState(e: any) {
+  private selectNode(e: any) {
     if (e.nodes && e.nodes[0]) {
       this.select.next(e.nodes[0]);
       this.metadata = null;
     }
   }
 
-  private tryShowDetails(e: any) {
+  private highlightNode(e: any) {
     if (e.nodes && e.nodes[0]) {
-      this.metadata = this.state.getMetadata(e.nodes[0]);
+      this.highlight.next(e.nodes[0]);
+      this.metadata = null;
     }
   }
 }

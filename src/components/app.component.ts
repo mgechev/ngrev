@@ -1,16 +1,24 @@
 import { Component, NgZone } from '@angular/core';
-import { Project } from '../model/project-loader';
+import { ProjectProxy } from '../model/project-proxy';
 import { Network } from 'vis';
 import { State } from '../states/state';
 import { ModuleTreeState } from '../states/module-tree.state';
 import { ContextSymbols } from 'ngast';
+import { StateProxy } from '../states/state-proxy';
+import { VisualizationConfig, Metadata } from '../formatters/data-format';
 
 @Component({
   selector: 'ngrev-app',
   template: `
-    <button [disabled]="states.length <= 1" (click)="prevState()">Back</button>
-    <ngrev-home *ngIf="!project" (project)="onProject($event)"></ngrev-home>
-    <ngrev-visualizer *ngIf="project" [state]="currentState" (select)="tryChangeState($event)">
+    <button (click)="prevState()">Back</button>
+    <ngrev-home *ngIf="!state" (project)="onProject($event)"></ngrev-home>
+    <ngrev-visualizer
+      *ngIf="state"
+      [data]="currentData"
+      [metadata]="currentMetadata"
+      (select)="tryChangeState($event)"
+      (highlight)="updateMetadata($event)"
+    >
     </ngrev-visualizer>
   `,
   styles: [`
@@ -39,9 +47,10 @@ import { ContextSymbols } from 'ngast';
   `]
 })
 export class AppComponent {
-  project: Project = null;
+  state: StateProxy = null;
 
-  private states: State[] = [];
+  currentMetadata: Metadata;
+  currentData: VisualizationConfig<any>;
 
   constructor(private ngZone: NgZone) {}
 
@@ -50,36 +59,32 @@ export class AppComponent {
   }
 
   tryChangeState(nodeId: string) {
-    const next = this.currentState.nextState(nodeId);
-    if (next) {
-      this.states.push(next);
-    }
+    this.state.nextState(nodeId)
+      .then(() => this.state.getData())
+      .then(data => {
+        this.currentData = data;
+        this.currentMetadata = null;
+      });
   }
 
-  get currentState() {
-    return this.states[this.states.length - 1];
+  updateMetadata(nodeId: string) {
+    this.state.getMetadata(nodeId)
+    .then((metadata: Metadata) => {
+      this.currentMetadata = metadata;
+    });
   }
 
   onProject(tsconfig: string) {
     this.ngZone.run(() => {
-      let project = new Project();
+      let project = new ProjectProxy();
       project.load(tsconfig)
-        .then((rootContext: ContextSymbols) => {
-          const allModules = rootContext.getModules();
-          const rootSymbol = rootContext.getContextSummary().type.reference;
-          const module = 
-            allModules
-              .filter(m => m.symbol.name === rootSymbol.name && m.symbol.filePath === rootSymbol.filePath)
-              .pop();
-          this.states.push(new ModuleTreeState(rootContext, module));
-          this.project = project;
-        });
+        .then((rootContext: ContextSymbols) => this.state = new StateProxy())
+        .then((proxy: StateProxy) => proxy.getData())
+        .then(data => this.currentData = data);
     });
   }
 
   prevState() {
-    if (this.states.length > 1) {
-      this.states.pop();
-    }
+    this.state.prevState();
   }
 }
