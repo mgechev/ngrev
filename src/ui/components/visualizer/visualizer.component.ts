@@ -2,120 +2,27 @@ import { Component, Input, ViewChild, ElementRef, OnChanges, SimpleChanges, Outp
 import { Network, DataSet } from 'vis';
 import { StateProxy } from '../../states/state-proxy';
 import { VisualizationConfig, Layout, Metadata, Direction, SymbolTypes } from '../../../shared/data-format';
+import { NodeTypeColorMap, DefaultColor } from './color-map';
 
-const NodeTypeColorMap = {
-  [SymbolTypes.Component]: {
-    color: {
-      background: '#f8f800',
-      border: '#fcda1e',
-      highlight: {
-        background: '#f8f800',
-        border: '#fcda1e',
-      }
-    },
-    font: {
-      color: '#000000'
-    }
-  },
-  [SymbolTypes.ComponentWithDirective]: {
-    color: {
-      background: '#FFC0CB',
-      border: '#FFB8C5',
-      highlight: {
-        background: '#FFC0CB',
-        border: '#FFB8C5'
-      }
-    },
-    font: {
-      color: '#000000'
-    }
-  },
-  [SymbolTypes.HtmlElement]: {
-    color: {
-      background: '#C2FABC',
-      border: '#000000',
-      highlight: {
-        background: '#C2FABC',
-        border: '#000000'
-      }
-    },
-    font: {
-      color: '#000000'
-    }
-  },
-  [SymbolTypes.HtmlElementWithDirective]: {
-    color: {
-      background: '#ffa807',
-      border: '#e5a124',
-      highlight: {
-        background: '#ffa807',
-        border: '#e5a124'
-      }
-    },
-    font: {
-      color: '#000000'
-    }
-  },
-  [SymbolTypes.Meta]: {
-    color: {
-      background: '#c8c8c8',
-      border: '#000000',
-      highlight: {
-        background: '#c8c8c8',
-        border: '#000000'
-      }
-    },
-    font: {
-      color: '#000000'
-    }
-  },
-  [SymbolTypes.Module]: {
-    color: {
-      background: '#97C2FC',
-      border: '#000000',
-      highlight: {
-        background: '#97C2FC',
-        border: '#000000'
-      }
-    },
-    font: {
-      color: '#000000'
-    }
-  },
-  [SymbolTypes.Provider]: {
-    color: {
-      background: '#EB7DF4',
-      border: '#EA79F4',
-      highlight: {
-        background: '#EB7DF4',
-        border: '#EA79F4'
-      }
-    },
-    font: {
-      color: '#000000'
-    }
-  }
+import { ColorLegend, Color } from './color-legend.component';
+
+export const TypeToNameMap = {
+  [SymbolTypes.Component]: 'Component',
+  [SymbolTypes.ComponentWithDirective]: 'Component with Directive',
+  [SymbolTypes.HtmlElement]: 'Html element',
+  [SymbolTypes.HtmlElementWithDirective]: 'Html element with Directive',
+  [SymbolTypes.Meta]: 'Meta',
+  [SymbolTypes.Module]: 'Module',
+  [SymbolTypes.Provider]: 'Provider'
 };
 
-const DefaultColor = {
-  color: {
-    background: '#ffffff',
-    border: '#000000',
-    highlight: {
-      background: '#ffffff',
-      border: '#000000'
-    }
-  },
-  font: {
-    color: '#000000'
-  }
-};
 
 @Component({
   selector: 'ngrev-visualizer',
   template: `
     <div class="container" #container></div>
     <ngrev-metadata-view [metadata]="metadata"></ngrev-metadata-view>
+    <ngrev-color-legend [colors]="usedColors"></ngrev-color-legend>
   `,
   styles: [`
     .container {
@@ -139,6 +46,8 @@ export class VisualizerComponent implements OnChanges {
 
   @ViewChild('container') container: ElementRef;
 
+  usedColors: ColorLegend;
+
   private network: Network;
 
   ngOnChanges(changes: SimpleChanges) {
@@ -149,10 +58,18 @@ export class VisualizerComponent implements OnChanges {
 
   private updateData(data: VisualizationConfig<any>) {
     const graph = data.graph;
+    this.usedColors = [];
+    const colors = new Map<SymbolTypes, Color>();
     const nodes = new DataSet(graph.nodes.map(n => {
-      console.log(NodeTypeColorMap[(n.type || { type: -1 }).type]);
-      return Object.assign({}, n, NodeTypeColorMap[(n.type || { type: -1 }).type] || DefaultColor);
+      const type = (n.type || { type: -1 }).type;
+      const styles = (NodeTypeColorMap[type] || DefaultColor);
+      const color = styles.color.background;
+      const label = TypeToNameMap[type] || 'Unknown';
+      colors.set(type, { color, label})
+      return Object.assign({}, n, styles);
     }));
+    colors.forEach(val => this.usedColors.push(val));
+
     const edges = new DataSet(graph.edges.map(e => {
       const copy = Object.assign({}, e);
       if (e.direction === Direction.To) {
