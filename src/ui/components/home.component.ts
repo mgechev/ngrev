@@ -18,11 +18,21 @@ import { remote } from 'electron';
     }
 
     button {
-      height: 32px;
-      width: 160px;
+      width: 185px;
       display: block;
       margin: auto;
       cursor: pointer;
+      background: #2196F3;
+      padding: 13px;
+      color: #fff;
+      font-size: 18px;
+      border: 2px solid #1976D2;
+      border-radius: 25px;
+      outline: none;
+    }
+
+    button:active {
+      background: #1976D2;
     }
   `]
 })

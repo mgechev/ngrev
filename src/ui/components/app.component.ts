@@ -26,8 +26,8 @@ const SpinnerProps = {
       [left]="spinner.left"
       [top]="spinner.top"
       [size]="spinner.size"
-      *ngIf="state.active"
-    ></ngrev-spinner>
+      *ngIf="state.active">
+    </ngrev-spinner>
     <ngrev-home *ngIf="!state.active" (project)="onProject($event)"></ngrev-home>
     <ngrev-visualizer
       *ngIf="state.active"

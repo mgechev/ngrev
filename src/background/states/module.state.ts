@@ -24,6 +24,7 @@ enum SymbolType {
 }
 
 const BootstrapId = '$$bootstrap';
+const DeclarationsId = '$$declarations';
 const ExportsId = '$$exports';
 const ProvidersId = '$$providers';
 const ModuleId = '$$module';
@@ -95,6 +96,18 @@ export class ModuleState extends State {
           type: SymbolTypes.Meta
         }
       },
+      [DeclarationsId]: {
+        id: DeclarationsId,
+        label: 'Declarations',
+        data: {
+          symbol: null,
+          metadata: null
+        },
+        type: {
+          angular: false,
+          type: SymbolTypes.Meta
+        }
+      },
       [ModuleId]: {
         id: ModuleId,
         label: this.module.symbol.name,
@@ -112,10 +125,15 @@ export class ModuleState extends State {
       { from: ModuleId, to: ExportsId },
       { from: ModuleId, to: BootstrapId },
       { from: ModuleId, to: ProvidersId },
+      { from: ModuleId, to: DeclarationsId },
     ];
     this.module.getBootstrapComponents().forEach(s => {
       const node = s.symbol;
       this._appendSet(BootstrapId, s, nodes, SymbolType.Directive, edges);
+    });
+    this.module.getDeclaredDirectives().forEach(s => {
+      const node = s.symbol;
+      this._appendSet(DeclarationsId, s, nodes, SymbolType.Directive, edges);
     });
     this.module.getExportedDirectives().forEach(d => {
       const node = d.symbol;
