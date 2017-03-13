@@ -1,8 +1,6 @@
-import { VisualizationConfig, Metadata } from '../../shared/formatters/data-format';
-import { fork } from 'child_process';
-import * as path from 'path';
 import { IPCBus } from '../model/ipc-bus';
-import { GetData, NextState, GetMetadata, PrevState } from '../model/ipc-constants';
+import { GetData, NextState, GetMetadata, PrevState } from '../../shared/ipc-constants';
+import { Metadata, VisualizationConfig } from '../../shared/data-format';
 
 export class StateProxy {
   private ipcBus: IPCBus = new IPCBus();

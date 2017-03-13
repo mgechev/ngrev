@@ -1,8 +1,5 @@
-import { ProjectSymbols, ContextSymbols } from 'ngast';
-import { createProgramFromTsConfig } from '../create-program';
-import { readFile, readFileSync } from 'fs';
 import { IPCBus } from './ipc-bus';
-import { LoadProject } from './ipc-constants';
+import { LoadProject } from '../../shared/ipc-constants';
 
 export class ProjectProxy {
   private ipcBus: IPCBus = new IPCBus();

@@ -13,7 +13,7 @@
   },
   "files": [
     "./src/ui/app.ts",
-    "./src/background/background.ts"
+    "./src/background/app.ts"
   ],
   "angularCompilerOptions": {
     "skipTemplateCodegen": true
