@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy } from '@angular/core';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
-import { Node, Edge, Metadata, getId, Direction } from '../../shared/data-format';
+import { Node, Edge, Metadata, getId, Direction, SymbolTypes, isAngularSymbol } from '../../shared/data-format';
 import { DirectiveSymbol, ModuleSymbol, ContextSymbols, Symbol, ProviderSymbol } from 'ngast';
 import { getDirectiveMetadata, getModuleMetadata } from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';
@@ -65,6 +65,10 @@ export class ModuleState extends State {
         data: {
           symbol: null,
           metadata: null
+        },
+        type: {
+          angular: false,
+          type: SymbolTypes.Meta
         }
       },
       [BootstrapId]: {
@@ -73,6 +77,10 @@ export class ModuleState extends State {
         data: {
           symbol: null,
           metadata: null
+        },
+        type: {
+          angular: false,
+          type: SymbolTypes.Meta
         }
       },
       [ProvidersId]: {
@@ -81,6 +89,10 @@ export class ModuleState extends State {
         data: {
           symbol: null,
           metadata: null
+        },
+        type: {
+          angular: false,
+          type: SymbolTypes.Meta
         }
       },
       [ModuleId]: {
@@ -89,6 +101,10 @@ export class ModuleState extends State {
         data: {
           symbol: this.module,
           metadata: getModuleMetadata(this.module.symbol)
+        },
+        type: {
+          angular: isAngularSymbol(this.module.symbol),
+          type: SymbolTypes.Module
         }
       }
     };
@@ -136,6 +152,10 @@ export class ModuleState extends State {
       data: {
         symbol: node,
         metadata: this._getMetadata(node, symbolType)
+      },
+      type: {
+        angular: isAngularSymbol(symbol),
+        type: parentSet === ExportsId || parentSet === BootstrapId ? SymbolTypes.Component : SymbolTypes.Provider
       }
     };
     edges.push({

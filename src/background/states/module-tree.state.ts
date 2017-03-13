@@ -2,7 +2,7 @@ import { State } from './state';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { ModuleState } from './module.state';
-import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction } from '../../shared/data-format';
+import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
 import { ContextSymbols, ModuleSymbol } from 'ngast';
 
 interface NodeMap {
@@ -60,12 +60,20 @@ export class ModuleTreeState extends State {
     const nodes: Node<ModuleSymbol>[] = [{
         id: getId(module.symbol),
         label: module.symbol.name,
-        data: module
+        data: module,
+        type: {
+          angular: isAngularSymbol(module.symbol),
+          type: SymbolTypes.Module
+        }
       }].concat(imports.map(m => {
         return {
           id: getId(m.symbol),
           label: m.symbol.name,
           data: m,
+          type: {
+            angular: isAngularSymbol(module.symbol),
+            type: SymbolTypes.Module
+          }
         };
       }));
     const edges = nodes.slice(1, nodes.length).map((n, idx) => {

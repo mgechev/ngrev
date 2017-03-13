@@ -4,10 +4,26 @@ export interface Graph<T> {
   edges: Edge[];
 }
 
+export enum SymbolTypes {
+  Provider,
+  HtmlElement,
+  HtmlElementWithDirective,
+  ComponentWithDirective,
+  Component,
+  Module,
+  Meta
+}
+
+export interface SymbolType {
+  angular: boolean;
+  type: SymbolTypes;
+}
+
 export interface Node<T> {
   id: string;
   label: string;
   data?: T;
+  type?: SymbolType;
 }
 
 export enum Direction {
@@ -42,4 +58,8 @@ export interface Metadata {
 
 export const getId = (symbol: StaticSymbol) => {
   return `${symbol.filePath}#${symbol.name}`;
+};
+
+export const isAngularSymbol = (symbol: StaticSymbol) => {
+  return /node_modules\/@angular/.test(symbol.filePath);
 };

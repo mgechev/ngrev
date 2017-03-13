@@ -1,4 +1,4 @@
-import { Node, Metadata, getId, VisualizationConfig, Layout, Direction } from '../../shared/data-format';
+import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
 import { StaticSymbol } from '@angular/compiler';
 import { ContextSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
@@ -38,14 +38,22 @@ export class ProviderState extends State {
     const nodes: Node<ProviderSymbol>[] = [{
       id: getId(symbol),
       data: this.provider,
-      label: symbol.name
+      label: symbol.name,
+      type: {
+        angular: isAngularSymbol(symbol),
+        type: SymbolTypes.Provider
+      }
     }];
     (this.provider.getDependencies() || [])
       .forEach(p => {
         nodes.push({
           id: getId(p.symbol),
           data: p,
-          label: p.symbol.name
+          label: p.symbol.name,
+          type: {
+            angular: isAngularSymbol(p.symbol),
+            type: SymbolTypes.Provider
+          }
         });
       });
     nodes.forEach(n => {

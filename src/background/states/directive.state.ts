@@ -2,7 +2,7 @@ import { DirectiveSymbol, ContextSymbols } from 'ngast';
 import { State } from './state';
 import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
 import { DataSet } from 'vis';
-import { VisualizationConfig, Metadata, getId, Node } from '../../shared/data-format';
+import { VisualizationConfig, Metadata, getId, Node, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
 import { getDirectiveMetadata, getElementMetadata } from '../formatters/model-formatter';
 
 interface NodeMap {
@@ -49,7 +49,11 @@ export class DirectiveState extends State {
     const nodes: Node<DirectiveSymbol>[] = [{
       id: nodeId,
       label: s.name,
-      data: this.directive
+      data: this.directive,
+      type: {
+        type: SymbolTypes.Component,
+        angular: isAngularSymbol(s)
+      }
     }, {
       id: TemplateId,
       label: 'Template'
@@ -98,15 +102,21 @@ export class DirectiveState extends State {
             from: parentNodeId,
             to: nodeId
           });
-          resNodes.push({
+          const node = {
             id: nodeId,
             label: n.name,
-            data: n as ElementAst
-          });
+            data: n as ElementAst,
+            type: {
+              angular: false,
+              type: n.directives.length ? SymbolTypes.HtmlElementWithDirective : SymbolTypes.HtmlElement
+            }
+          };
           const component = this.tryGetMatchingComponent(dirMap, n.directives);
           if (component) {
             this.symbols[nodeId] = component;
+            node.type.type = SymbolTypes.Component;
           }
+          resNodes.push(node);
           addNodes(n.children.filter(c => c instanceof ElementAst) as ElementAst[], nodeId);
         })
       };
@@ -118,7 +128,7 @@ export class DirectiveState extends State {
     return componentDirs.filter(d => {
       const ref = d.directive.type.reference;
       const symbol = dirMap[ref.filePath + '#' + ref.name];
-      if (symbol && symbol.isComponent) {
+      if (symbol && symbol.getNonResolvedMetadata().isComponent) {
         return true;
       }
       return false;
