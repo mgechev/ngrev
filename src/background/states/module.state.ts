@@ -34,7 +34,7 @@ export class ModuleState extends State {
   private symbols: NodeMap;
 
   constructor(context: ContextSymbols, protected module: ModuleSymbol) {
-    super(context);
+    super(getId(module.symbol), context);
   }
 
   getMetadata(id: string): Metadata {
@@ -46,6 +46,9 @@ export class ModuleState extends State {
   }
 
   nextState(nodeId: string) {
+    if (nodeId === this.symbolId) {
+      return null;
+    }
     const data = this.symbols[nodeId].data;
     if (!data) {
       return null;

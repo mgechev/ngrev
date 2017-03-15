@@ -88,22 +88,26 @@ export class AppComponent {
   }
 
   tryChangeState(nodeId: string) {
-    this.loading = true;
-    this.cd.detectChanges();
-    this.state.nextState(nodeId)
-      .then(() => this.updateNewState())
-      .then(() => this.loading = false)
-      .catch(() => this.loading = false);
+    this.ngZone.run(() => {
+      this.loading = true;
+      this.cd.detectChanges();
+      this.state.nextState(nodeId)
+        .then(() => this.updateNewState())
+        .then(() => this.loading = false)
+        .catch(() => this.loading = false);
+    });
   }
 
   updateMetadata(nodeId: string) {
-    this.loading = true;
-    this.cd.detectChanges();
-    this.currentMetadata = null;
-    this.state.getMetadata(nodeId)
-      .then((metadata: Metadata) => this.currentMetadata = metadata)
-      .then(() => this.loading = false)
-      .catch(() => this.loading = false);
+    this.ngZone.run(() => {
+      this.loading = true;
+      this.cd.detectChanges();
+      this.currentMetadata = null;
+      this.state.getMetadata(nodeId)
+        .then((metadata: Metadata) => this.currentMetadata = metadata)
+        .then(() => this.loading = false)
+        .catch(() => this.loading = false);
+    });
   }
 
   onProject(tsconfig: string) {
@@ -122,21 +126,25 @@ export class AppComponent {
   }
 
   prevState() {
-    this.loading = true;
-    this.cd.detectChanges();
-    this.currentMetadata = null;
-    this.state.prevState().then(() => this.updateNewState())
-      .then(() => this.loading = false)
-      .catch(() => this.loading = false);
+    this.ngZone.run(() => {
+      this.loading = true;
+      this.cd.detectChanges();
+      this.currentMetadata = null;
+      this.state.prevState().then(() => this.updateNewState())
+        .then(() => this.loading = false)
+        .catch(() => this.loading = false);
+    });
   }
 
   private updateNewState() {
-    this.loading = true;
-    this.cd.detectChanges();
-    this.currentMetadata = null;
-    this.state.getData()
-      .then(data => this.currentData = data)
-      .then(() => this.loading = false)
-      .catch(() => this.loading = false);
+    this.ngZone.run(() => {
+      this.loading = true;
+      this.cd.detectChanges();
+      this.currentMetadata = null;
+      this.state.getData()
+        .then(data => this.currentData = data)
+        .then(() => this.loading = false)
+        .catch(() => this.loading = false);
+    });
   }
 }

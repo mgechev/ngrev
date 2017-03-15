@@ -18,7 +18,7 @@ export class ProviderState extends State {
   private symbols: NodeMap = {};
 
   constructor(context: ContextSymbols, protected provider: ProviderSymbol) {
-    super(context);
+    super(getId(provider.symbol), context);
   }
 
   getMetadata(id: string): Metadata {
@@ -26,6 +26,9 @@ export class ProviderState extends State {
   }
 
   nextState(nodeId: string) {
+    if (nodeId === this.symbolId) {
+      return null;
+    }
     const symbol = this.symbols[nodeId];
     if (!symbol) {
       return null;

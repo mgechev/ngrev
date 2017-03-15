@@ -7,4 +7,5 @@ import { AppModule } from './app.module';
 
 import { ipcRenderer } from 'electron';
 
+enableProdMode();
 platformBrowserDynamic().bootstrapModule(AppModule);

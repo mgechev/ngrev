@@ -4,7 +4,7 @@ import { VisualizationConfig, Metadata } from '../../shared/data-format';
 import { ContextSymbols } from 'ngast';
 
 export abstract class State {
-  constructor(protected context: ContextSymbols) {} 
+  constructor(protected symbolId: string, protected context: ContextSymbols) {} 
 
   abstract getMetadata(id: string): Metadata;
 

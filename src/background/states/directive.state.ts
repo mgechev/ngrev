@@ -16,7 +16,7 @@ export class DirectiveState extends State {
   private symbols: NodeMap = {};
 
   constructor(context: ContextSymbols, protected directive: DirectiveSymbol) {
-    super(context);
+    super(getId(directive.symbol), context);
   }
 
   getMetadata(id: string): Metadata {
@@ -32,6 +32,9 @@ export class DirectiveState extends State {
   }
 
   nextState(id: string) {
+    if (id === this.symbolId) {
+      return null;
+    }
     const symbol = this.symbols[id];
     if (!symbol) {
       return null;

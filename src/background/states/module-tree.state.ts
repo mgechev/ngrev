@@ -14,7 +14,7 @@ export class ModuleTreeState extends State {
   private symbols: NodeMap = {};
 
   constructor(private rootContext: ContextSymbols, private module: ModuleSymbol) {
-    super(rootContext);
+    super(getId(module.symbol), rootContext);
     const graph = this._getModuleGraph(module);
     graph.nodes.forEach(n => {
       this.symbols[n.id] = n.data;
