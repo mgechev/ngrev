@@ -84,7 +84,7 @@ export class AppComponent {
     public state: StateProxy) {}
 
   ngAfterViewInit() {
-    // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
   }
 
   tryChangeState(nodeId: string) {

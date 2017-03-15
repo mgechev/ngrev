@@ -4,6 +4,8 @@ import { StateProxy } from '../../states/state-proxy';
 import { VisualizationConfig, Layout, Metadata, Direction, SymbolTypes } from '../../../shared/data-format';
 import { NodeTypeColorMap, DefaultColor } from './color-map';
 
+import { remote } from 'electron';
+
 import { ColorLegend, Color } from './color-legend.component';
 
 export const TypeToNameMap = {
@@ -125,6 +127,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
       });
       this.network.on('doubleClick', this.selectNode.bind(this));
       this.network.on('click', this.highlightNode.bind(this));
+      this.network.on('oncontext', this.nodeContext.bind(this));
     } else {
       this.network.unselectAll();
       this.network.setData({ nodes, edges });
@@ -138,6 +141,33 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
       });
       this.network.redraw();
     }
+  }
+
+  private nodeContext(e: any) {
+    const node = this.network.getNodeAt({
+      x: e.event.layerX,
+      y: e.event.layerY
+    }) as string;
+    const { Menu, MenuItem } = remote;
+    const menu = new Menu()
+    const self = this;
+    menu.append(new MenuItem({
+      label: 'Select',
+      click() {
+        self.select.next(node);
+      }
+    }))
+    menu.append(new MenuItem({
+      type: 'separator'
+    }))
+    menu.append(new MenuItem({
+      label: 'View Metadata',
+      click() {
+        self.highlight.next(node);
+      }
+    }))
+
+    menu.popup(remote.getCurrentWindow())
   }
 
   private stateChanged(changes: SimpleChanges) {
