@@ -1,5 +1,5 @@
 import { State } from './state';
-import { ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
@@ -16,13 +16,6 @@ interface DataType {
 
 interface NodeMap {
   [id: string]: Node<DataType>;
-}
-
-enum SymbolType {
-  Directive,
-  Provider,
-  Meta,
-  Pipe
 }
 
 const BootstrapId = '$$bootstrap';
@@ -140,23 +133,23 @@ export class ModuleState extends State {
     ];
     this.module.getBootstrapComponents().forEach(s => {
       const node = s.symbol;
-      this._appendSet(BootstrapId, s, nodes, SymbolType.Directive, edges);
+      this._appendSet(BootstrapId, s, nodes, SymbolTypes.ComponentOrDirective, edges);
     });
     this.module.getDeclaredDirectives().forEach(s => {
       const node = s.symbol;
-      this._appendSet(DeclarationsId, s, nodes, SymbolType.Directive, edges);
+      this._appendSet(DeclarationsId, s, nodes, SymbolTypes.ComponentOrDirective, edges);
     });
     this.module.getExportedDirectives().forEach(d => {
       const node = d.symbol;
-      this._appendSet(ExportsId, d, nodes, SymbolType.Directive, edges);
+      this._appendSet(ExportsId, d, nodes, SymbolTypes.ComponentOrDirective, edges);
     });
     this.module.getDeclaredPipes().forEach(s => {
       const node = s.symbol;
-      this._appendSet(DeclarationsId, s, nodes, SymbolType.Pipe, edges);
+      this._appendSet(DeclarationsId, s, nodes, SymbolTypes.Pipe, edges);
     });
     this.module.getExportedPipes().forEach(d => {
       const node = d.symbol;
-      this._appendSet(ExportsId, d, nodes, SymbolType.Pipe, edges);
+      this._appendSet(ExportsId, d, nodes, SymbolTypes.Pipe, edges);
     });
     const providers = this.module.getProviders().reduce((prev: any, p) => {
       const id = getId(p.symbol);
@@ -164,7 +157,7 @@ export class ModuleState extends State {
       return prev;
     }, {});
     Object.keys(providers).forEach(key => {
-      this._appendSet(ProvidersId, providers[key], nodes, SymbolType.Provider, edges);
+      this._appendSet(ProvidersId, providers[key], nodes, SymbolTypes.Provider, edges);
     });
     this.symbols = nodes;
     console.log(edges);
@@ -180,7 +173,7 @@ export class ModuleState extends State {
     };
   }
 
-  private _appendSet(parentSet: string, node: Symbol, nodes: NodeMap, symbolType: SymbolType, edges: Edge[]) {
+  private _appendSet(parentSet: string, node: Symbol, nodes: NodeMap, symbolType: SymbolTypes, edges: Edge[]) {
     const symbol = node.symbol;
     const id = getId(symbol);
     nodes[id] = {
@@ -188,11 +181,11 @@ export class ModuleState extends State {
       label: symbol.name,
       data: {
         symbol: node,
-        metadata: this._getMetadata(node, symbolType)
+        metadata: null
       },
       type: {
         angular: isAngularSymbol(symbol),
-        type: parentSet === ExportsId || parentSet === BootstrapId ? SymbolTypes.Component : SymbolTypes.Provider
+        type: symbolType
       }
     };
     edges.push({
@@ -201,12 +194,4 @@ export class ModuleState extends State {
     });
   }
 
-  private _getMetadata(node: Symbol, type: SymbolType) {
-    if (type === SymbolType.Directive) {
-      return getDirectiveMetadata(node as DirectiveSymbol);
-    } else if (type === SymbolType.Provider) {
-      return null;
-      // return this._getProviderMetadata(node as ProviderSymbol);
-    }
-  }
 }

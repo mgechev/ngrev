@@ -1,4 +1,4 @@
-import { SymbolTypes } from '../../../shared/data-format';
+import { SymbolTypes, Direction } from '../../../shared/data-format';
 
 export const NodeTypeColorMap = {
   [SymbolTypes.Component]: {
@@ -9,6 +9,21 @@ export const NodeTypeColorMap = {
       highlight: {
         background: '#2196F3',
         border: '#1E88E5',
+      }
+    },
+    labelHighlightBold: false,
+    font: {
+      color: '#FFFFFF'
+    }
+  },
+  [SymbolTypes.ComponentOrDirective]: {
+    margin: 10,
+    color: {
+      background: '#FF5722',
+      border: '#E64A19',
+      highlight: {
+        background: '#FF5722',
+        border: '#E64A19',
       }
     },
     labelHighlightBold: false,

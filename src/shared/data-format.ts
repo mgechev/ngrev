@@ -10,6 +10,7 @@ export enum SymbolTypes {
   HtmlElementWithDirective,
   ComponentWithDirective,
   Component,
+  ComponentOrDirective,
   Pipe,
   Module,
   Meta

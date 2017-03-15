@@ -13,6 +13,7 @@ export const TypeToNameMap = {
   [SymbolTypes.ComponentWithDirective]: 'Component with Directive',
   [SymbolTypes.HtmlElement]: 'Html element',
   [SymbolTypes.HtmlElementWithDirective]: 'Html element with Directive',
+  [SymbolTypes.ComponentOrDirective]: 'Component or Directive',
   [SymbolTypes.Meta]: 'Meta',
   [SymbolTypes.Module]: 'Module',
   [SymbolTypes.Provider]: 'Provider'
