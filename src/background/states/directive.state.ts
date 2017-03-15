@@ -5,6 +5,7 @@ import { DataSet } from 'vis';
 import { VisualizationConfig, Metadata, getId, Node, isAngularSymbol, SymbolTypes, Direction } from '../../shared/data-format';
 import { getDirectiveMetadata, getElementMetadata, getProviderMetadata } from '../formatters/model-formatter';
 import { TemplateState } from './template.state';
+import { ProviderState } from './provider.state';
 
 interface NodeMap {
   [id: string]: ProviderSymbol | DirectiveSymbol | ElementAst;
@@ -45,6 +46,8 @@ export class DirectiveState extends State {
     const symbol = this.symbols[id];
     if (symbol instanceof DirectiveSymbol) {
       return new DirectiveState(this.context, symbol);
+    } else if (symbol instanceof ProviderSymbol) {
+      return new ProviderState(this.context, symbol);
     } else {
       return null;
     }
