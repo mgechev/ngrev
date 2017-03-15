@@ -11,10 +11,11 @@ import { ColorLegend, Color } from './color-legend.component';
 export const TypeToNameMap = {
   [SymbolTypes.Component]: 'Component',
   [SymbolTypes.ComponentWithDirective]: 'Component with Directive',
-  [SymbolTypes.HtmlElement]: 'Html element',
-  [SymbolTypes.HtmlElementWithDirective]: 'Html element with Directive',
+  [SymbolTypes.HtmlElement]: 'HTML element',
+  [SymbolTypes.HtmlElementWithDirective]: 'HTML element with Directive',
   [SymbolTypes.ComponentOrDirective]: 'Component or Directive',
   [SymbolTypes.Meta]: 'Meta',
+  [SymbolTypes.Pipe]: 'Pipe',
   [SymbolTypes.Module]: 'Module',
   [SymbolTypes.Provider]: 'Provider'
 };
