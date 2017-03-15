@@ -66,10 +66,18 @@ export class DirectiveState extends State {
       }
     }, {
       id: TemplateId,
-      label: 'Template'
+      label: 'Template',
+      type: {
+        type: SymbolTypes.Meta,
+        angular: false
+      }
     }, {
       id: DependenciesId,
-      label: 'Dependencies'
+      label: 'Dependencies',
+      type: {
+        type: SymbolTypes.Meta,
+        angular: false
+      }
     }];
     const edges = [{
       from: nodeId,

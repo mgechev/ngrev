@@ -52,7 +52,11 @@ export class TemplateState extends State {
     const nodeId = getId(s);
     const nodes: Node<DirectiveSymbol>[] = [{
       id: TemplateId,
-      label: `${this.directive.symbol.name}'s Template`
+      label: `${this.directive.symbol.name}'s Template`,
+      type: {
+        type: SymbolTypes.Meta,
+        angular: false
+      }
     }];
     const edges = [];
     this.addTemplateNodes(nodes, edges);
