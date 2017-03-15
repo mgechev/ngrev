@@ -4,6 +4,7 @@ import { DataSet } from 'vis';
 import { ModuleState } from './module.state';
 import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
 import { ContextSymbols, ModuleSymbol } from 'ngast';
+import { getModuleMetadata } from '../formatters/model-formatter';
 
 interface NodeMap {
   [id: string]: ModuleSymbol;
@@ -28,7 +29,7 @@ export class ModuleTreeState extends State {
   getMetadata(id: string): Metadata {
     const m = this.symbols[id];
     if (m && m.symbol) {
-      return this._getModuleMetadata(m.symbol);
+      return getModuleMetadata(m.symbol);
     }
     return null;
   }
@@ -45,13 +46,6 @@ export class ModuleTreeState extends State {
     } else {
       return new ModuleTreeState(this.context, module);
     }
-  }
-
-  private _getModuleMetadata(node: StaticSymbol): Metadata {
-    return [
-      { key: 'Name', value: node.name },
-      { key: 'Members', value: node.members.join('\n') }
-    ];
   }
 
   private _getModuleGraph(module: ModuleSymbol): Graph<ModuleSymbol> {

@@ -52,7 +52,8 @@ export interface VisualizationConfig<T> {
 export type StringPair = { key: string, value: string};
 
 export interface Metadata {
-  [key: number]: StringPair;
+  properties: {[key: number]: StringPair};
+  filePath?: string;
 }
 
 

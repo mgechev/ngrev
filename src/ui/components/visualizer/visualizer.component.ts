@@ -23,7 +23,7 @@ export const TypeToNameMap = {
   selector: 'ngrev-visualizer',
   template: `
     <div class="container" #container></div>
-    <ngrev-metadata-view [metadata]="metadata"></ngrev-metadata-view>
+    <ngrev-metadata-view [metadata]="(metadata || {}).properties"></ngrev-metadata-view>
     <ngrev-color-legend [colors]="usedColors"></ngrev-color-legend>
   `,
   styles: [`
@@ -41,7 +41,7 @@ export const TypeToNameMap = {
 })
 export class VisualizerComponent implements OnChanges, OnDestroy {
   @Input() data: VisualizationConfig<any>;
-  @Input() metadata: Metadata;
+  @Input() metadataResolver: (id: string) => Promise<Metadata>;
 
   @Output() select = new EventEmitter<string>();
   @Output() highlight = new EventEmitter<string>();
@@ -49,6 +49,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
   @ViewChild('container') container: ElementRef;
 
   usedColors: ColorLegend;
+  metadata: Metadata;
 
   private network: Network;
 
@@ -148,25 +149,43 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
       x: e.event.layerX,
       y: e.event.layerY
     }) as string;
+
+    if (node) {
+      this.metadataResolver(node)
+        .then((metadata: Metadata) => this.showContextMenu(node, metadata));
+    }
+  }
+
+  private showContextMenu(id: string, metadata: Metadata) {
     const { Menu, MenuItem } = remote;
     const menu = new Menu()
     const self = this;
+    console.log(metadata);
+    if (metadata && metadata.filePath) {
+      menu.append(new MenuItem({
+        label: 'Open File',
+        click() {
+          open(metadata.filePath);
+        }
+      }));
+      menu.append(new MenuItem({
+        type: 'separator'
+      }));
+    }
     menu.append(new MenuItem({
       label: 'Select',
       click() {
-        self.select.next(node);
+        self.select.next(id);
       }
-    }))
-    menu.append(new MenuItem({
-      type: 'separator'
-    }))
-    menu.append(new MenuItem({
-      label: 'View Metadata',
-      click() {
-        self.highlight.next(node);
-      }
-    }))
-
+    }));
+    if (metadata) {
+      menu.append(new MenuItem({
+        label: 'View Metadata',
+        click() {
+          self.metadata = metadata;
+        }
+      }));
+    }
     menu.popup(remote.getCurrentWindow())
   }
 
@@ -188,6 +207,8 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
     if (e.nodes && e.nodes[0]) {
       this.highlight.next(e.nodes[0]);
       this.metadata = null;
+      this.metadataResolver(e.nodes[0])
+        .then((metadata: Metadata) => this.metadata = metadata);
     }
   }
 }

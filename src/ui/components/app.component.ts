@@ -5,18 +5,6 @@ import { ContextSymbols } from 'ngast';
 import { StateProxy } from '../states/state-proxy';
 import { VisualizationConfig, Metadata } from '../../shared/data-format';
 
-const SpinnerProps = {
-  project: {
-    left: '50%',
-    top: '50%',
-    size: 55
-  },
-  default: {
-    left: 15,
-    top: 8,
-    size: 35
-  }
-};
 
 @Component({
   selector: 'ngrev-app',
@@ -32,10 +20,8 @@ const SpinnerProps = {
     <ngrev-visualizer
       *ngIf="state.active"
       [data]="currentData"
-      [metadata]="currentMetadata"
-      (select)="tryChangeState($event)"
-      (highlight)="updateMetadata($event)"
-    >
+      [metadataResolver]="resolveMetadata"
+      (select)="tryChangeState($event)">
     </ngrev-visualizer>
   `,
   styles: [`
@@ -71,17 +57,33 @@ const SpinnerProps = {
   `]
 })
 export class AppComponent {
-  currentMetadata: Metadata;
   currentData: VisualizationConfig<any>;
   loading = false;
 
-  spinner = SpinnerProps.project;
+  spinner = {
+    left: 15,
+    top: 8,
+    size: 35
+  };
+
+  resolveMetadata = (nodeId: string) => {
+    this.loading = true;
+    return this.state.getMetadata(nodeId)
+      .then((metadata: Metadata) => {
+        this.loading = false;
+        return metadata;
+      })
+      .catch(() => {
+        this.loading = false;
+        return null;
+      });
+  };
 
   constructor(
     private ngZone: NgZone,
     private project: ProjectProxy,
     private cd: ChangeDetectorRef,
-    public state: StateProxy) {}
+    private state: StateProxy) {}
 
   ngAfterViewInit() {
     this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
@@ -98,18 +100,6 @@ export class AppComponent {
     });
   }
 
-  updateMetadata(nodeId: string) {
-    this.ngZone.run(() => {
-      this.loading = true;
-      this.cd.detectChanges();
-      this.currentMetadata = null;
-      this.state.getMetadata(nodeId)
-        .then((metadata: Metadata) => this.currentMetadata = metadata)
-        .then(() => this.loading = false)
-        .catch(() => this.loading = false);
-    });
-  }
-
   onProject(tsconfig: string) {
     this.ngZone.run(() => {
       this.loading = true;
@@ -118,18 +108,16 @@ export class AppComponent {
         .then((proxy: StateProxy) => proxy.getData())
         .then(data => this.currentData = data)
         .then(() => {
-          this.spinner = SpinnerProps.project;
           this.loading = false;
         })
         .catch(() => this.loading = false);
     });
   }
 
-  prevState() {
+  private prevState() {
     this.ngZone.run(() => {
       this.loading = true;
       this.cd.detectChanges();
-      this.currentMetadata = null;
       this.state.prevState().then(() => this.updateNewState())
         .then(() => this.loading = false)
         .catch(() => this.loading = false);
@@ -140,7 +128,6 @@ export class AppComponent {
     this.ngZone.run(() => {
       this.loading = true;
       this.cd.detectChanges();
-      this.currentMetadata = null;
       this.state.getData()
         .then(data => this.currentData = data)
         .then(() => this.loading = false)

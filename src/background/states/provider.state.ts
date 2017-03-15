@@ -2,6 +2,7 @@ import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngula
 import { StaticSymbol } from '@angular/compiler';
 import { ContextSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
+import { getProviderMetadata } from '../formatters/model-formatter';
 
 interface NodeMap {
   [id: string]: ProviderSymbol;
@@ -22,7 +23,7 @@ export class ProviderState extends State {
   }
 
   getMetadata(id: string): Metadata {
-    return null;
+    return getProviderMetadata(this.symbols[id]);
   }
 
   nextState(nodeId: string) {
