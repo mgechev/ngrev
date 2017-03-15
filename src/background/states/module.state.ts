@@ -4,9 +4,10 @@ import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
 import { Node, Edge, Metadata, getId, Direction, SymbolTypes, isAngularSymbol } from '../../shared/data-format';
-import { DirectiveSymbol, ModuleSymbol, ContextSymbols, Symbol, ProviderSymbol } from 'ngast';
-import { getDirectiveMetadata, getModuleMetadata } from '../formatters/model-formatter';
+import { DirectiveSymbol, ModuleSymbol, ContextSymbols, Symbol, ProviderSymbol, PipeSymbol } from 'ngast';
+import { getDirectiveMetadata, getModuleMetadata, getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';
+import { PipeState } from './pipe.state';
 
 interface DataType {
   symbol: Symbol;
@@ -20,7 +21,8 @@ interface NodeMap {
 enum SymbolType {
   Directive,
   Provider,
-  Meta
+  Meta,
+  Pipe
 }
 
 const BootstrapId = '$$bootstrap';
@@ -38,9 +40,13 @@ export class ModuleState extends State {
   }
 
   getMetadata(id: string): Metadata {
-    const symbol = this.symbols[id];
-    if (symbol && symbol.data.metadata) {
-      return symbol.data.metadata;
+    const data = this.symbols[id].data;
+    if (data.symbol instanceof DirectiveSymbol) {
+      return getDirectiveMetadata(data.symbol);
+    } else if (data.symbol instanceof ProviderSymbol) {
+      return getProviderMetadata(data.symbol);
+    } else if (data.symbol instanceof PipeSymbol) {
+      return getPipeMetadata(data.symbol);
     }
     return null;
   }
@@ -57,6 +63,8 @@ export class ModuleState extends State {
       return new DirectiveState(this.context, data.symbol);
     } else if (data.symbol instanceof ProviderSymbol) {
       return new ProviderState(this.context, data.symbol);
+    } else if (data.symbol instanceof PipeSymbol) {
+      return new PipeState(this.context, data.symbol);
     }
     return null;
   }
@@ -116,7 +124,7 @@ export class ModuleState extends State {
         label: this.module.symbol.name,
         data: {
           symbol: this.module,
-          metadata: getModuleMetadata(this.module.symbol)
+          metadata: null
         },
         type: {
           angular: isAngularSymbol(this.module.symbol),
@@ -141,6 +149,14 @@ export class ModuleState extends State {
     this.module.getExportedDirectives().forEach(d => {
       const node = d.symbol;
       this._appendSet(ExportsId, d, nodes, SymbolType.Directive, edges);
+    });
+    this.module.getDeclaredPipes().forEach(s => {
+      const node = s.symbol;
+      this._appendSet(DeclarationsId, s, nodes, SymbolType.Pipe, edges);
+    });
+    this.module.getExportedPipes().forEach(d => {
+      const node = d.symbol;
+      this._appendSet(ExportsId, d, nodes, SymbolType.Pipe, edges);
     });
     const providers = this.module.getProviders().reduce((prev: any, p) => {
       const id = getId(p.symbol);

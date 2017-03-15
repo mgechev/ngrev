@@ -90,6 +90,21 @@ export const NodeTypeColorMap = {
     font: {
       color: '#FFFFFF'
     }
+  },
+  [SymbolTypes.Pipe]: {
+    margin: 10,
+    color: {
+      background: '#FF9800',
+      border: '#F57C00',
+      highlight: {
+        background: '#FF9800',
+        border: '#F57C00'
+      }
+    },
+    labelHighlightBold: false,
+    font: {
+      color: '#FFFFFF'
+    }
   }
 };
 

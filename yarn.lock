@@ -66,6 +66,10 @@
   version "7.0.7"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.7.tgz#92637c6c4844bfc9a0a686323e38f3e9319118c2"
 
+"@types/open@0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@types/open/-/open-0.0.29.tgz#3de910012674909db14d608d1fde44ffa7a9ecea"
+
 "@types/vis@^4.17.3":
   version "4.17.3"
   resolved "https://registry.yarnpkg.com/@types/vis/-/vis-4.17.3.tgz#af941e26e377424e4270ffd3e02b26ef5cab2f7e"
@@ -2908,9 +2912,9 @@ next-tick@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
 
-ngast@^0.0.12:
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/ngast/-/ngast-0.0.12.tgz#27250d0d45074a35e80505f94ba869aa8d430ee7"
+ngast@^0.0.14:
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/ngast/-/ngast-0.0.14.tgz#c65c395cc5fd01016364965a20e5081d546d7464"
 
 node-emoji@^1.4.1:
   version "1.5.1"
@@ -3028,6 +3032,10 @@ once@~1.3.0, once@~1.3.3:
 onetime@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/onetime/-/onetime-1.1.0.tgz#a1f7838f8314c516f05ecefcbc4ccfe04b4ed789"
+
+open@0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/open/-/open-0.0.5.tgz#42c3e18ec95466b6bf0dc42f3a2945c3f0cad8fc"
 
 optimist@^0.6.1:
   version "0.6.1"

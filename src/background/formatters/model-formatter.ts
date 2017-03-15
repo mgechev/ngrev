@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy } from '@angular/core';
-import { DirectiveSymbol, ProviderSymbol } from 'ngast';
+import { DirectiveSymbol, ProviderSymbol, PipeSymbol } from 'ngast';
 import { Metadata } from '../../shared/data-format';
 import { StaticSymbol, ElementAst } from '@angular/compiler';
 
@@ -21,6 +21,17 @@ export const getProviderMetadata = (provider: ProviderSymbol): Metadata => {
       { key: 'Name', value: provider.symbol.name },
       { key: 'Multiprovider', value: meta.multi.toString() },
       { key: 'Dependencies', value: deps }
+    ]
+  };
+};
+
+export const getPipeMetadata = (pipe: PipeSymbol): Metadata => {
+  const meta = pipe.getMetadata();
+  return {
+    filePath: pipe.symbol.filePath,
+    properties: [
+      { key: 'Name', value: meta.name },
+      { key: 'Pure', value: meta.pure.toString() }
     ]
   };
 };
