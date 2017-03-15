@@ -1,16 +1,17 @@
-import { DirectiveSymbol, ContextSymbols } from 'ngast';
+import { DirectiveSymbol, ContextSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
 import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
 import { DataSet } from 'vis';
-import { VisualizationConfig, Metadata, getId, Node, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
-import { getDirectiveMetadata, getElementMetadata } from '../formatters/model-formatter';
+import { VisualizationConfig, Metadata, getId, Node, isAngularSymbol, SymbolTypes, Direction } from '../../shared/data-format';
+import { getDirectiveMetadata, getElementMetadata, getProviderMetadata } from '../formatters/model-formatter';
 
 interface NodeMap {
-  [id: string]: DirectiveSymbol | ElementAst;
+  [id: string]: ProviderSymbol | DirectiveSymbol | ElementAst;
 }
 
 const TemplateId = 'template';
 const TemplateErrorId = 'template-error';
+const DependenciesId = 'dependencies';
 
 export class DirectiveState extends State {
   private symbols: NodeMap = {};
@@ -28,6 +29,8 @@ export class DirectiveState extends State {
       return getElementMetadata(s);
     } else if (s instanceof DirectiveSymbol) {
       return getDirectiveMetadata(s);
+    } else if (s instanceof ProviderSymbol) {
+      return getProviderMetadata(s);
     }
   }
 
@@ -60,13 +63,19 @@ export class DirectiveState extends State {
     }, {
       id: TemplateId,
       label: 'Template'
+    }, {
+      id: DependenciesId,
+      label: 'Dependencies'
     }];
     const edges = [{
       from: nodeId,
-      to: 'template'
+      to: TemplateId
+    }, {
+      from: nodeId,
+      to: DependenciesId
     }];
     this.addTemplateNodes(nodes, edges);
-    this.addStyleNodes(nodes, edges);
+    this.addDependencyNodes(nodes, edges);
     return {
       graph: {
         nodes, edges
@@ -139,8 +148,29 @@ export class DirectiveState extends State {
     }).map(d => dirMap[getId(d.directive.type.reference)]).pop();
   }
 
-  private addStyleNodes(nodes: any[], edges: any[]) {
-    
+  private addDependencyNodes(nodes: Node<any>[], edges: any[]) {
+    const deps = this.directive.getDependencies() || [];
+    deps.forEach(p => {
+        nodes.push({
+          id: getId(p.symbol),
+          data: p,
+          label: p.symbol.name,
+          type: {
+            angular: isAngularSymbol(p.symbol),
+            type: SymbolTypes.Provider
+          }
+        });
+      });
+    nodes.forEach(n => {
+      this.symbols[n.id] = n.data;
+    });
+    nodes.slice(nodes.length - deps.length, nodes.length).map(n => {
+      edges.push({
+        from: DependenciesId,
+        to: n.id,
+        direction: Direction.To
+      })
+    });
   }  
 
   private getErrorNode(errors: string[]) {
