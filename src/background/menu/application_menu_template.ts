@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog } from 'electron';
 
 export var applicationMenuTemplate = () => {
   return {
@@ -8,7 +8,16 @@ export var applicationMenuTemplate = () => {
         label: 'Reset',
         accelerator: 'CmdOrCtrl+R',
         click: function () {
-          BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache();
+          dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
+            type: 'warning',
+            buttons: ['OK', 'Cancel'],
+            title: 'Are you sure?',
+            message: 'Your progress will be lost. Are you sure you want to refresh and select a new project?'
+          }, (response: number) => {
+            if (!response) {
+              BrowserWindow.getAllWindows().forEach(w => w.webContents.reloadIgnoringCache());
+            }
+          });
         }
       },
       {
