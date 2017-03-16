@@ -2,7 +2,7 @@ import { app, BrowserWindow, dialog } from 'electron';
 
 export var applicationMenuTemplate = () => {
   return {
-    label: 'Application',
+    label: 'ngrev',
     submenu: [
       {
         label: 'Reset',

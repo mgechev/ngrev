@@ -88,7 +88,7 @@ export class AppComponent {
 
   ngAfterViewInit() {
     // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
-    this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
+    // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
   tryChangeState(nodeId: string) {

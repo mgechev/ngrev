@@ -49,6 +49,8 @@ app.on('ready', function () {
     height: 600
   });
 
+  mainWindow.setTitle(require('../package.json').name);
+
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'app.html'),
     protocol: 'file:',
