@@ -21,18 +21,22 @@ export class BackgroundApp {
       this.states = [];
       console.log(`Loading project: "${tsconfig}"`);
       this.project = new Project();
-      this.project.load(tsconfig);
-      const rootContext = this.project.rootContext;
-      const allModules = rootContext.getModules();
-      const rootSymbol = rootContext.getContextSummary().type.reference;
-      const module = 
-        allModules
-          .filter(m => m.symbol.name === rootSymbol.name &&
-            m.symbol.filePath === rootSymbol.filePath
-          ).pop();
-      this.states.push(new ModuleTreeState(rootContext, module));
-      console.log('Project loaded');
-      success(e.sender, LoadProject, true);
+      try {
+        this.project.load(tsconfig);
+        const rootContext = this.project.rootContext;
+        const allModules = rootContext.getModules();
+        const rootSymbol = rootContext.getContextSummary().type.reference;
+        const module =
+          allModules
+            .filter(m => m.symbol.name === rootSymbol.name &&
+              m.symbol.filePath === rootSymbol.filePath
+            ).pop();
+        this.states.push(new ModuleTreeState(rootContext, module));
+        console.log('Project loaded');
+        success(e.sender, LoadProject, true);
+      } catch (exception) {
+        error(e.sender, LoadProject, false);
+      }
     });
 
     ipcMain.on(PrevState, e => {

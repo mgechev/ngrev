@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as url from 'url';
 import { app, dialog, Menu, ipcMain } from 'electron';
 import { devMenuTemplate } from './menu/dev_menu_template';
-import { editMenuTemplate } from './menu/edit_menu_template';
+import { applicationMenuTemplate } from './menu/application_menu_template';
 import createWindow from './helpers/window';
 import {ProjectSymbols, ProgramFactory} from 'ngast';
 import {createProgramFromTsConfig} from './create-program';
@@ -25,9 +25,9 @@ const backgroundApp = new BackgroundApp();
 backgroundApp.init();
 
 var setApplicationMenu = function () {
-  var menus: any[] = [editMenuTemplate];
+  var menus: any[] = [applicationMenuTemplate()];
   if (env.name !== 'production') {
-    menus.push(devMenuTemplate);
+    menus.push(devMenuTemplate());
   }
   Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
 };

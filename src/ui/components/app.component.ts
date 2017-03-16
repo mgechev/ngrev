@@ -1,4 +1,5 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
+import { remote } from 'electron';
 import { ProjectProxy } from '../model/project-proxy';
 import { Network } from 'vis';
 import { ContextSymbols } from 'ngast';
@@ -87,6 +88,7 @@ export class AppComponent {
 
   ngAfterViewInit() {
     // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
   tryChangeState(nodeId: string) {
@@ -107,10 +109,12 @@ export class AppComponent {
         .then((rootContext: ContextSymbols) => this.state = new StateProxy())
         .then((proxy: StateProxy) => proxy.getData())
         .then(data => this.currentData = data)
-        .then(() => {
+        .then(() => this.loading = false)
+        .catch(() => {
+          remote.dialog.showErrorBox('Error while parsing project', 'Cannot parse your project. Make sure it\'s ' +
+          'compatible with the Angular\'s AoT compiler and try again');
           this.loading = false;
-        })
-        .catch(() => this.loading = false);
+        });
     });
   }
 
