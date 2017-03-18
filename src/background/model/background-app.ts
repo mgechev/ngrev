@@ -35,6 +35,7 @@ export class BackgroundApp {
         console.log('Project loaded');
         success(e.sender, LoadProject, true);
       } catch (exception) {
+        console.log(exception);
         error(e.sender, LoadProject, false);
       }
     });
