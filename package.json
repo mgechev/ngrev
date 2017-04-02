@@ -37,7 +37,6 @@
     "@types/vis": "^4.17.3",
     "fs-jetpack": "^0.10.2",
     "ngast": "^0.0.16",
-    "open": "0.0.5",
     "reflect-metadata": "^0.1.10",
     "run-sequence": "^1.2.2",
     "rxjs": "^5.2.0",
@@ -48,7 +47,6 @@
   "devDependencies": {
     "@types/electron": "^1.4.33",
     "@types/node": "^7.0.7",
-    "@types/open": "0.0.29",
     "chai": "^3.5.0",
     "electron": "^1.4.7",
     "electron-builder": "^8.6.0",
