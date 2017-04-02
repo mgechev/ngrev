@@ -4,7 +4,7 @@ import { StateProxy } from '../../states/state-proxy';
 import { VisualizationConfig, Layout, Metadata, Direction, SymbolTypes } from '../../../shared/data-format';
 import { NodeTypeColorMap, DefaultColor } from './color-map';
 
-import { remote } from 'electron';
+import { remote, shell } from 'electron';
 
 import { ColorLegend, Color } from './color-legend.component';
 
@@ -167,7 +167,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
       menu.append(new MenuItem({
         label: 'Open File',
         click() {
-          open(metadata.filePath);
+          shell.openItem(metadata.filePath);
         }
       }));
       menu.append(new MenuItem({
