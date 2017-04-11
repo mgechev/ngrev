@@ -40,7 +40,7 @@ export class HomeComponent {
   @Output() project = new EventEmitter<string>();
 
   loadProject() {
-    const files = remote.dialog.showOpenDialog({ properties: ['openFile', 'openDirectory', 'multiSelections'] });
+    const files = remote.dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] });
     if (files && files[0]) {
       this.project.emit(files[0]);
     }
