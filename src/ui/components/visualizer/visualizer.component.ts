@@ -102,7 +102,11 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
     let layout: any = {
       hierarchical: {
         sortMethod: 'directed',
-        enabled: true
+        enabled: true,
+        direction: 'LR',
+        edgeMinimization: true,
+        parentCentralization: true,
+        nodeSpacing: 50
       }
     };
     if (data.layout === Layout.Regular) {
@@ -113,37 +117,31 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
         randomSeed: 2
       };
     }
-    if (!this.network) {
-      this.network = new Network(this.container.nativeElement, { nodes, edges }, {
-        layout,
-        nodes: {
-          shape: 'box',
-          fixed: true,
-          shapeProperties: {
-            borderRadius: 1,
-            interpolation: true,
-            borderDashes: false,
-            useImageSize: false,
-            useBorderWithImage: false
-          }
-        }
-      });
-      this.network.on('doubleClick', this.selectNode.bind(this));
-      this.network.on('click', this.highlightNode.bind(this));
-      this.network.on('oncontext', this.nodeContext.bind(this));
-    } else {
-      this.network.unselectAll();
-      this.network.setData({ nodes, edges });
-      this.network.setOptions({ layout })
-      this.network.fit({
-        nodes: nodes.map(n => n.id),
-        animation: {
-          duration: 1000,
-          easingFunction: 'linear'
-        }
-      });
-      this.network.redraw();
+    if (this.network) {
+      this.network.destroy();
     }
+    this.network = new Network(this.container.nativeElement, { nodes, edges }, {
+      interaction: {
+        dragNodes: true
+      },
+      layout,
+      physics: {
+        enabled: false
+      },
+      nodes: {
+        shape: 'box',
+        shapeProperties: {
+          borderRadius: 1,
+          interpolation: true,
+          borderDashes: false,
+          useImageSize: false,
+          useBorderWithImage: false
+        }
+      }
+    });
+    this.network.on('doubleClick', this.selectNode.bind(this));
+    this.network.on('click', this.highlightNode.bind(this));
+    this.network.on('oncontext', this.nodeContext.bind(this));
   }
 
   private nodeContext(e: any) {
