@@ -2,10 +2,15 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { remote } from 'electron';
 import { ProjectProxy } from '../model/project-proxy';
 import { Network } from 'vis';
-import { ContextSymbols } from 'ngast';
+import { ContextSymbols, Symbol } from 'ngast';
 import { StateProxy } from '../states/state-proxy';
 import { VisualizationConfig, Metadata } from '../../shared/data-format';
+import { KeyValuePair } from './quick-access/quck-access.component';
+import { StaticSymbol } from '@angular/compiler';
 
+export interface SymbolWithId extends StaticSymbol {
+  id: string;
+}
 
 @Component({
   selector: 'ngrev-app',
@@ -24,6 +29,12 @@ import { VisualizationConfig, Metadata } from '../../shared/data-format';
       [metadataResolver]="resolveMetadata"
       (select)="tryChangeState($event)">
     </ngrev-visualizer>
+    <ngrev-quick-access
+      (select)="selectSymbol($event)"
+      [queryList]="queryList"
+      [queryObject]="queryObject"
+    >
+    </ngrev-quick-access>
   `,
   styles: [`
     :host {
@@ -61,6 +72,9 @@ export class AppComponent {
   currentData: VisualizationConfig<any>;
   loading = false;
 
+  queryList: KeyValuePair<SymbolWithId>[] = [];
+  queryObject = ['value.name', 'value.filePath'];
+
   spinner = {
     left: 15,
     top: 8,
@@ -87,7 +101,7 @@ export class AppComponent {
     private state: StateProxy) {}
 
   ngAfterViewInit() {
-    // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
@@ -109,6 +123,8 @@ export class AppComponent {
         .then((rootContext: ContextSymbols) => this.state = new StateProxy())
         .then((proxy: StateProxy) => proxy.getData())
         .then(data => this.currentData = data)
+        .then(() => this.project.getSymbols())
+        .then(symbols => this.queryList = symbols.map(s => ({ key: s.name, value: s })))
         .then(() => this.loading = false)
         .catch(() => {
           remote.dialog.showErrorBox('Error while parsing project', 'Cannot parse your project. Make sure it\'s ' +
@@ -116,6 +132,12 @@ export class AppComponent {
           this.loading = false;
         });
     });
+  }
+
+  selectSymbol(symbolPair: KeyValuePair<SymbolWithId>) {
+    if (symbolPair && symbolPair.value) {
+      this.tryChangeState(symbolPair.value.id);
+    }
   }
 
   private prevState() {

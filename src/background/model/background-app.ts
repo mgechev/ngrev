@@ -1,8 +1,10 @@
 import { ipcMain } from 'electron';
-import { LoadProject, PrevState, GetMetadata, GetData, NextState, Success, Failure } from '../../shared/ipc-constants';
+import { LoadProject, PrevState, GetMetadata, GetData, NextState, Success, Failure, GetSymbols } from '../../shared/ipc-constants';
 import { Project } from './project';
 import { State } from '../states/state';
 import { ModuleTreeState } from '../states/module-tree.state';
+import { getModuleMetadata } from '../formatters/model-formatter';
+import { getId } from '../../shared/data-format';
 
 const success = (sender, msg, payload) => {
   sender.send(msg, Success, payload);
@@ -50,6 +52,25 @@ export class BackgroundApp {
         console.log('Unsuccessfully moved to previous state');
         error(e.sender, PrevState, false);
       }
+    });
+
+    ipcMain.on(GetSymbols, e => {
+      console.log('Get symbols');
+      let res = [];
+      try {
+        const pipes = this.project.rootContext.getPipes();
+        const modules = this.project.rootContext.getModules();
+        const directives = this.project.rootContext.getDirectives();
+        res = pipes.map(p => p.symbol)
+          .concat(modules.map(m => m.symbol))
+          .concat(directives.map(d => d.symbol))
+          .map(s => {
+            return Object.assign({}, s, { id: getId(s) });
+          });
+      } catch (e) {
+        console.error(e);
+      }
+      success(e.sender, GetSymbols, res);
     });
 
     ipcMain.on(GetMetadata, (e, id: string) => {
