@@ -15,6 +15,9 @@ const MetaKeyCodes = [91, 17];
 const PKeyCode = 80;
 const ESCKeyCode = 27;
 
+const UpArrowKeyCode = 38;
+const DownArrowKeyCode = 40;
+
 export interface KeyValuePair<T> {
   key: string;
   value: T;
@@ -30,7 +33,9 @@ export interface QueryObject {
     <div class="fuzzy-box" *ngIf="fuzzyBoxVisible" (click)="$event.stopImmediatePropagation()">
       <input autofocus #input type="text" [(ngModel)]="symbolName">
       <ngrev-quick-access-list
-        [data]="search()"
+        *ngIf="search() as results"
+        [style.display]="results.length ? 'block' : 'none'"
+        [data]="results"
         (select)="select.next($event); hide()"
       >
       </ngrev-quick-access-list>
@@ -48,17 +53,22 @@ export interface QueryObject {
     position: absolute;
     top: 0; left: 0; bottom: 0; right: 0;
     width: 70%;
-    height: 60px
+    height: calc(100% - 45px);
   }
   .fuzzy-box {
     padding: 5px;
     width: 100%;
+    max-height: 80%;
     box-shadow: 0 0 11px 3px #ccc;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
   }
   .fuzzy-box input {
-    width: 100%;
-    height: 60px;
+    max-height: 60px;
     font-size: 35px;
+    outline: none;
+    border: 1px solid #ccc;
   }
   `]
 })
@@ -92,6 +102,9 @@ export class QuickAccessComponent implements AfterViewInit {
     }
     if (e.keyCode === ESCKeyCode) {
       this.hide();
+    }
+    if (e.keyCode === DownArrowKeyCode || e.keyCode === UpArrowKeyCode) {
+      e.preventDefault();
     }
   }
 

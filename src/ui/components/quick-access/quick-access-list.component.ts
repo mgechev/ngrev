@@ -4,6 +4,7 @@ import {
   EventEmitter,
   ViewChildren,
   ElementRef,
+  Renderer2,
   QueryList,
   AfterViewInit,
   Input
@@ -19,8 +20,8 @@ const DownArrowKeyCode = 40;
 @Component({
   selector: 'ngrev-quick-access-list',
   template: `
-    <ul *ngIf="data.length">
-      <li *ngFor="let element of data; let i=index"
+    <ul *ngIf="bindData.length">
+      <li #items *ngFor="let element of bindData; let i=index"
         [class.selected]="i === selection"
         (click)="selectItem($event, element)">
         {{ element.key }}
@@ -34,12 +35,17 @@ const DownArrowKeyCode = 40;
     :host {
       background: white;
       display: block;
-      margin-top: -1px;
-      width: 101%;
+      margin-top: 3px;
+      width: 100%;
+      max-height: calc(100% - 70px);
+      border-top: 1px solid #ccc;
+      overflow: auto;
     }
     ul {
-      padding: 0px;
-      margin-top: 0px;
+      width: 100%;
+      padding: 0;
+      margin-top: 0;
+      margin-bottom: 0;
     }
     li {
       list-style: none;
@@ -55,10 +61,20 @@ const DownArrowKeyCode = 40;
   `]
 })
 export class QuickAccessListComponent {
-  @Input() data: KeyValuePair<any>[];
+  bindData: KeyValuePair<any>[] = [];
+
+  @Input() set data(val: KeyValuePair<any>[]) {
+    this.bindData = val;
+    if (this.selection >= val.length) {
+      this.highlightItem(0);
+    }
+  }
   @Output() select = new EventEmitter<KeyValuePair<any>>();
+  @ViewChildren('items') items: QueryList<ElementRef>;
 
   selection = 0;
+
+  constructor(private renderer: Renderer2) {}
 
   selectItem(e, element: KeyValuePair<any>) {
     this.select.emit(element);
@@ -66,17 +82,55 @@ export class QuickAccessListComponent {
   }
 
   onKeyDown(e) {
+    let nextIdx = this.selection;
     if (e.keyCode === UpArrowKeyCode) {
-      this.selection = this.selection - 1;
-      if (this.selection < 0) {
-        this.selection = this.data.length - 1;
+      nextIdx = this.selection - 1;
+      if (nextIdx < 0) {
+        nextIdx = this.bindData.length - 1;
       }
     }
     if (e.keyCode === DownArrowKeyCode) {
-      this.selection = (this.selection + 1) % this.data.length;
+      nextIdx = (this.selection + 1) % this.bindData.length;
     }
-    if (e.keyCode === EnterKeyCode && this.data[this.selection]) {
-      this.select.emit(this.data[this.selection]);
+    if (e.keyCode === EnterKeyCode && this.bindData[this.selection]) {
+      this.select.emit(this.bindData[this.selection]);
+    }
+    this.highlightItem(nextIdx);
+  }
+
+  private highlightItem(idx: number) {
+    if (!this.items) return;
+    this.unHighlightItem(this.selection);
+    const elements = this.items.toArray();
+    const item = elements[idx];
+    if (item) {
+      this.renderer.addClass(item.nativeElement, 'selected');
+      this.ensureVisible(item);
+    }
+    this.selection = idx;
+  }
+
+  private unHighlightItem(idx: number) {
+    if (!this.items) return;
+    const elements = this.items.toArray();
+    const item = elements[idx];
+    if (item) {
+      this.renderer.removeClass(item.nativeElement, 'selected');
+    }
+  }
+
+  private ensureVisible(item: ElementRef) {
+    const domNode = item.nativeElement;
+    const directParent = domNode.parentNode;
+    const scrollParent = directParent.parentNode;
+    const nodeTop = domNode.offsetTop;
+    const nodeBottom = nodeTop + domNode.offsetHeight;
+    const visibleBottom = scrollParent.scrollTop + scrollParent.offsetHeight;
+    if (nodeTop - domNode.offsetHeight < scrollParent.scrollTop) {
+      scrollParent.scrollTop = nodeTop - domNode.offsetHeight;
+    }
+    if (nodeBottom > visibleBottom) {
+      scrollParent.scrollTop = nodeBottom - scrollParent.offsetHeight - domNode.offsetHeight;
     }
   }
 }
