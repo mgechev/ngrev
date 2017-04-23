@@ -1,10 +1,15 @@
 import { ipcMain } from 'electron';
-import { LoadProject, PrevState, GetMetadata, GetData, NextState, Success, Failure, GetSymbols } from '../../shared/ipc-constants';
+import { LoadProject, PrevState, GetMetadata, GetData, NextState, Success, Failure, GetSymbols, DirectStateTransition } from '../../shared/ipc-constants';
 import { Project } from './project';
 import { State } from '../states/state';
 import { ModuleTreeState } from '../states/module-tree.state';
 import { getModuleMetadata } from '../formatters/model-formatter';
 import { getId } from '../../shared/data-format';
+import { Symbol, ContextSymbols } from 'ngast';
+import { PipeState } from '../states/pipe.state';
+import { ModuleState } from '../states/module.state';
+import { DirectiveState } from '../states/directive.state';
+import { SymbolIndex, SymbolData } from './symbol-index';
 
 const success = (sender, msg, payload) => {
   sender.send(msg, Success, payload);
@@ -54,19 +59,28 @@ export class BackgroundApp {
       }
     });
 
+    ipcMain.on(DirectStateTransition, (e, id: string) => {
+      console.log('Direct state transition');
+      const index = SymbolIndex.getIndex(this.project.rootContext);
+      const nextState = index.get(id);
+      if (nextState) {
+        this.states.push(nextState.stateFactory());
+        console.log('Found next state');
+        success(e.sender, DirectStateTransition, true);
+      } else {
+        console.log('No next state');
+        error(e.sender, DirectStateTransition, false);
+      }
+    });
+
     ipcMain.on(GetSymbols, e => {
       console.log('Get symbols');
       let res = [];
       try {
-        const pipes = this.project.rootContext.getPipes();
-        const modules = this.project.rootContext.getModules();
-        const directives = this.project.rootContext.getDirectives();
-        res = pipes.map(p => p.symbol)
-          .concat(modules.map(m => m.symbol))
-          .concat(directives.map(d => d.symbol))
-          .map(s => {
-            return Object.assign({}, s, { id: getId(s) });
-          });
+        const map = SymbolIndex.getIndex(this.project.rootContext);
+        map.forEach((data: SymbolData, id: string) => {
+          res.push(Object.assign({}, data.symbol.symbol, { id }));
+        })
       } catch (e) {
         console.error(e);
       }

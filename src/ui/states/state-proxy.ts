@@ -1,5 +1,5 @@
 import { IPCBus } from '../model/ipc-bus';
-import { GetData, NextState, GetMetadata, PrevState } from '../../shared/ipc-constants';
+import { GetData, NextState, GetMetadata, PrevState, DirectStateTransition } from '../../shared/ipc-constants';
 import { Metadata, VisualizationConfig } from '../../shared/data-format';
 
 export class StateProxy {
@@ -46,6 +46,14 @@ export class StateProxy {
 
   prevState(): Promise<void> {
     return this.ipcBus.send(PrevState)
+      .then(state => {
+        this.dataDirty = true;
+        return state;
+      });
+  }
+
+  directStateTransfer(id: string): Promise<void> {
+    return this.ipcBus.send(DirectStateTransition, id)
       .then(state => {
         this.dataDirty = true;
         return state;

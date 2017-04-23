@@ -109,7 +109,7 @@ export class AppComponent {
     this.ngZone.run(() => {
       this.loading = true;
       this.cd.detectChanges();
-      this.state.nextState(nodeId)
+      this.state.directStateTransfer(nodeId)
         .then(() => this.updateNewState())
         .then(() => this.loading = false)
         .catch(() => this.loading = false);
