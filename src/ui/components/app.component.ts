@@ -105,11 +105,11 @@ export class AppComponent {
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
-  tryChangeState(nodeId: string) {
+  tryChangeState(nodeId: string, direct = false) {
     this.ngZone.run(() => {
       this.loading = true;
       this.cd.detectChanges();
-      this.state.directStateTransfer(nodeId)
+      (direct ? this.state.directStateTransfer(nodeId) : this.state.nextState(nodeId))
         .then(() => this.updateNewState())
         .then(() => this.loading = false)
         .catch(() => this.loading = false);
@@ -136,7 +136,7 @@ export class AppComponent {
 
   selectSymbol(symbolPair: KeyValuePair<SymbolWithId>) {
     if (symbolPair && symbolPair.value) {
-      this.tryChangeState(symbolPair.value.id);
+      this.tryChangeState(symbolPair.value.id, true);
     }
   }
 

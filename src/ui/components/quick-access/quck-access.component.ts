@@ -4,6 +4,7 @@ import {
   EventEmitter,
   ViewChildren,
   ElementRef,
+  Renderer2,
   QueryList,
   AfterViewInit,
   Input
@@ -78,6 +79,8 @@ export class QuickAccessComponent implements AfterViewInit {
   private symbolName = '';
   private fuse = new Fuse([], { keys: ["name", "filePath"] });
 
+  constructor(private element: ElementRef, private renderer: Renderer2) {}
+
   @Input() set queryObject(query: QueryObject) {
     let list = [];
     if (this.fuse) {
@@ -98,7 +101,7 @@ export class QuickAccessComponent implements AfterViewInit {
       this.metaKeyDown = e.keyCode;
     }
     if (e.keyCode === PKeyCode && this.metaKeyDown) {
-      this.fuzzyBoxVisible = true;
+      this.show();
     }
     if (e.keyCode === ESCKeyCode) {
       this.hide();
@@ -115,6 +118,13 @@ export class QuickAccessComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+    // In most cases (always) fuzzyBoxVisible will be false
+    // when this life-cycle hook is invoked.
+    // We want to hide the access bar by default in order to
+    // not prevent capturing clicks in the visualizer.
+    if (!this.fuzzyBoxVisible) {
+      this.hide();
+    }
     this.input.changes
       .subscribe(e => e.first ? e.first.nativeElement.focus() : void 0);
   }
@@ -127,8 +137,14 @@ export class QuickAccessComponent implements AfterViewInit {
     this.hide();
   }
 
+  private show() {
+    this.fuzzyBoxVisible = true;
+    this.renderer.setStyle(this.element.nativeElement, 'display', 'block');
+  }
+
   private hide() {
     this.fuzzyBoxVisible = false;
     this.symbolName = '';
+    this.renderer.setStyle(this.element.nativeElement, 'display', 'none');
   }
 }
