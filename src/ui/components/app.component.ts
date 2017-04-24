@@ -8,6 +8,8 @@ import { VisualizationConfig, Metadata } from '../../shared/data-format';
 import { KeyValuePair } from './quick-access/quck-access.component';
 import { StaticSymbol } from '@angular/compiler';
 
+const BackspaceKeyCode = 8;
+
 export interface SymbolWithId extends StaticSymbol {
   id: string;
 }
@@ -36,6 +38,9 @@ export interface SymbolWithId extends StaticSymbol {
     >
     </ngrev-quick-access>
   `,
+  host: {
+    '(document:keydown)': 'onKeyDown($event)'
+  },
   styles: [`
     :host {
       width: 100%;
@@ -94,6 +99,8 @@ export class AppComponent {
       });
   };
 
+  private metaKeyDown = 0;
+
   constructor(
     private ngZone: NgZone,
     private project: ProjectProxy,
@@ -137,6 +144,12 @@ export class AppComponent {
   selectSymbol(symbolPair: KeyValuePair<SymbolWithId>) {
     if (symbolPair && symbolPair.value) {
       this.tryChangeState(symbolPair.value.id, true);
+    }
+  }
+
+  onKeyDown(e) {
+    if (e.keyCode === 8) {
+      this.prevState();
     }
   }
 

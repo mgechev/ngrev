@@ -55,6 +55,7 @@ export interface QueryObject {
     position: absolute;
     top: 0; left: 0; bottom: 0; right: 0;
     width: 70%;
+    max-width: 600px;
     height: calc(100% - 45px);
   }
   .fuzzy-box {
