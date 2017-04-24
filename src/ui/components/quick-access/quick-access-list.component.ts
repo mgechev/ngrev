@@ -10,6 +10,8 @@ import {
   Input
 } from '@angular/core';
 
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
 import { Symbol } from 'ngast';
 import { KeyValuePair } from './quck-access.component';
 
@@ -23,8 +25,8 @@ const DownArrowKeyCode = 40;
     <ul *ngIf="bindData.length">
       <li #items *ngFor="let element of bindData; let i=index"
         [class.selected]="i === selection"
-        (click)="selectItem($event, element)">
-        {{ element.key }}
+        (click)="selectItem($event, element)"
+        [innerHtml]="formatText(element.key)">
       </li>
     </ul>
   `,
@@ -63,6 +65,7 @@ const DownArrowKeyCode = 40;
 export class QuickAccessListComponent {
   bindData: KeyValuePair<any>[] = [];
 
+  @Input() highlight: string;
   @Input() set data(val: KeyValuePair<any>[]) {
     this.bindData = val;
     if (this.selection >= val.length) {
@@ -74,7 +77,7 @@ export class QuickAccessListComponent {
 
   selection = 0;
 
-  constructor(private renderer: Renderer2) {}
+  constructor(private renderer: Renderer2, private sanitizer: DomSanitizer) {}
 
   selectItem(e, element: KeyValuePair<any>) {
     this.select.emit(element);
@@ -96,6 +99,15 @@ export class QuickAccessListComponent {
       this.select.emit(this.bindData[this.selection]);
     }
     this.highlightItem(nextIdx);
+  }
+
+  formatText(text: string): SafeHtml {
+    const map = {};
+    (this.highlight || '').split('').forEach(c => map[c.toLowerCase()] = true);
+    const textChars = text.split('');
+    return this.sanitizer.bypassSecurityTrustHtml(textChars.reduce((a, c) => {
+      return a + (map[c.toLowerCase()] ? `<b>${c}</b>` : c);
+    }, ''));
   }
 
   private highlightItem(idx: number) {

@@ -37,6 +37,7 @@ export interface QueryObject {
         *ngIf="search() as results"
         [style.display]="results.length ? 'block' : 'none'"
         [data]="results"
+        [highlight]="symbolName"
         (select)="select.next($event); hide()"
       >
       </ngrev-quick-access-list>
@@ -70,6 +71,7 @@ export interface QueryObject {
     font-size: 35px;
     outline: none;
     border: 1px solid #ccc;
+    padding: 7px;
   }
   `]
 })
