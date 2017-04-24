@@ -4,6 +4,7 @@ import { getId } from '../../shared/data-format';
 import { PipeState } from '../states/pipe.state';
 import { ModuleState } from '../states/module.state';
 import { DirectiveState } from '../states/directive.state';
+import { ProviderState } from '../states/provider.state';
 
 export interface StateFactory {
   (): State;
@@ -46,6 +47,12 @@ class SymbolIndexImpl {
           return new DirectiveState(context, symbol);
         }
       }));
+    context.getProviders()
+      .forEach(symbol => this.symbolsIndex.set(getId(symbol.symbol), {
+        symbol, stateFactory() {
+          return new ProviderState(context, symbol);
+        }
+      }))
     return this.symbolsIndex;
   }
 }

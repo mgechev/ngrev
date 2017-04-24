@@ -71,20 +71,10 @@ export class DirectiveState extends State {
         type: SymbolTypes.Meta,
         angular: false
       }
-    }, {
-      id: DependenciesId,
-      label: 'Dependencies',
-      type: {
-        type: SymbolTypes.Meta,
-        angular: false
-      }
     }];
     const edges = [{
       from: nodeId,
       to: TemplateId
-    }, {
-      from: nodeId,
-      to: DependenciesId
     }];
     this.addDependencyNodes(nodes, edges);
     return {
@@ -96,17 +86,31 @@ export class DirectiveState extends State {
 
   private addDependencyNodes(nodes: Node<any>[], edges: any[]) {
     const deps = this.directive.getDependencies() || [];
-    deps.forEach(p => {
-        nodes.push({
-          id: getId(p.symbol),
-          data: p,
-          label: p.symbol.name,
-          type: {
-            angular: isAngularSymbol(p.symbol),
-            type: SymbolTypes.Provider
-          }
-        });
+    if (deps.length > 0) {
+      nodes.push({
+        id: DependenciesId,
+        label: 'Dependencies',
+        type: {
+          type: SymbolTypes.Meta,
+          angular: false
+        }
       });
+      edges.push({
+        from: getId(this.directive.symbol),
+        to: DependenciesId
+      });
+    }
+    deps.forEach(p => {
+      nodes.push({
+        id: getId(p.symbol),
+        data: p,
+        label: p.symbol.name,
+        type: {
+          angular: isAngularSymbol(p.symbol),
+          type: SymbolTypes.Provider
+        }
+      });
+    });
     nodes.forEach(n => {
       this.symbols[n.id] = n.data;
     });
@@ -117,5 +121,5 @@ export class DirectiveState extends State {
         direction: Direction.To
       })
     });
-  }  
+  }
 }
