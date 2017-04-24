@@ -14,6 +14,8 @@ interface NodeMap {
 const TemplateId = 'template';
 const TemplateErrorId = 'template-error';
 const DependenciesId = 'dependencies';
+const ViewProvidersId = 'view-providers';
+const ProvidersId = 'providers';
 
 export class DirectiveState extends State {
   private symbols: NodeMap = {};
@@ -76,7 +78,9 @@ export class DirectiveState extends State {
       from: nodeId,
       to: TemplateId
     }];
-    this.addDependencyNodes(nodes, edges);
+    this.addProviderNodes(nodes, edges, 'Dependencies', DependenciesId, this.directive.getDependencies());
+    this.addProviderNodes(nodes, edges, 'Providers', ProvidersId, this.directive.getProviders());
+    this.addProviderNodes(nodes, edges, 'View Providers', ViewProvidersId, this.directive.getViewProviders());
     return {
       graph: {
         nodes, edges
@@ -84,12 +88,11 @@ export class DirectiveState extends State {
     };
   }
 
-  private addDependencyNodes(nodes: Node<any>[], edges: any[]) {
-    const deps = this.directive.getDependencies() || [];
-    if (deps.length > 0) {
+  private addProviderNodes(nodes: Node<any>[], edges: any[], rootLabel: string, rootId: string, providers: ProviderSymbol[]) {
+    if (providers.length > 0) {
       nodes.push({
-        id: DependenciesId,
-        label: 'Dependencies',
+        id: rootId,
+        label: rootLabel,
         type: {
           type: SymbolTypes.Meta,
           angular: false
@@ -97,10 +100,10 @@ export class DirectiveState extends State {
       });
       edges.push({
         from: getId(this.directive.symbol),
-        to: DependenciesId
+        to: rootId
       });
     }
-    deps.forEach(p => {
+    providers.forEach(p => {
       nodes.push({
         id: getId(p.symbol),
         data: p,
@@ -114,9 +117,9 @@ export class DirectiveState extends State {
     nodes.forEach(n => {
       this.symbols[n.id] = n.data;
     });
-    nodes.slice(nodes.length - deps.length, nodes.length).map(n => {
+    nodes.slice(nodes.length - providers.length, nodes.length).map(n => {
       edges.push({
-        from: DependenciesId,
+        from: rootId,
         to: n.id,
         direction: Direction.To
       })
