@@ -28,8 +28,8 @@ export class BackgroundApp {
       this.states = [];
       console.log(`Loading project: "${tsconfig}"`);
       this.project = new Project();
+      let parseError = null;
       try {
-        let parseError = null;
         this.project.load(tsconfig, e => parseError = e);
         const rootContext = this.project.rootContext;
         const allModules = rootContext.getModules();
@@ -49,7 +49,14 @@ export class BackgroundApp {
         }
       } catch (exception) {
         console.log(exception);
-        error(e.sender, LoadProject, exception);
+        let message = exception.message;
+        if (parseError) {
+          if (parseError instanceof Error) {
+            parseError = parseError.message;
+          }
+          message = parseError;
+        }
+        error(e.sender, LoadProject, message);
       }
     });
 
