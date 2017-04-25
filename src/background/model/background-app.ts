@@ -29,21 +29,27 @@ export class BackgroundApp {
       console.log(`Loading project: "${tsconfig}"`);
       this.project = new Project();
       try {
-        this.project.load(tsconfig);
+        let parseError = null;
+        this.project.load(tsconfig, e => parseError = e);
         const rootContext = this.project.rootContext;
         const allModules = rootContext.getModules();
         const rootSymbol = rootContext.getContextSummary().type.reference;
-        const module =
-          allModules
-            .filter(m => m.symbol.name === rootSymbol.name &&
-              m.symbol.filePath === rootSymbol.filePath
-            ).pop();
-        this.states.push(new ModuleTreeState(rootContext, module));
-        console.log('Project loaded');
-        success(e.sender, LoadProject, true);
+        if (!parseError) {
+          const module =
+            allModules
+              .filter(m => m.symbol.name === rootSymbol.name &&
+                m.symbol.filePath === rootSymbol.filePath
+              ).pop();
+          this.states.push(new ModuleTreeState(rootContext, module));
+          console.log('Project loaded');
+          success(e.sender, LoadProject, null);
+        } else {
+          console.log(parseError);
+          error(e.sender, LoadProject, parseError.message);
+        }
       } catch (exception) {
         console.log(exception);
-        error(e.sender, LoadProject, false);
+        error(e.sender, LoadProject, exception);
       }
     });
 

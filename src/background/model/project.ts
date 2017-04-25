@@ -1,4 +1,4 @@
-import { ProjectSymbols, ContextSymbols } from 'ngast';
+import { ProjectSymbols, ContextSymbols, ErrorReporter } from 'ngast';
 import { createProgramFromTsConfig } from '../create-program';
 import { readFile, readFileSync } from 'fs';
 
@@ -7,7 +7,7 @@ export class Project {
   private projectSymbols: ProjectSymbols;
   rootContext: ContextSymbols;
 
-  load(tsconfig: string) {
+  load(tsconfig: string, reporter: ErrorReporter) {
     this.projectSymbols = new ProjectSymbols({
       create() {
         return createProgramFromTsConfig(tsconfig);
@@ -25,7 +25,7 @@ export class Project {
       getSync(name: string) {
         return readFileSync(name, { encoding: 'utf-8' });
       }
-    });
+    }, reporter);
     this.rootContext = this.projectSymbols.getRootContext();
     return Promise.resolve(this.rootContext);
   }

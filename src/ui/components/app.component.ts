@@ -14,6 +14,19 @@ export interface SymbolWithId extends StaticSymbol {
   id: string;
 }
 
+const formatError = (error: any) => {
+  if (typeof error === 'string') {
+    return error;
+  } else {
+    try {
+      error = JSON.stringify(error);
+    } catch (e) {
+      console.log('Cannot serialize the error', e);
+    }
+    return error;
+  }
+};
+
 @Component({
   selector: 'ngrev-app',
   template: `
@@ -108,7 +121,7 @@ export class AppComponent {
     private state: StateProxy) {}
 
   ngAfterViewInit() {
-    this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
@@ -133,9 +146,9 @@ export class AppComponent {
         .then(() => this.project.getSymbols())
         .then(symbols => this.queryList = symbols.map(s => ({ key: s.name, value: s })))
         .then(() => this.loading = false)
-        .catch(() => {
+        .catch(error => {
           remote.dialog.showErrorBox('Error while parsing project', 'Cannot parse your project. Make sure it\'s ' +
-          'compatible with the Angular\'s AoT compiler and try again');
+          'compatible with the Angular\'s AoT compiler. Error during parsing:\n\n' + formatError(error));
           this.loading = false;
         });
     });
