@@ -123,7 +123,7 @@ export class AppComponent {
     private state: StateProxy) {}
 
   ngAfterViewInit() {
-    this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
