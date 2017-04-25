@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, ViewChild, ElementRef, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnDestroy, ViewChild, ElementRef, OnChanges, SimpleChanges, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Network, DataSet } from 'vis';
 import { StateProxy } from '../../states/state-proxy';
 import { VisualizationConfig, Layout, Metadata, Direction, SymbolTypes } from '../../../shared/data-format';
@@ -39,7 +39,8 @@ export const TypeToNameMap = {
       display: block;
       position: relative;
     }
-  `]
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VisualizerComponent implements OnChanges, OnDestroy {
   @Input() data: VisualizationConfig<any>;

@@ -7,7 +7,8 @@ import {
   Renderer2,
   QueryList,
   AfterViewInit,
-  Input
+  Input,
+  ChangeDetectionStrategy
 } from '@angular/core';
 
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -60,7 +61,8 @@ const DownArrowKeyCode = 40;
     .selected {
       background: #efefef;
     }
-  `]
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuickAccessListComponent {
   bindData: KeyValuePair<any>[] = [];

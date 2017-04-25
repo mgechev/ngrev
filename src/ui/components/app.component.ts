@@ -1,11 +1,11 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
 import { remote } from 'electron';
 import { ProjectProxy } from '../model/project-proxy';
 import { Network } from 'vis';
 import { ContextSymbols, Symbol } from 'ngast';
 import { StateProxy } from '../states/state-proxy';
 import { VisualizationConfig, Metadata } from '../../shared/data-format';
-import { KeyValuePair } from './quick-access/quck-access.component';
+import { KeyValuePair, QuickAccessComponent } from './quick-access/quck-access.component';
 import { StaticSymbol } from '@angular/compiler';
 
 const BackspaceKeyCode = 8;
@@ -93,6 +93,8 @@ export class AppComponent {
   queryList: KeyValuePair<SymbolWithId>[] = [];
   queryObject = ['value.name', 'value.filePath'];
 
+  @ViewChild(QuickAccessComponent) quickAccess: QuickAccessComponent;
+
   spinner = {
     left: 15,
     top: 8,
@@ -121,7 +123,7 @@ export class AppComponent {
     private state: StateProxy) {}
 
   ngAfterViewInit() {
-    // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
@@ -161,7 +163,7 @@ export class AppComponent {
   }
 
   onKeyDown(e) {
-    if (e.keyCode === 8) {
+    if (e.keyCode === 8 && this.quickAccess && !this.quickAccess.visible()) {
       this.prevState();
     }
   }

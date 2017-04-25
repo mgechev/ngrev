@@ -7,7 +7,8 @@ import {
   Renderer2,
   QueryList,
   AfterViewInit,
-  Input
+  Input,
+  ChangeDetectorRef
 } from '@angular/core';
 
 const Fuse = require('fuse.js');
@@ -15,7 +16,7 @@ const Fuse = require('fuse.js');
 const MetaKeyCodes = [91, 17];
 const PKeyCode = 80;
 const ESCKeyCode = 27;
-
+const BackspaceKeyCode = 8;
 const UpArrowKeyCode = 38;
 const DownArrowKeyCode = 40;
 
@@ -32,7 +33,7 @@ export interface QueryObject {
   selector: 'ngrev-quick-access',
   template: `
     <div class="fuzzy-box" *ngIf="fuzzyBoxVisible" (click)="$event.stopImmediatePropagation()">
-      <input autofocus #input type="text" [(ngModel)]="symbolName">
+      <input autofocus #input type="text" (keydown)="updateKeyword($event)">
       <ngrev-quick-access-list
         *ngIf="search() as results"
         [style.display]="results.length ? 'block' : 'none'"
@@ -82,7 +83,7 @@ export class QuickAccessComponent implements AfterViewInit {
   private symbolName = '';
   private fuse = new Fuse([], { keys: ["name", "filePath"] });
 
-  constructor(private element: ElementRef, private renderer: Renderer2) {}
+  constructor(private element: ElementRef, private renderer: Renderer2, private cd: ChangeDetectorRef) {}
 
   @Input() set queryObject(query: QueryObject) {
     let list = [];
@@ -140,14 +141,25 @@ export class QuickAccessComponent implements AfterViewInit {
     this.hide();
   }
 
+  updateKeyword(event) {
+    this.symbolName = event.target.value;
+    this.cd.detectChanges();
+  }
+
+  visible() {
+    return this.fuzzyBoxVisible;
+  }
+
   private show() {
     this.fuzzyBoxVisible = true;
     this.renderer.setStyle(this.element.nativeElement, 'display', 'block');
+    this.cd.detectChanges();
   }
 
   private hide() {
     this.fuzzyBoxVisible = false;
     this.symbolName = '';
     this.renderer.setStyle(this.element.nativeElement, 'display', 'none');
+    this.cd.detectChanges();
   }
 }
