@@ -45,6 +45,7 @@ const formatError = (error: any) => {
       (select)="tryChangeState($event)">
     </ngrev-visualizer>
     <ngrev-quick-access
+      *ngIf="state.active"
       (select)="selectSymbol($event)"
       [queryList]="queryList"
       [queryObject]="queryObject"

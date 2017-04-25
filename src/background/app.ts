@@ -19,6 +19,8 @@ import {BackgroundApp} from './model/background-app';
 // in config/env_xxx.json file.
 import env from './env';
 
+console.log(env);
+
 var mainWindow;
 
 const backgroundApp = new BackgroundApp();
