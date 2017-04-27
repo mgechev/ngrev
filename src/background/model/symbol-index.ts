@@ -1,6 +1,6 @@
 import { State } from '../states/state';
-import { ProjectSymbols, Symbol } from 'ngast';
-import { getId } from '../../shared/data-format';
+import { ProjectSymbols, Symbol, ProviderSymbol } from 'ngast';
+import { getId, getProviderId } from '../../shared/data-format';
 import { PipeState } from '../states/pipe.state';
 import { ModuleState } from '../states/module.state';
 import { DirectiveState } from '../states/directive.state';
@@ -12,7 +12,7 @@ export interface StateFactory {
 
 export interface SymbolData {
   stateFactory: StateFactory;
-  symbol: Symbol;
+  symbol: Symbol | ProviderSymbol;
 }
 
 export type Index = Map<string, SymbolData>;
@@ -48,7 +48,7 @@ class SymbolIndexImpl {
         }
       }));
     context.getProviders()
-      .forEach(symbol => this.symbolsIndex.set(getId(symbol.symbol), {
+      .forEach(symbol => this.symbolsIndex.set(getProviderId(symbol.getMetadata()), {
         symbol, stateFactory() {
           return new ProviderState(context, symbol);
         }

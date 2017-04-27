@@ -1,4 +1,4 @@
-import { StaticSymbol } from '@angular/compiler';
+import { StaticSymbol, CompileProviderMetadata } from '@angular/compiler';
 export interface Graph<T> {
   nodes: Node<T>[];
   edges: Edge[];
@@ -65,6 +65,32 @@ export const getId = (symbol: { name: string, filePath: string }) => {
   return `${symbol.filePath}#${symbol.name}`;
 };
 
-export const isAngularSymbol = (symbol: StaticSymbol) => {
-  return /node_modules\/@angular/.test(symbol.filePath);
+export const getProviderId = (provider: CompileProviderMetadata) => {
+  if (provider.token.value) {
+    return provider.token.value;
+  } else {
+    return getId(provider.token.identifier.reference);
+  }
+};
+
+export const getProviderName = (provider: CompileProviderMetadata) => {
+  if (provider.token.value) {
+    return provider.token.value;
+  } else {
+    return provider.token.identifier.reference.name;
+  }
+};
+
+export const isAngularSymbol = (symbol: StaticSymbol | CompileProviderMetadata) => {
+  if (symbol instanceof StaticSymbol) {
+    return /node_modules\/@angular/.test(symbol.filePath);
+  } else {
+    if (symbol.token.value) {
+      // We can't be completely sure since we don't know
+      // the filePath but Angular doesn't have any non-reference tokens.
+      return false;
+    } else {
+      return isAngularSymbol(symbol.token.identifier.reference);
+    }
+  }
 };

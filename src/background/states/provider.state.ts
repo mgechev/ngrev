@@ -1,4 +1,4 @@
-import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
+import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes, getProviderId, getProviderName } from '../../shared/data-format';
 import { StaticSymbol } from '@angular/compiler';
 import { ProjectSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
@@ -19,7 +19,7 @@ export class ProviderState extends State {
   private symbols: NodeMap = {};
 
   constructor(context: ProjectSymbols, protected provider: ProviderSymbol) {
-    super(getId(provider.symbol), context);
+    super(getProviderId(provider.getMetadata()), context);
   }
 
   getMetadata(id: string): Metadata {
@@ -38,24 +38,25 @@ export class ProviderState extends State {
   }
 
   getData(): VisualizationConfig<ProviderSymbol> {
-    const symbol = this.provider.symbol;
+    const metadata = this.provider.getMetadata();
     const nodes: Node<ProviderSymbol>[] = [{
-      id: getId(symbol),
+      id: getProviderId(metadata),
       data: this.provider,
-      label: symbol.name,
+      label: getProviderName(metadata),
       type: {
-        angular: isAngularSymbol(symbol),
+        angular: isAngularSymbol(metadata),
         type: SymbolTypes.Provider
       }
     }];
     (this.provider.getDependencies() || [])
       .forEach(p => {
+        const dependencyMetadata = p.getMetadata();
         nodes.push({
-          id: getId(p.symbol),
+          id: getProviderId(dependencyMetadata),
           data: p,
-          label: p.symbol.name,
+          label: getProviderName(dependencyMetadata),
           type: {
-            angular: isAngularSymbol(p.symbol),
+            angular: isAngularSymbol(p.getMetadata()),
             type: SymbolTypes.Provider
           }
         });
@@ -65,8 +66,8 @@ export class ProviderState extends State {
     });
     const edges = nodes.slice(1, nodes.length).map(n => {
       return {
-        from: getId(symbol),
-        to: getId(n.data.symbol),
+        from: getProviderId(metadata),
+        to: getProviderId(n.data.getMetadata()),
         direction: Direction.To
       }
     });

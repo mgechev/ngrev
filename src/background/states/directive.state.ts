@@ -2,7 +2,7 @@ import { DirectiveSymbol, ProjectSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
 import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
 import { DataSet } from 'vis';
-import { VisualizationConfig, Metadata, getId, Node, isAngularSymbol, SymbolTypes, Direction } from '../../shared/data-format';
+import { VisualizationConfig, Metadata, getId, Node, isAngularSymbol, SymbolTypes, Direction, getProviderId, getProviderName } from '../../shared/data-format';
 import { getDirectiveMetadata, getElementMetadata, getProviderMetadata } from '../formatters/model-formatter';
 import { TemplateState } from './template.state';
 import { ProviderState } from './provider.state';
@@ -104,12 +104,13 @@ export class DirectiveState extends State {
       });
     }
     providers.forEach(p => {
+      const m = p.getMetadata();
       nodes.push({
-        id: getId(p.symbol),
+        id: getProviderId(m),
         data: p,
-        label: p.symbol.name,
+        label: getProviderName(m),
         type: {
-          angular: isAngularSymbol(p.symbol),
+          angular: isAngularSymbol(m),
           type: SymbolTypes.Provider
         }
       });

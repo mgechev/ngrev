@@ -3,14 +3,14 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
-import { Node, Edge, Metadata, getId, Direction, SymbolTypes, isAngularSymbol } from '../../shared/data-format';
+import { Node, Edge, Metadata, getId, Direction, SymbolTypes, isAngularSymbol, getProviderId, getProviderName } from '../../shared/data-format';
 import { DirectiveSymbol, ModuleSymbol, ProjectSymbols, Symbol, ProviderSymbol, PipeSymbol } from 'ngast';
 import { getDirectiveMetadata, getModuleMetadata, getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';
 import { PipeState } from './pipe.state';
 
 interface DataType {
-  symbol: Symbol;
+  symbol: Symbol | ProviderSymbol;
   metadata: any;
 }
 
@@ -152,7 +152,7 @@ export class ModuleState extends State {
       this._appendSet(ExportsId, d, nodes, SymbolTypes.Pipe, edges);
     });
     const providers = this.module.getProviders().reduce((prev: any, p) => {
-      const id = getId(p.symbol);
+      const id = getProviderId(p.getMetadata());
       prev[id] = p;
       return prev;
     }, {});
@@ -173,18 +173,25 @@ export class ModuleState extends State {
     };
   }
 
-  private _appendSet(parentSet: string, node: Symbol, nodes: NodeMap, symbolType: SymbolTypes, edges: Edge[]) {
-    const symbol = node.symbol;
-    const id = getId(symbol);
+  private _appendSet(parentSet: string, node: Symbol | ProviderSymbol, nodes: NodeMap, symbolType: SymbolTypes, edges: Edge[]) {
+    let id: string = '';
+    let name = '';
+    if (node instanceof ProviderSymbol) {
+      id = getProviderId(node.getMetadata());
+      name = getProviderName(node.getMetadata());
+    } else {
+      id = getId(node.symbol);
+      name = node.symbol.name;
+    }
     nodes[id] = {
       id,
-      label: symbol.name,
+      label: name,
       data: {
         symbol: node,
         metadata: null
       },
       type: {
-        angular: isAngularSymbol(symbol),
+        angular: node instanceof Symbol ? isAngularSymbol(node.symbol) : isAngularSymbol(node.getMetadata()),
         type: symbolType
       }
     };

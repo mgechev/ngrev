@@ -4,12 +4,13 @@ import { Project } from './project';
 import { State } from '../states/state';
 import { ModuleTreeState } from '../states/module-tree.state';
 import { getModuleMetadata } from '../formatters/model-formatter';
-import { getId } from '../../shared/data-format';
+import { getId, getProviderName } from '../../shared/data-format';
 import { Symbol, ProjectSymbols } from 'ngast';
 import { PipeState } from '../states/pipe.state';
 import { ModuleState } from '../states/module.state';
 import { DirectiveState } from '../states/directive.state';
 import { SymbolIndex, SymbolData } from './symbol-index';
+import { StaticSymbol } from '@angular/compiler';
 
 const success = (sender, msg, payload) => {
   sender.send(msg, Success, payload);
@@ -88,7 +89,12 @@ export class BackgroundApp {
       try {
         const map = SymbolIndex.getIndex(this.project.projectSymbols);
         map.forEach((data: SymbolData, id: string) => {
-          res.push(Object.assign({}, data.symbol.symbol, { id }));
+          if (data.symbol instanceof Symbol) {
+            res.push(Object.assign({}, data.symbol.symbol, { id }));
+          } else {
+            const staticSymbol = new StaticSymbol(null, getProviderName(data.symbol.getMetadata()), []);
+            res.push(Object.assign({}, staticSymbol, { id }));
+          }
         })
       } catch (e) {
         console.error(e);

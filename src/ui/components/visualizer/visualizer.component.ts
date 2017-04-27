@@ -40,8 +40,7 @@ export const TypeToNameMap = {
       display: block;
       position: relative;
     }
-  `],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  `]
 })
 export class VisualizerComponent implements OnChanges, OnDestroy {
   @Input() data: VisualizationConfig<any>;

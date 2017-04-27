@@ -1,4 +1,4 @@
-import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
+import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes, getProviderId, getProviderName } from '../../shared/data-format';
 import { StaticSymbol } from '@angular/compiler';
 import { ProjectSymbols, ProviderSymbol, PipeSymbol } from 'ngast';
 import { State } from './state';
@@ -53,12 +53,13 @@ export class PipeState extends State {
     }];
     (this.pipe.getDependencies() || [])
       .forEach(p => {
+        const m = p.getMetadata();
         nodes.push({
-          id: getId(p.symbol),
+          id: getProviderId(m),
           data: p,
-          label: p.symbol.name,
+          label: getProviderName(m),
           type: {
-            angular: isAngularSymbol(p.symbol),
+            angular: isAngularSymbol(m),
             type: SymbolTypes.Provider
           }
         });
@@ -69,7 +70,7 @@ export class PipeState extends State {
     const edges = nodes.slice(1, nodes.length).map(n => {
       return {
         from: getId(symbol),
-        to: getId(n.data.symbol),
+        to: getProviderId(n.data.getMetadata()),
         direction: Direction.To
       }
     });

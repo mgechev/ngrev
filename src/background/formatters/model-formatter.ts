@@ -15,10 +15,16 @@ const _changeDetectionToString = (cd: ChangeDetectionStrategy) => {
 export const getProviderMetadata = (provider: ProviderSymbol): Metadata => {
   const meta = provider.getMetadata();
   const deps = (meta.deps || []).map(d => d.token.identifier.reference.name).join(', ');
+  let filePath = null;
+  let name = meta.token.value;
+  if (meta.token.identifier) {
+    filePath = meta.token.identifier.reference.filePath;
+    name = meta.token.identifier.reference.name;
+  }
   return {
-    filePath: provider.symbol.filePath,
+    filePath,
     properties: [
-      { key: 'Name', value: provider.symbol.name },
+      { key: 'Name', value: name },
       { key: 'Multiprovider', value: meta.multi.toString() },
       { key: 'Dependencies', value: deps }
     ]
