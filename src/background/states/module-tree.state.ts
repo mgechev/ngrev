@@ -134,7 +134,7 @@ export class ModuleTreeState extends State {
       return [];
     } else {
       const routes = summary.providers.filter(s => {
-        return s.provider.token.identifier.reference.name === 'ROUTES';
+        return s.provider.token.identifier && s.provider.token.identifier.reference.name === 'ROUTES';
       });
       if (!routes.length) {
         return [];
