@@ -2,13 +2,17 @@ import { State } from './state';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { ModuleState } from './module.state';
-import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
+import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction, isAngularSymbol, SymbolTypes, SymbolType } from '../../shared/data-format';
 import { ProjectSymbols, ModuleSymbol } from 'ngast';
 import { getModuleMetadata } from '../formatters/model-formatter';
+import { Trie } from '../utils/suffix-tree';
+import { isAbsolute, normalize, join, sep } from 'path';
 
 interface NodeMap {
   [id: string]: ModuleSymbol;
 }
+
+const ModuleIndex = new Trie<ModuleSymbol>((str: string) => str.split(/\/|#/));
 
 export class ModuleTreeState extends State {
   private data: VisualizationConfig<ModuleSymbol>;
@@ -19,6 +23,14 @@ export class ModuleTreeState extends State {
   // find the symbols corresponding to the lazy-loaded modules and add them to the graph.
   constructor(private rootContext: ProjectSymbols, private module: ModuleSymbol) {
     super(getId(module.symbol), rootContext);
+
+    if (!ModuleIndex.size) {
+      rootContext.getModules()
+        .forEach(m => {
+          ModuleIndex.insert(getId(m.symbol), m);
+        });
+    }
+
     const graph = this._getModuleGraph(module);
     graph.nodes.forEach(n => {
       this.symbols[n.id] = n.data;
@@ -54,6 +66,7 @@ export class ModuleTreeState extends State {
   private _getModuleGraph(module: ModuleSymbol): Graph<ModuleSymbol> {
     const imports = module.getImportedModules();
     const exports = module.getExportedModules();
+    const lazyModules = this._getLazyModules();
     const nodes: Node<ModuleSymbol>[] = [{
         id: getId(module.symbol),
         label: module.symbol.name,
@@ -72,17 +85,71 @@ export class ModuleTreeState extends State {
             type: SymbolTypes.Module
           }
         };
+      })).concat(lazyModules.map(m => {
+        return {
+          id: getId(m.symbol),
+          label: m.symbol.name,
+          data: m,
+          type: {
+            angular: isAngularSymbol(module.symbol),
+            type: SymbolTypes.LazyModule
+          }
+        };
       }));
     const edges = nodes.slice(1, nodes.length).map((n, idx) => {
       return {
         from: nodes[0].id,
         to: n.id,
-        direction: Direction.To
+        direction: Direction.To,
+        dashes: n.type.type === SymbolTypes.LazyModule
       };
     });
     return {
       nodes,
       edges
+    }
+  }
+
+  private _loadChildrenToSymbolId(moduleUri: string) {
+    const currentPath = this.module.symbol.filePath;
+    const moduleUriParts = moduleUri.split('#');
+    if (!/\.js|\.ts/.test(moduleUriParts[0])) {
+      moduleUriParts[0] = moduleUriParts[0] + '.ts';
+    }
+    if (!isAbsolute(moduleUriParts[0])) {
+      const parent = currentPath.split(sep);
+      parent.pop();
+      moduleUriParts[0] = normalize(join(parent.join(sep), moduleUriParts[0]));
+    }
+    console.log(moduleUriParts);
+    return getId({
+      name: moduleUriParts[1],
+      filePath: moduleUriParts[0]
+    });
+  }
+
+  private _getLazyModules(): ModuleSymbol[] {
+    const summary = this.module.getModuleSummary();
+    if (!summary) {
+      return [];
+    } else {
+      const routes = summary.providers.filter(s => {
+        return s.provider.token.identifier.reference.name === 'ROUTES';
+      });
+      if (!routes.length) {
+        return [];
+      } else {
+        const declarations = routes.pop().provider.useValue as any[];
+        if (!declarations) {
+          return [];
+        } else {
+          return declarations
+            .filter(d => !!d.loadChildren)
+            .map(d => this._loadChildrenToSymbolId(d.loadChildren))
+            .map(id => ModuleIndex.get(id))
+            .filter(s => !!s);
+        }
+      }
     }
   }
 }

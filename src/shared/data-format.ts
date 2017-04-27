@@ -13,6 +13,7 @@ export enum SymbolTypes {
   ComponentOrDirective,
   Pipe,
   Module,
+  LazyModule,
   Meta
 }
 
@@ -39,6 +40,7 @@ export interface Edge {
   to: string;
   direction?: Direction;
   data?: any;
+  dashes?: boolean;
 }
 
 export enum Layout {
@@ -59,7 +61,7 @@ export interface Metadata {
 }
 
 
-export const getId = (symbol: StaticSymbol) => {
+export const getId = (symbol: { name: string, filePath: string }) => {
   return `${symbol.filePath}#${symbol.name}`;
 };
 

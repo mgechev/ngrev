@@ -17,6 +17,7 @@ export const TypeToNameMap = {
   [SymbolTypes.Meta]: 'Meta',
   [SymbolTypes.Pipe]: 'Pipe',
   [SymbolTypes.Module]: 'Module',
+  [SymbolTypes.LazyModule]: 'Lazy Module',
   [SymbolTypes.Provider]: 'Provider'
 };
 
