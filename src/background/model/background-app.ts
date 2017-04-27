@@ -31,14 +31,12 @@ export class BackgroundApp {
       let parseError = null;
       try {
         this.project.load(tsconfig, e => parseError = e);
-        const rootContext = this.project.projectSymbols;
-        const allModules = rootContext.getModules();
-        const rootSymbol = rootContext.getContextSummary().type.reference;
+        const allModules = this.project.projectSymbols.getModules();
         if (!parseError) {
           const module =
             allModules
               .filter(m => m.getBootstrapComponents().length).pop();
-          this.states.push(new ModuleTreeState(rootContext, module));
+          this.states.push(new ModuleTreeState(this.project.projectSymbols, module));
           console.log('Project loaded');
           success(e.sender, LoadProject, null);
         } else {

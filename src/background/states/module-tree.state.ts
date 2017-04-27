@@ -14,6 +14,9 @@ export class ModuleTreeState extends State {
   private data: VisualizationConfig<ModuleSymbol>;
   private symbols: NodeMap = {};
 
+  // Based on the summary find all lazy loaded modules (look for `ROUTES` and `loadChildren`)
+  // Based on the content of the `loadChildren` property and the path for the current module
+  // find the symbols corresponding to the lazy-loaded modules and add them to the graph.
   constructor(private rootContext: ProjectSymbols, private module: ModuleSymbol) {
     super(getId(module.symbol), rootContext);
     const graph = this._getModuleGraph(module);
