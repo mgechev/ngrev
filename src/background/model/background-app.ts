@@ -5,7 +5,7 @@ import { State } from '../states/state';
 import { ModuleTreeState } from '../states/module-tree.state';
 import { getModuleMetadata } from '../formatters/model-formatter';
 import { getId } from '../../shared/data-format';
-import { Symbol, ContextSymbols } from 'ngast';
+import { Symbol, ProjectSymbols } from 'ngast';
 import { PipeState } from '../states/pipe.state';
 import { ModuleState } from '../states/module.state';
 import { DirectiveState } from '../states/directive.state';
@@ -31,15 +31,13 @@ export class BackgroundApp {
       let parseError = null;
       try {
         this.project.load(tsconfig, e => parseError = e);
-        const rootContext = this.project.rootContext;
+        const rootContext = this.project.projectSymbols;
         const allModules = rootContext.getModules();
         const rootSymbol = rootContext.getContextSummary().type.reference;
         if (!parseError) {
           const module =
             allModules
-              .filter(m => m.symbol.name === rootSymbol.name &&
-                m.symbol.filePath === rootSymbol.filePath
-              ).pop();
+              .filter(m => m.getBootstrapComponents().length).pop();
           this.states.push(new ModuleTreeState(rootContext, module));
           console.log('Project loaded');
           success(e.sender, LoadProject, null);
@@ -74,7 +72,7 @@ export class BackgroundApp {
 
     ipcMain.on(DirectStateTransition, (e, id: string) => {
       console.log('Direct state transition');
-      const index = SymbolIndex.getIndex(this.project.rootContext);
+      const index = SymbolIndex.getIndex(this.project.projectSymbols);
       const nextState = index.get(id);
       if (nextState) {
         this.states.push(nextState.stateFactory());
@@ -90,7 +88,7 @@ export class BackgroundApp {
       console.log('Get symbols');
       let res = [];
       try {
-        const map = SymbolIndex.getIndex(this.project.rootContext);
+        const map = SymbolIndex.getIndex(this.project.projectSymbols);
         map.forEach((data: SymbolData, id: string) => {
           res.push(Object.assign({}, data.symbol.symbol, { id }));
         })

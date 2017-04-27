@@ -1,18 +1,14 @@
-import { ProjectSymbols, ContextSymbols, ErrorReporter } from 'ngast';
+import { ProjectSymbols, ErrorReporter } from 'ngast';
 import { createProgramFromTsConfig } from '../create-program';
 import { readFile, readFileSync } from 'fs';
 
 export class Project {
 
-  private projectSymbols: ProjectSymbols;
-  rootContext: ContextSymbols;
+  projectSymbols: ProjectSymbols;
 
   load(tsconfig: string, reporter: ErrorReporter) {
-    this.projectSymbols = new ProjectSymbols({
-      create() {
-        return createProgramFromTsConfig(tsconfig);
-      }
-    }, {
+    this.projectSymbols = new ProjectSymbols(
+      createProgramFromTsConfig(tsconfig), {
       get(name: string) {
         return new Promise((resolve: any, reject: any) => {
           readFile(name, (e, data) => {
@@ -21,12 +17,10 @@ export class Project {
           });
         });
       },
-
       getSync(name: string) {
         return readFileSync(name, { encoding: 'utf-8' });
       }
     }, reporter);
-    this.rootContext = this.projectSymbols.getRootContext();
-    return Promise.resolve(this.rootContext);
+    return Promise.resolve(this.projectSymbols);
   }
 }
