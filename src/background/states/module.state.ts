@@ -4,7 +4,7 @@ import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
 import { Node, Edge, Metadata, getId, Direction, SymbolTypes, isAngularSymbol } from '../../shared/data-format';
-import { DirectiveSymbol, ModuleSymbol, ContextSymbols, Symbol, ProviderSymbol, PipeSymbol } from 'ngast';
+import { DirectiveSymbol, ModuleSymbol, ProjectSymbols, Symbol, ProviderSymbol, PipeSymbol } from 'ngast';
 import { getDirectiveMetadata, getModuleMetadata, getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';
 import { PipeState } from './pipe.state';
@@ -28,7 +28,7 @@ export class ModuleState extends State {
 
   private symbols: NodeMap;
 
-  constructor(context: ContextSymbols, protected module: ModuleSymbol) {
+  constructor(context: ProjectSymbols, protected module: ModuleSymbol) {
     super(getId(module.symbol), context);
   }
 

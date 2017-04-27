@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
 import { remote } from 'electron';
 import { ProjectProxy } from '../model/project-proxy';
 import { Network } from 'vis';
-import { ContextSymbols, Symbol } from 'ngast';
+import { ProjectSymbols, Symbol } from 'ngast';
 import { StateProxy } from '../states/state-proxy';
 import { VisualizationConfig, Metadata } from '../../shared/data-format';
 import { KeyValuePair, QuickAccessComponent } from './quick-access/quck-access.component';
@@ -143,7 +143,7 @@ export class AppComponent {
     this.ngZone.run(() => {
       this.loading = true;
       this.project.load(tsconfig)
-        .then((rootContext: ContextSymbols) => this.state = new StateProxy())
+        .then((rootContext: ProjectSymbols) => this.state = new StateProxy())
         .then((proxy: StateProxy) => proxy.getData())
         .then(data => this.currentData = data)
         .then(() => this.project.getSymbols())

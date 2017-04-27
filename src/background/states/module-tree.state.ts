@@ -3,7 +3,7 @@ import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { ModuleState } from './module.state';
 import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
-import { ContextSymbols, ModuleSymbol } from 'ngast';
+import { ProjectSymbols, ModuleSymbol } from 'ngast';
 import { getModuleMetadata } from '../formatters/model-formatter';
 
 interface NodeMap {
@@ -14,7 +14,7 @@ export class ModuleTreeState extends State {
   private data: VisualizationConfig<ModuleSymbol>;
   private symbols: NodeMap = {};
 
-  constructor(private rootContext: ContextSymbols, private module: ModuleSymbol) {
+  constructor(private rootContext: ProjectSymbols, private module: ModuleSymbol) {
     super(getId(module.symbol), rootContext);
     const graph = this._getModuleGraph(module);
     graph.nodes.forEach(n => {

@@ -1,5 +1,5 @@
 import { State } from '../states/state';
-import { ContextSymbols, Symbol } from 'ngast';
+import { ProjectSymbols, Symbol } from 'ngast';
 import { getId } from '../../shared/data-format';
 import { PipeState } from '../states/pipe.state';
 import { ModuleState } from '../states/module.state';
@@ -18,13 +18,13 @@ export interface SymbolData {
 export type Index = Map<string, SymbolData>;
 
 export interface ISymbolIndex {
-  getIndex(context: ContextSymbols): Index;
+  getIndex(context: ProjectSymbols): Index;
 }
 
 class SymbolIndexImpl {
   private symbolsIndex: Index;
 
-  getIndex(context: ContextSymbols) {
+  getIndex(context: ProjectSymbols) {
     if (this.symbolsIndex) {
       return this.symbolsIndex;
     }

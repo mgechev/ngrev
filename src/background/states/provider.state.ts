@@ -1,6 +1,6 @@
 import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
 import { StaticSymbol } from '@angular/compiler';
-import { ContextSymbols, ProviderSymbol } from 'ngast';
+import { ProjectSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
 import { getProviderMetadata } from '../formatters/model-formatter';
 
@@ -18,7 +18,7 @@ export class ProviderState extends State {
 
   private symbols: NodeMap = {};
 
-  constructor(context: ContextSymbols, protected provider: ProviderSymbol) {
+  constructor(context: ProjectSymbols, protected provider: ProviderSymbol) {
     super(getId(provider.symbol), context);
   }
 

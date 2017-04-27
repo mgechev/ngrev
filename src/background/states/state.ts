@@ -1,10 +1,10 @@
 import { DataSet } from 'vis';
 import { StaticSymbol } from '@angular/compiler';
 import { VisualizationConfig, Metadata } from '../../shared/data-format';
-import { ContextSymbols } from 'ngast';
+import { ProjectSymbols } from 'ngast';
 
 export abstract class State {
-  constructor(protected symbolId: string, protected context: ContextSymbols) {} 
+  constructor(protected symbolId: string, protected context: ProjectSymbols) {}
 
   abstract getMetadata(id: string): Metadata;
 

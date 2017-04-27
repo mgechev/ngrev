@@ -1,4 +1,4 @@
-import { DirectiveSymbol, ContextSymbols, ProviderSymbol } from 'ngast';
+import { DirectiveSymbol, ProjectSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
 import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
 import { DataSet } from 'vis';
@@ -16,7 +16,7 @@ const TemplateErrorId = 'template-error';
 export class TemplateState extends State {
   private symbols: NodeMap = {};
 
-  constructor(context: ContextSymbols, protected directive: DirectiveSymbol) {
+  constructor(context: ProjectSymbols, protected directive: DirectiveSymbol) {
     super(getId(directive.symbol), context);
   }
 

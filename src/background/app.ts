@@ -9,7 +9,7 @@ import { app, dialog, Menu, ipcMain } from 'electron';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { applicationMenuTemplate } from './menu/application_menu_template';
 import createWindow from './helpers/window';
-import {ProjectSymbols, ProgramFactory} from 'ngast';
+import {ProjectSymbols} from 'ngast';
 import {createProgramFromTsConfig} from './create-program';
 import {readFileSync, readFile} from 'fs';
 

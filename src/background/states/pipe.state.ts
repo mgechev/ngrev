@@ -1,6 +1,6 @@
 import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes } from '../../shared/data-format';
 import { StaticSymbol } from '@angular/compiler';
-import { ContextSymbols, ProviderSymbol, PipeSymbol } from 'ngast';
+import { ProjectSymbols, ProviderSymbol, PipeSymbol } from 'ngast';
 import { State } from './state';
 import { getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';
@@ -13,7 +13,7 @@ export class PipeState extends State {
 
   private symbols: NodeMap = {};
 
-  constructor(context: ContextSymbols, protected pipe: PipeSymbol) {
+  constructor(context: ProjectSymbols, protected pipe: PipeSymbol) {
     super(getId(pipe.symbol), context);
   }
 
