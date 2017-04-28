@@ -5,7 +5,7 @@ import { ModuleState } from './module.state';
 import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction, isAngularSymbol, SymbolTypes, SymbolType } from '../../shared/data-format';
 import { ProjectSymbols, ModuleSymbol } from 'ngast';
 import { getModuleMetadata } from '../formatters/model-formatter';
-import { Trie } from '../utils/suffix-tree';
+import { Trie } from '../utils/trie';
 import { isAbsolute, normalize, join, sep } from 'path';
 
 interface NodeMap {
@@ -63,6 +63,10 @@ export class ModuleTreeState extends State {
     } else {
       return new ModuleTreeState(this.context, module);
     }
+  }
+
+  destroy() {
+    ModuleIndex.clear();
   }
 
   private _getModuleGraph(module: ModuleSymbol): Graph<ModuleSymbol> {

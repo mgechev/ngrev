@@ -10,7 +10,7 @@ export interface SplitFunction {
 const defaultSplit = (str: string) => str.split('');
 
 export class Trie<T> {
-  private root = new Node<T>();
+  private _root = new Node<T>();
   private _size = 0;
 
   constructor(private splitFunction: SplitFunction = defaultSplit) {}
@@ -34,9 +34,14 @@ export class Trie<T> {
     return null;
   }
 
+  clear() {
+    this._root = new Node<T>();
+    this._size = 0;
+  }
+
   private findNode(key: string, createIfDoesNotExist = false): Node<T> {
     const parts = this.splitFunction(key);
-    let currentNode = this.root;
+    let currentNode = this._root;
     for (let i = 0; i < parts.length; i += 1) {
       let child = currentNode.children[parts[i]];
       if (!child) {

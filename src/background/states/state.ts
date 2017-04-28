@@ -11,4 +11,6 @@ export abstract class State {
   abstract getData(): VisualizationConfig<any>;
 
   abstract nextState(id: string): State | null;
+
+  destroy() {};
 }

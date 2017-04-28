@@ -19,13 +19,14 @@ export type Index = Map<string, SymbolData>;
 
 export interface ISymbolIndex {
   getIndex(context: ProjectSymbols): Index;
+  clear(): void;
 }
 
 class SymbolIndexImpl {
   private symbolsIndex: Index;
 
   getIndex(context: ProjectSymbols) {
-    if (this.symbolsIndex) {
+    if (this.symbolsIndex && this.symbolsIndex.size) {
       return this.symbolsIndex;
     }
     this.symbolsIndex = new Map<string, SymbolData>();
@@ -54,6 +55,10 @@ class SymbolIndexImpl {
         }
       }))
     return this.symbolsIndex;
+  }
+
+  clear() {
+    this.symbolsIndex = new Map<string, SymbolData>();
   }
 }
 

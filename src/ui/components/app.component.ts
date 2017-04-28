@@ -27,6 +27,10 @@ const formatError = (error: any) => {
   }
 };
 
+const isMetaNodeId = (id: string) => {
+  return id.split('#').length !== 2;
+};
+
 @Component({
   selector: 'ngrev-app',
   template: `
@@ -128,11 +132,11 @@ export class AppComponent {
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
-  tryChangeState(nodeId: string, direct = false) {
+  tryChangeState(nodeId: string) {
     this.ngZone.run(() => {
       this.loading = true;
       this.cd.detectChanges();
-      (direct ? this.state.directStateTransfer(nodeId) : this.state.nextState(nodeId))
+      (!isMetaNodeId(nodeId) ? this.state.directStateTransfer(nodeId) : this.state.nextState(nodeId))
         .then(() => this.updateNewState())
         .then(() => this.loading = false)
         .catch(() => this.loading = false);
@@ -159,7 +163,7 @@ export class AppComponent {
 
   selectSymbol(symbolPair: KeyValuePair<SymbolWithId>) {
     if (symbolPair && symbolPair.value) {
-      this.tryChangeState(symbolPair.value.id, true);
+      this.tryChangeState(symbolPair.value.id);
     }
   }
 

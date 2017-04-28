@@ -26,6 +26,9 @@ export class BackgroundApp {
 
   init() {
     ipcMain.on(LoadProject, (e, tsconfig: string) => {
+      this.states.forEach(s => s.destroy());
+      SymbolIndex.clear();
+
       this.states = [];
       console.log(`Loading project: "${tsconfig}"`);
       this.project = new Project();
