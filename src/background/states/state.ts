@@ -6,9 +6,9 @@ import { ProjectSymbols } from 'ngast';
 export abstract class State {
   constructor(protected symbolId: string, protected context: ProjectSymbols) {}
 
-  abstract getMetadata(id: string): Metadata;
+  abstract getMetadata(id: string): Metadata | null;
 
   abstract getData(): VisualizationConfig<any>;
 
-  abstract nextState(id: string): State;
+  abstract nextState(id: string): State | null;
 }

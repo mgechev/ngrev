@@ -4,7 +4,7 @@ import { Metadata, VisualizationConfig } from '../../shared/data-format';
 
 export class StateProxy {
   private ipcBus: IPCBus = new IPCBus();
-  private currentMetadata: Metadata;
+  private currentMetadata: Metadata | null;
   private currentData: VisualizationConfig<any>;
   private dataDirty = true;
   private _active: boolean;

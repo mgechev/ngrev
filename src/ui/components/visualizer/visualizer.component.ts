@@ -52,9 +52,9 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
   @ViewChild('container') container: ElementRef;
 
   usedColors: ColorLegend;
-  metadata: Metadata;
+  metadata: Metadata | null;
 
-  private network: Network;
+  private network: Network | null;
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.stateChanged(changes)) {
@@ -146,14 +146,16 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
   }
 
   private nodeContext(e: any) {
-    const node = this.network.getNodeAt({
-      x: e.event.layerX,
-      y: e.event.layerY
-    }) as string;
+    if (this.network) {
+      const node = this.network.getNodeAt({
+        x: e.event.layerX,
+        y: e.event.layerY
+      }) as string;
 
-    if (node) {
-      this.metadataResolver(node)
-        .then((metadata: Metadata) => this.showContextMenu(node, metadata));
+      if (node) {
+        this.metadataResolver(node)
+          .then((metadata: Metadata) => this.showContextMenu(node, metadata));
+      }
     }
   }
 
@@ -166,7 +168,9 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
       menu.append(new MenuItem({
         label: 'Open File',
         click() {
-          shell.openItem(metadata.filePath);
+          if (metadata && metadata.filePath) {
+            shell.openItem(metadata.filePath);
+          }
         }
       }));
       menu.append(new MenuItem({

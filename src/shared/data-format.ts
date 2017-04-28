@@ -53,11 +53,11 @@ export interface VisualizationConfig<T> {
   graph: Graph<T>;
 }
 
-export type StringPair = { key: string, value: string};
+export type StringPair = { key: string, value: string | null};
 
 export interface Metadata {
   properties: {[key: number]: StringPair};
-  filePath?: string;
+  filePath?: string | null;
 }
 
 
@@ -69,7 +69,10 @@ export const getProviderId = (provider: CompileProviderMetadata) => {
   if (provider.token.value) {
     return provider.token.value;
   } else {
-    return getId(provider.token.identifier.reference);
+    if (provider.token.identifier) {
+      return getId(provider.token.identifier.reference);
+    }
+    return null;
   }
 };
 
@@ -77,7 +80,10 @@ export const getProviderName = (provider: CompileProviderMetadata) => {
   if (provider.token.value) {
     return provider.token.value;
   } else {
-    return provider.token.identifier.reference.name;
+    if (provider.token.identifier) {
+      return provider.token.identifier.reference.name;
+    }
+    return null;
   }
 };
 
@@ -90,7 +96,10 @@ export const isAngularSymbol = (symbol: StaticSymbol | CompileProviderMetadata) 
       // the filePath but Angular doesn't have any non-reference tokens.
       return false;
     } else {
-      return isAngularSymbol(symbol.token.identifier.reference);
+      if (symbol.token.identifier) {
+        return isAngularSymbol(symbol.token.identifier.reference);
+      }
+      return null;
     }
   }
 };

@@ -10,7 +10,7 @@ import { ProviderState } from './provider.state';
 import { PipeState } from './pipe.state';
 
 interface DataType {
-  symbol: Symbol | ProviderSymbol;
+  symbol: Symbol | ProviderSymbol | null;
   metadata: any;
 }
 
@@ -32,8 +32,11 @@ export class ModuleState extends State {
     super(getId(module.symbol), context);
   }
 
-  getMetadata(id: string): Metadata {
+  getMetadata(id: string): Metadata | null {
     const data = this.symbols[id].data;
+    if (!data) {
+      return null;
+    }
     if (data.symbol instanceof DirectiveSymbol) {
       return getDirectiveMetadata(data.symbol);
     } else if (data.symbol instanceof ProviderSymbol) {
@@ -64,54 +67,6 @@ export class ModuleState extends State {
 
   getData() {
     const nodes: NodeMap = {
-      [ExportsId]: {
-        id: ExportsId,
-        label: 'Exports',
-        data: {
-          symbol: null,
-          metadata: null
-        },
-        type: {
-          angular: false,
-          type: SymbolTypes.Meta
-        }
-      },
-      [BootstrapId]: {
-        id: BootstrapId,
-        label: 'Bootstrap',
-        data: {
-          symbol: null,
-          metadata: null
-        },
-        type: {
-          angular: false,
-          type: SymbolTypes.Meta
-        }
-      },
-      [ProvidersId]: {
-        id: ProvidersId,
-        label: 'Providers',
-        data: {
-          symbol: null,
-          metadata: null
-        },
-        type: {
-          angular: false,
-          type: SymbolTypes.Meta
-        }
-      },
-      [DeclarationsId]: {
-        id: DeclarationsId,
-        label: 'Declarations',
-        data: {
-          symbol: null,
-          metadata: null
-        },
-        type: {
-          angular: false,
-          type: SymbolTypes.Meta
-        }
-      },
       [ModuleId]: {
         id: ModuleId,
         label: this.module.symbol.name,
@@ -125,37 +80,102 @@ export class ModuleState extends State {
         }
       }
     };
-    const edges = [
-      { from: ModuleId, to: ExportsId },
-      { from: ModuleId, to: BootstrapId },
-      { from: ModuleId, to: ProvidersId },
-      { from: ModuleId, to: DeclarationsId },
-    ];
-    this.module.getBootstrapComponents().forEach(s => {
-      const node = s.symbol;
-      this._appendSet(BootstrapId, s, nodes, SymbolTypes.ComponentOrDirective, edges);
-    });
-    this.module.getDeclaredDirectives().forEach(s => {
-      const node = s.symbol;
-      this._appendSet(DeclarationsId, s, nodes, SymbolTypes.ComponentOrDirective, edges);
-    });
-    this.module.getExportedDirectives().forEach(d => {
-      const node = d.symbol;
-      this._appendSet(ExportsId, d, nodes, SymbolTypes.ComponentOrDirective, edges);
-    });
+    const edges: Edge[] = [];
+    const bootstrapComponents = this.module.getBootstrapComponents();
+    if (bootstrapComponents.length) {
+      bootstrapComponents.forEach(s => {
+        const node = s.symbol;
+        this._appendSet(BootstrapId, s, nodes, SymbolTypes.ComponentOrDirective, edges);
+      });
+      nodes[BootstrapId] = {
+        id: BootstrapId,
+        label: 'Bootstrap',
+        data: {
+          symbol: null,
+          metadata: null
+        },
+        type: {
+          angular: false,
+          type: SymbolTypes.Meta
+        }
+      };
+      edges.push({ from: ModuleId, to: BootstrapId });
+    }
     this.module.getDeclaredPipes().forEach(s => {
       const node = s.symbol;
       this._appendSet(DeclarationsId, s, nodes, SymbolTypes.Pipe, edges);
     });
-    this.module.getExportedPipes().forEach(d => {
-      const node = d.symbol;
-      this._appendSet(ExportsId, d, nodes, SymbolTypes.Pipe, edges);
-    });
+    const declarations: (PipeSymbol | DirectiveSymbol)[] = this.module.getDeclaredDirectives();
+    this.module.getDeclaredPipes().forEach(d => declarations.push(d));
+    if (declarations.length) {
+      declarations.forEach(s => {
+        const node = s.symbol;
+        if (node instanceof PipeSymbol) {
+          this._appendSet(DeclarationsId, s, nodes, SymbolTypes.Pipe, edges);
+        } else {
+          this._appendSet(DeclarationsId, s, nodes, SymbolTypes.ComponentOrDirective, edges);
+        }
+      });
+      nodes[DeclarationsId] = {
+        id: DeclarationsId,
+        label: 'Declarations',
+        data: {
+          symbol: null,
+          metadata: null
+        },
+        type: {
+          angular: false,
+          type: SymbolTypes.Meta
+        }
+      };
+      edges.push({ from: ModuleId, to: DeclarationsId });
+    }
+
+    const exports: (PipeSymbol | DirectiveSymbol)[] = this.module.getExportedDirectives();
+    this.module.getExportedPipes().forEach(d => exports.push(d));
+    if (exports.length) {
+      this.module.getExportedDirectives().forEach(d => {
+        const node = d.symbol;
+        this._appendSet(ExportsId, d, nodes, SymbolTypes.ComponentOrDirective, edges);
+      });
+      this.module.getExportedPipes().forEach(d => {
+        const node = d.symbol;
+        this._appendSet(ExportsId, d, nodes, SymbolTypes.Pipe, edges);
+      });
+      nodes[ExportsId] = {
+        id: ExportsId,
+        label: 'Exports',
+        data: {
+          symbol: null,
+          metadata: null
+        },
+        type: {
+          angular: false,
+          type: SymbolTypes.Meta
+        }
+      };
+      edges.push({ from: ModuleId, to: ExportsId });
+    }
     const providers = this.module.getProviders().reduce((prev: any, p) => {
       const id = getProviderId(p.getMetadata());
       prev[id] = p;
       return prev;
     }, {});
+    if (Object.keys(providers).length) {
+      edges.push({ from: ModuleId, to: ProvidersId });
+      nodes[ProvidersId] = {
+        id: ProvidersId,
+        label: 'Providers',
+        data: {
+          symbol: null,
+          metadata: null
+        },
+        type: {
+          angular: false,
+          type: SymbolTypes.Meta
+        }
+      };
+    }
     Object.keys(providers).forEach(key => {
       this._appendSet(ProvidersId, providers[key], nodes, SymbolTypes.Provider, edges);
     });

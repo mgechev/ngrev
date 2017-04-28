@@ -3,18 +3,28 @@ import { DirectiveSymbol, ProviderSymbol, PipeSymbol } from 'ngast';
 import { Metadata } from '../../shared/data-format';
 import { StaticSymbol, ElementAst } from '@angular/compiler';
 
-const _changeDetectionToString = (cd: ChangeDetectionStrategy) => {
+const _changeDetectionToString = (cd: ChangeDetectionStrategy | null): string | null => {
   switch (cd) {
     case ChangeDetectionStrategy.Default:
       return 'Default';
     case ChangeDetectionStrategy.OnPush:
       return 'OnPush';
   }
+  return null;
 };
 
 export const getProviderMetadata = (provider: ProviderSymbol): Metadata => {
   const meta = provider.getMetadata();
-  const deps = (meta.deps || []).map(d => d.token.identifier.reference.name).join(', ');
+  const deps = (meta.deps || []).map(d => {
+    const t = d.token;
+    if (t) {
+      if (t.identifier) {
+        return t.identifier.reference.name;
+      }
+      return t.value;
+    };
+    return 'Undefined';
+  }).join(', ');
   let filePath = null;
   let name = meta.token.value;
   if (meta.token.identifier) {
@@ -25,7 +35,7 @@ export const getProviderMetadata = (provider: ProviderSymbol): Metadata => {
     filePath,
     properties: [
       { key: 'Name', value: name },
-      { key: 'Multiprovider', value: meta.multi.toString() },
+      { key: 'Multiprovider', value: (meta.multi === true).toString() },
       { key: 'Dependencies', value: deps }
     ]
   };
@@ -36,14 +46,19 @@ export const getPipeMetadata = (pipe: PipeSymbol): Metadata => {
   return {
     filePath: pipe.symbol.filePath,
     properties: [
-      { key: 'Name', value: meta.name },
-      { key: 'Pure', value: meta.pure.toString() }
+      { key: 'Name', value: (meta || { name: 'Unknown' }).name },
+      { key: 'Pure', value: ((meta || { pure: true }).pure === true).toString() }
     ]
   };
 };
 
 export const getDirectiveMetadata = (dir: DirectiveSymbol): Metadata => {
-  const meta = dir.getNonResolvedMetadata();
+  const meta = dir.getNonResolvedMetadata() || {
+    selector: 'Unknown',
+    isComponent: false,
+    changeDetection: null,
+    exportAs: null
+  };
   return {
     filePath: dir.symbol.filePath,
     properties: [

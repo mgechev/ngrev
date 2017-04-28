@@ -1,4 +1,4 @@
-import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes, getProviderId, getProviderName } from '../../shared/data-format';
+import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes, getProviderId, getProviderName, Edge } from '../../shared/data-format';
 import { StaticSymbol } from '@angular/compiler';
 import { ProjectSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
@@ -50,6 +50,7 @@ export class ProviderState extends State {
     }];
     (this.provider.getDependencies() || [])
       .forEach(p => {
+        console.log(p);
         const dependencyMetadata = p.getMetadata();
         nodes.push({
           id: getProviderId(dependencyMetadata),
@@ -61,19 +62,23 @@ export class ProviderState extends State {
           }
         });
       });
-    nodes.forEach(n => {
-      this.symbols[n.id] = n.data;
-    });
-    const edges = nodes.slice(1, nodes.length).map(n => {
-      return {
-        from: getProviderId(metadata),
-        to: getProviderId(n.data.getMetadata()),
-        direction: Direction.To
+    nodes.forEach(n => n.data && (this.symbols[n.id] = n.data));
+    const resultEdges: Edge[] = [];
+    const edges = nodes.slice(1, nodes.length).forEach(n => {
+      const data = n.data;
+      if (data) {
+        resultEdges.push({
+          from: getProviderId(metadata),
+          to: getProviderId(data.getMetadata()),
+          direction: Direction.To
+        });
+      } else {
+        console.warn('No data for ' + getProviderName(metadata));
       }
     });
     return {
       layout: Layout.Regular,
-      graph: { edges, nodes }
+      graph: { edges: resultEdges, nodes }
     };
   }
 

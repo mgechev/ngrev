@@ -29,27 +29,34 @@ export class BackgroundApp {
       this.states = [];
       console.log(`Loading project: "${tsconfig}"`);
       this.project = new Project();
-      let parseError = null;
+      let parseError: string | null = null;
       try {
         this.project.load(tsconfig, e => parseError = e);
         const allModules = this.project.projectSymbols.getModules();
         if (!parseError) {
           const module =
             allModules
-              .filter(m => m.getBootstrapComponents().length).pop();
-          this.states.push(new ModuleTreeState(this.project.projectSymbols, module));
-          console.log('Project loaded');
-          success(e.sender, LoadProject, null);
+              .filter(m => {
+                console.log(m.symbol.name);
+                return m.getBootstrapComponents().length
+              }).pop();
+          if (module) {
+            console.log('Project loaded');
+            this.states.push(new ModuleTreeState(this.project.projectSymbols, module));
+            success(e.sender, LoadProject, null);
+          } else {
+            error(e.sender, LoadProject, 'Cannot find the root module of your project.');
+          }
         } else {
           console.log(parseError);
-          error(e.sender, LoadProject, parseError.message);
+          error(e.sender, LoadProject, (parseError as Error).message);
         }
       } catch (exception) {
         console.log(exception);
         let message = exception.message;
         if (parseError) {
           if (parseError instanceof Error) {
-            parseError = parseError.message;
+            parseError = (parseError as Error).message;
           }
           message = parseError;
         }
@@ -85,14 +92,14 @@ export class BackgroundApp {
 
     ipcMain.on(GetSymbols, e => {
       console.log('Get symbols');
-      let res = [];
+      let res: any[] = [];
       try {
         const map = SymbolIndex.getIndex(this.project.projectSymbols);
         map.forEach((data: SymbolData, id: string) => {
           if (data.symbol instanceof Symbol) {
             res.push(Object.assign({}, data.symbol.symbol, { id }));
           } else {
-            const staticSymbol = new StaticSymbol(null, getProviderName(data.symbol.getMetadata()), []);
+            const staticSymbol = new StaticSymbol('', getProviderName(data.symbol.getMetadata()), []);
             res.push(Object.assign({}, staticSymbol, { id }));
           }
         })
@@ -104,29 +111,42 @@ export class BackgroundApp {
 
     ipcMain.on(GetMetadata, (e, id: string) => {
       console.log('Getting metadata');
-      success(e.sender, GetMetadata, this.state.getMetadata(id));
+      if (this.state) {
+        success(e.sender, GetMetadata, this.state.getMetadata(id));
+      } else {
+        error(e.sender, GetMetadata, null);
+      }
     });
 
     ipcMain.on(GetData, e => {
       console.log('Getting data');
-      success(e.sender, GetData, this.state.getData());
+      if (this.state) {
+        success(e.sender, GetData, this.state.getData());
+      } else {
+        error(e.sender, GetData, null);
+      }
     });
 
     ipcMain.on(NextState, (e, id: string) => {
       console.log('Moving to next state');
-      const nextState = this.state.nextState(id);
-      if (nextState) {
-        this.states.push(nextState);
-        console.log('Found next state');
-        success(e.sender, NextState, true);
-      } else {
+      if (!this.state) {
         console.log('No next state');
         error(e.sender, NextState, false);
+      } else {
+        const nextState = this.state.nextState(id);
+        if (nextState) {
+          this.states.push(nextState);
+          console.log('Found next state');
+          success(e.sender, NextState, true);
+        } else {
+          console.log('No next state');
+          error(e.sender, NextState, false);
+        }
       }
     });
   }
 
-  get state() {
+  get state(): State | undefined {
     return this.states[this.states.length - 1];
   }
 }

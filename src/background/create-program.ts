@@ -8,7 +8,7 @@ export const normalizeOptions = (options: any, configFilePath: string) => {
   console.log(configFilePath);
 };
 
-export const createProgramFromTsConfig = (configFile: string, overrideFiles: string[] = undefined): ts.Program => {
+export const createProgramFromTsConfig = (configFile: string, overrideFiles: string[] | undefined = undefined): ts.Program => {
   const projectDirectory = dirname(configFile);
   const { config } = ts.readConfigFile(configFile, ts.sys.readFile);
 

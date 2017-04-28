@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { APP_BASE_HREF } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './components/app.component';
 import { HomeComponent } from './components/home.component';

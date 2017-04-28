@@ -33,7 +33,9 @@ export class ModuleTreeState extends State {
 
     const graph = this._getModuleGraph(module);
     graph.nodes.forEach(n => {
-      this.symbols[n.id] = n.data;
+      if (n.data) {
+        this.symbols[n.id] = n.data;
+      }
     });
     this.data = {
       graph,
@@ -41,7 +43,7 @@ export class ModuleTreeState extends State {
     }
   }
 
-  getMetadata(id: string): Metadata {
+  getMetadata(id: string): Metadata | null {
     const m = this.symbols[id];
     if (m && m.symbol) {
       return getModuleMetadata(m.symbol);
@@ -54,7 +56,7 @@ export class ModuleTreeState extends State {
   }
 
   // Switch to binary search if gets too slow.
-  nextState(id: string) {
+  nextState(id: string): State {
     const module = this.symbols[id];
     if (module === this.module) {
       return new ModuleState(this.context, module);
@@ -101,7 +103,7 @@ export class ModuleTreeState extends State {
         from: nodes[0].id,
         to: n.id,
         direction: Direction.To,
-        dashes: n.type.type === SymbolTypes.LazyModule
+        dashes: n.type && n.type.type === SymbolTypes.LazyModule
       };
     });
     return {
@@ -136,18 +138,24 @@ export class ModuleTreeState extends State {
       const routes = summary.providers.filter(s => {
         return s.provider.token.identifier && s.provider.token.identifier.reference.name === 'ROUTES';
       });
-      if (!routes.length) {
+      if (!routes) {
+        return [];
+      }
+      const currentDeclarations = routes.pop();
+      if (!currentDeclarations) {
         return [];
       } else {
-        const declarations = routes.pop().provider.useValue as any[];
+        const declarations = currentDeclarations.provider.useValue as any[];
         if (!declarations) {
           return [];
         } else {
-          return declarations
+          const result: ModuleSymbol[] = [];
+          declarations
             .filter(d => !!d.loadChildren)
             .map(d => this._loadChildrenToSymbolId(d.loadChildren))
             .map(id => ModuleIndex.get(id))
-            .filter(s => !!s);
+            .forEach(d => d && result.push(d));
+          return result;
         }
       }
     }

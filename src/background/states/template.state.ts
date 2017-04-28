@@ -20,16 +20,16 @@ export class TemplateState extends State {
     super(getId(directive.symbol), context);
   }
 
-  getMetadata(id: string): Metadata {
+  getMetadata(id: string): Metadata | null {
     const s = this.symbols[id];
-    if (!s) {
-      return null;
+    if (s) {
+      if (s instanceof ElementAst) {
+        return getElementMetadata(s);
+      } else if (s instanceof DirectiveSymbol) {
+        return getDirectiveMetadata(s);
+      }
     }
-    if (s instanceof ElementAst) {
-      return getElementMetadata(s);
-    } else if (s instanceof DirectiveSymbol) {
-      return getDirectiveMetadata(s);
-    }
+    return null;
   }
 
   nextState(id: string) {
@@ -117,7 +117,7 @@ export class TemplateState extends State {
           addNodes(n.children.filter(c => c instanceof ElementAst) as ElementAst[], nodeId);
         })
       };
-      addNodes(rootNodes.filter(c => c instanceof ElementAst) as ElementAst[], TemplateId);
+      addNodes((rootNodes || []).filter(c => c instanceof ElementAst) as ElementAst[], TemplateId);
     }
   }
 
@@ -125,7 +125,8 @@ export class TemplateState extends State {
     return componentDirs.filter(d => {
       const ref = d.directive.type.reference;
       const symbol = dirMap[ref.filePath + '#' + ref.name];
-      if (symbol && symbol.getNonResolvedMetadata().isComponent) {
+      const metadata = symbol.getNonResolvedMetadata();
+      if (symbol && metadata && metadata.isComponent) {
         return true;
       }
       return false;

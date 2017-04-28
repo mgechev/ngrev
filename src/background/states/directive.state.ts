@@ -2,7 +2,7 @@ import { DirectiveSymbol, ProjectSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
 import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
 import { DataSet } from 'vis';
-import { VisualizationConfig, Metadata, getId, Node, isAngularSymbol, SymbolTypes, Direction, getProviderId, getProviderName } from '../../shared/data-format';
+import { VisualizationConfig, Metadata, getId, Node, isAngularSymbol, SymbolTypes, Direction, getProviderId, getProviderName, Edge } from '../../shared/data-format';
 import { getDirectiveMetadata, getElementMetadata, getProviderMetadata } from '../formatters/model-formatter';
 import { TemplateState } from './template.state';
 import { ProviderState } from './provider.state';
@@ -24,18 +24,18 @@ export class DirectiveState extends State {
     super(getId(directive.symbol), context);
   }
 
-  getMetadata(id: string): Metadata {
+  getMetadata(id: string): Metadata | null {
     const s = this.symbols[id];
-    if (!s) {
-      return null;
+    if (s) {
+      if (s instanceof ElementAst) {
+        return getElementMetadata(s);
+      } else if (s instanceof DirectiveSymbol) {
+        return getDirectiveMetadata(s);
+      } else if (s instanceof ProviderSymbol) {
+        return getProviderMetadata(s);
+      }
     }
-    if (s instanceof ElementAst) {
-      return getElementMetadata(s);
-    } else if (s instanceof DirectiveSymbol) {
-      return getDirectiveMetadata(s);
-    } else if (s instanceof ProviderSymbol) {
-      return getProviderMetadata(s);
-    }
+    return null;
   }
 
   nextState(id: string) {
@@ -66,18 +66,22 @@ export class DirectiveState extends State {
         type: SymbolTypes.Component,
         angular: isAngularSymbol(s)
       }
-    }, {
-      id: TemplateId,
-      label: 'Template',
-      type: {
-        type: SymbolTypes.Meta,
-        angular: false
-      }
     }];
-    const edges = [{
-      from: nodeId,
-      to: TemplateId
-    }];
+    const edges: Edge[] = [];
+    if (this.directive.isComponent()) {
+      nodes.push({
+        id: TemplateId,
+        label: 'Template',
+        type: {
+          type: SymbolTypes.Meta,
+          angular: false
+        }
+      });
+      edges.push({
+        from: nodeId,
+        to: TemplateId
+      });
+    }
     this.addProviderNodes(nodes, edges, 'Dependencies', DependenciesId, this.directive.getDependencies());
     this.addProviderNodes(nodes, edges, 'Providers', ProvidersId, this.directive.getProviders());
     this.addProviderNodes(nodes, edges, 'View Providers', ViewProvidersId, this.directive.getViewProviders());
