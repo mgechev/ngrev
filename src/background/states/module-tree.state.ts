@@ -123,7 +123,6 @@ export class ModuleTreeState extends State {
       parent.pop();
       moduleUriParts[0] = normalize(join(parent.join(sep), moduleUriParts[0]));
     }
-    console.log(moduleUriParts);
     return getId({
       name: moduleUriParts[1],
       filePath: moduleUriParts[0]

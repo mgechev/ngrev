@@ -39,8 +39,10 @@ export class ProviderState extends State {
 
   getData(): VisualizationConfig<ProviderSymbol> {
     const metadata = this.provider.getMetadata();
+    const existing: {[key: string]: number} = {};
+    const currentId = getProviderId(metadata);
     const nodes: Node<ProviderSymbol>[] = [{
-      id: getProviderId(metadata),
+      id: currentId,
       data: this.provider,
       label: getProviderName(metadata),
       type: {
@@ -48,32 +50,37 @@ export class ProviderState extends State {
         type: SymbolTypes.Provider
       }
     }];
+    existing[currentId] = 1;
     (this.provider.getDependencies() || [])
       .forEach(p => {
-        console.log(p);
         const dependencyMetadata = p.getMetadata();
-        nodes.push({
-          id: getProviderId(dependencyMetadata),
-          data: p,
-          label: getProviderName(dependencyMetadata),
-          type: {
-            angular: isAngularSymbol(p.getMetadata()),
-            type: SymbolTypes.Provider
-          }
-        });
+        // Handle @SkipSelf()
+        const id = getProviderId(dependencyMetadata);
+        if (!existing[id]) {
+          nodes.push({
+            id,
+            data: p,
+            label: getProviderName(dependencyMetadata),
+            type: {
+              angular: isAngularSymbol(p.getMetadata()),
+              type: SymbolTypes.Provider
+            }
+          });
+        }
+        existing[id] = (existing[id] || 0) + 1;
       });
+    existing[currentId] -= 1;
     nodes.forEach(n => n.data && (this.symbols[n.id] = n.data));
     const resultEdges: Edge[] = [];
-    const edges = nodes.slice(1, nodes.length).forEach(n => {
-      const data = n.data;
-      if (data) {
+
+    // Show only a single arrow
+    Object.keys(existing).forEach(id => {
+      if (existing[id] >= 1) {
         resultEdges.push({
-          from: getProviderId(metadata),
-          to: getProviderId(data.getMetadata()),
+          from: currentId,
+          to: id,
           direction: Direction.To
         });
-      } else {
-        console.warn('No data for ' + getProviderName(metadata));
       }
     });
     return {

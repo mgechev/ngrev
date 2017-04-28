@@ -180,7 +180,6 @@ export class ModuleState extends State {
       this._appendSet(ProvidersId, providers[key], nodes, SymbolTypes.Provider, edges);
     });
     this.symbols = nodes;
-    console.log(edges);
     return {
       graph: {
         nodes: Object.keys(nodes).map((key: string) => {

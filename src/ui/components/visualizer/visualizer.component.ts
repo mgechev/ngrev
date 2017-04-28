@@ -163,7 +163,6 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
     const { Menu, MenuItem } = remote;
     const menu = new Menu()
     const self = this;
-    console.log(metadata);
     if (metadata && metadata.filePath) {
       menu.append(new MenuItem({
         label: 'Open File',
