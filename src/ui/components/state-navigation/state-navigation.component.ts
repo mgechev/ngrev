@@ -19,7 +19,8 @@ const MetaMemento = new Memento(dummyConfig);
 @Component({
   selector: 'ngrev-state-navigation',
   template: `
-    <ul>
+    <h2 *ngIf="states.length">History</h2>
+    <ul *ngIf="states.length">
       <li
         [class.state]="!isMetaState(memento)"
         [class.meta]="isMetaState(memento)"
@@ -40,10 +41,21 @@ const MetaMemento = new Memento(dummyConfig);
   styles: [`
     :host {
       position: absolute;
-      top: 40px;
+      top: 30px;
       width: 100%;
       display: flex;
+      flex-direction: column;
       z-index: 10;
+    }
+    h2 {
+      text-align: center;
+      display: block;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      margin-bottom: 13px;
+      font-size: 13px;
+      font-weight: 400;
     }
     ul {
       list-style: none;
