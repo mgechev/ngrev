@@ -26,6 +26,7 @@ export class DirectiveState extends State {
 
   getMetadata(id: string): Metadata | null {
     const s = this.symbols[id];
+    console.log(Object.keys(this.symbols));
     if (s) {
       if (s instanceof ElementAst) {
         return getElementMetadata(s);
@@ -82,9 +83,10 @@ export class DirectiveState extends State {
         to: TemplateId
       });
     }
-    this.addProviderNodes(nodes, edges, 'Dependencies', DependenciesId, this.directive.getDependencies());
-    this.addProviderNodes(nodes, edges, 'Providers', ProvidersId, this.directive.getProviders());
-    this.addProviderNodes(nodes, edges, 'View Providers', ViewProvidersId, this.directive.getViewProviders());
+    const addedSymbols: {[key: string]: boolean} = {};
+    this.addProviderNodes(nodes, edges, addedSymbols, 'Dependencies', DependenciesId, this.directive.getDependencies());
+    this.addProviderNodes(nodes, edges, addedSymbols, 'Providers', ProvidersId, this.directive.getProviders());
+    this.addProviderNodes(nodes, edges, addedSymbols, 'View Providers', ViewProvidersId, this.directive.getViewProviders());
     return {
       title: this.directive.symbol.name,
       graph: {
@@ -93,7 +95,7 @@ export class DirectiveState extends State {
     };
   }
 
-  private addProviderNodes(nodes: Node<any>[], edges: any[], rootLabel: string, rootId: string, providers: ProviderSymbol[]) {
+  private addProviderNodes(nodes: Node<any>[], edges: any[], addedSymbols: {[key: string]: boolean}, rootLabel: string, rootId: string, providers: ProviderSymbol[]) {
     if (providers.length > 0) {
       nodes.push({
         id: rootId,
@@ -108,27 +110,43 @@ export class DirectiveState extends State {
         to: rootId
       });
     }
+    const existing = {};
+    const directiveId = getId(this.directive.symbol);
     providers.forEach(p => {
       const m = p.getMetadata();
-      nodes.push({
-        id: getProviderId(m),
+      const id = getProviderId(m);
+      existing[id] = (existing[id] || 0) + 1;
+      const node = {
+        id,
         data: p,
         label: getProviderName(m),
         type: {
           angular: isAngularSymbol(m),
           type: SymbolTypes.Provider
         }
-      });
+      };
+      // Handle circular references
+      if (!addedSymbols[id]) {
+        nodes.push(node);
+        addedSymbols[id] = true;
+      }
+    });
+    if (existing[directiveId]) {
+      edges.push({
+        from: rootId,
+        to: directiveId,
+        direction: Direction.To
+      })
+    }
+    Object.keys(existing).forEach((key: string) => {
+      edges.push({
+        from: rootId,
+        to: key,
+        direction: Direction.To
+      })
     });
     nodes.forEach(n => {
       this.symbols[n.id] = n.data;
-    });
-    nodes.slice(nodes.length - providers.length, nodes.length).map(n => {
-      edges.push({
-        from: rootId,
-        to: n.id,
-        direction: Direction.To
-      })
     });
   }
 }
