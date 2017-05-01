@@ -7,7 +7,7 @@ import { Memento } from '../../model/state-manager';
 const BoxWidth = 40;
 
 const dummyConfig: VisualizationConfig<any> = {
-  title: '',
+  title: '...',
   graph: {
     nodes: [],
     edges: []
@@ -108,7 +108,7 @@ const MetaMemento = new Memento(dummyConfig);
     .label {
       position: absolute;
       top: -2px;
-      left: 15px;
+      left: 13px;
       font-size: 16px;
       display: block;
     }

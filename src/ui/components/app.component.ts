@@ -119,26 +119,28 @@ export class AppComponent {
     private cd: ChangeDetectorRef) {}
 
   ngAfterViewInit() {
-    // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
   onWindowResize(e: any) {
     this.maxStateNavigationWidth = e.target.innerWidth;
+    this.cd.detectChanges();
   }
 
   onProject(tsconfig: string) {
-    this._startLoading()
-    this.manager.loadProject(tsconfig)
-      .then(() => this.project.getSymbols())
-      .then((symbols) => this.queryList = symbols.map(s => ({ key: s.name, value: s })))
-      .then(this._stopLoading)
-      .then(() => this.cd.detectChanges())
-      .catch(error => {
-        remote.dialog.showErrorBox('Error while parsing project', 'Cannot parse your project. Make sure it\'s ' +
-        'compatible with the Angular\'s AoT compiler. Error during parsing:\n\n' + formatError(error));
-        this._stopLoading();
-      });
+    this.ngZone.run(() => {
+      this._startLoading()
+      this.manager.loadProject(tsconfig)
+        .then(() => this.project.getSymbols())
+        .then((symbols) => this.queryList = symbols.map(s => ({ key: s.name, value: s })))
+        .then(this._stopLoading)
+        .catch(error => {
+          remote.dialog.showErrorBox('Error while parsing project', 'Cannot parse your project. Make sure it\'s ' +
+          'compatible with the Angular\'s AoT compiler. Error during parsing:\n\n' + formatError(error));
+          this._stopLoading();
+        });
+    });
   }
 
   onKeyDown(e) {
@@ -148,10 +150,12 @@ export class AppComponent {
   }
 
   tryChangeState(id: string) {
-    this._startLoading();
-    this.manager.tryChangeState(id)
-      .then(this._stopLoading)
-      .catch(this._stopLoading);
+    this.ngZone.run(() => {
+      this._startLoading();
+      this.manager.tryChangeState(id)
+        .then(this._stopLoading)
+        .catch(this._stopLoading);
+    });
   }
 
   selectSymbol(symbolPair: KeyValuePair<SymbolWithId>) {
@@ -161,19 +165,17 @@ export class AppComponent {
   }
 
   restoreMemento(memento: Memento) {
-    this._startLoading();
     this.manager.restoreMemento(memento)
       .then(this._stopLoading)
       .catch(this._stopLoading);
   }
 
   private prevState() {
-    const mementos = this.manager.getHistory();
-    if (mementos.length > 1) {
-      this._startLoading();
-      this.manager.restoreMemento(mementos[mementos.length - 2])
-        .then(this._stopLoading)
-        .catch(this._stopLoading);
-    }
+    this.ngZone.run(() => {
+      const mementos = this.manager.getHistory();
+      if (mementos.length > 1) {
+        this.restoreMemento(mementos[mementos.length - 2]);
+      }
+    });
   }
 }
