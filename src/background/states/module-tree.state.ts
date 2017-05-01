@@ -38,7 +38,7 @@ export class ModuleTreeState extends State {
       }
     });
     this.data = {
-      title: module.symbol.name,
+      title: `${module.symbol.name}'s imports & exports`,
       graph,
       layout: Layout.Regular
     }

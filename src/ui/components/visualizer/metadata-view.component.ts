@@ -19,8 +19,8 @@ import { Metadata } from '../../../shared/data-format';
   `,
   styles: [`
   table {
-    bottom: 0;
-    right: 0;
+    bottom: 7px;
+    right: 3px;
     position: absolute;
     background-color: rgba(255, 255, 255, 0.8);
     font-size: 13px;

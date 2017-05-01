@@ -107,6 +107,10 @@ export class AppComponent {
     this.loading = false;
     this.cd.detectChanges();
   };
+  private _startLoading = () => {
+    this.loading = true;
+    this.cd.detectChanges();
+  };
 
   constructor(
     private ngZone: NgZone,
@@ -124,18 +128,16 @@ export class AppComponent {
   }
 
   onProject(tsconfig: string) {
-    this.loading = true;
-    this.cd.detectChanges();
+    this._startLoading()
     this.manager.loadProject(tsconfig)
       .then(() => this.project.getSymbols())
       .then((symbols) => this.queryList = symbols.map(s => ({ key: s.name, value: s })))
-      .then(() => this.loading = false)
+      .then(this._stopLoading)
       .then(() => this.cd.detectChanges())
       .catch(error => {
         remote.dialog.showErrorBox('Error while parsing project', 'Cannot parse your project. Make sure it\'s ' +
         'compatible with the Angular\'s AoT compiler. Error during parsing:\n\n' + formatError(error));
-        this.loading = false;
-        this.cd.detectChanges();
+        this._stopLoading();
       });
   }
 
@@ -146,7 +148,7 @@ export class AppComponent {
   }
 
   tryChangeState(id: string) {
-    this.loading = true;
+    this._startLoading();
     this.manager.tryChangeState(id)
       .then(this._stopLoading)
       .catch(this._stopLoading);
@@ -159,35 +161,19 @@ export class AppComponent {
   }
 
   restoreMemento(memento: Memento) {
-    const stopLoading =
+    this._startLoading();
     this.manager.restoreMemento(memento)
       .then(this._stopLoading)
       .catch(this._stopLoading);
   }
 
   private prevState() {
-    const stopLoading = () => {
-      this.loading = false;
-      this.cd.detectChanges();
-    };
-    this.loading = true;
-    this.cd.detectChanges();
     const mementos = this.manager.getHistory();
     if (mementos.length > 1) {
-      this.manager.restoreMemento(mementos[mementos.length - 1])
+      this._startLoading();
+      this.manager.restoreMemento(mementos[mementos.length - 2])
         .then(this._stopLoading)
         .catch(this._stopLoading);
     }
   }
-
-  // private updateNewState() {
-  //   this.ngZone.run(() => {
-  //     this.loading = true;
-  //     this.cd.detectChanges();
-  //     this.state.getData()
-  //       .then(data => this.currentData = data)
-  //       .then(() => this.loading = false)
-  //       .catch(() => this.loading = false);
-  //   });
-  // }
 }
