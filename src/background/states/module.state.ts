@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
-import { Node, Edge, Metadata, getId, Direction, SymbolTypes, isAngularSymbol, getProviderId, getProviderName } from '../../shared/data-format';
+import { Node, Edge, Metadata, getId, Direction, SymbolTypes, isAngularSymbol, getProviderId, getProviderName, VisualizationConfig } from '../../shared/data-format';
 import { DirectiveSymbol, ModuleSymbol, ProjectSymbols, Symbol, ProviderSymbol, PipeSymbol } from 'ngast';
 import { getDirectiveMetadata, getModuleMetadata, getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';
@@ -22,7 +22,6 @@ const BootstrapId = '$$bootstrap';
 const DeclarationsId = '$$declarations';
 const ExportsId = '$$exports';
 const ProvidersId = '$$providers';
-const ModuleId = '$$module';
 
 export class ModuleState extends State {
 
@@ -65,10 +64,11 @@ export class ModuleState extends State {
     return null;
   }
 
-  getData() {
+  getData(): VisualizationConfig<any> {
+    const currentModuleId = getId(this.module.symbol);
     const nodes: NodeMap = {
-      [ModuleId]: {
-        id: ModuleId,
+      [currentModuleId]: {
+        id: currentModuleId,
         label: this.module.symbol.name,
         data: {
           symbol: this.module,
@@ -99,7 +99,7 @@ export class ModuleState extends State {
           type: SymbolTypes.Meta
         }
       };
-      edges.push({ from: ModuleId, to: BootstrapId });
+      edges.push({ from: currentModuleId, to: BootstrapId });
     }
     this.module.getDeclaredPipes().forEach(s => {
       const node = s.symbol;
@@ -128,7 +128,7 @@ export class ModuleState extends State {
           type: SymbolTypes.Meta
         }
       };
-      edges.push({ from: ModuleId, to: DeclarationsId });
+      edges.push({ from: currentModuleId, to: DeclarationsId });
     }
 
     const exports: (PipeSymbol | DirectiveSymbol)[] = this.module.getExportedDirectives();
@@ -154,7 +154,7 @@ export class ModuleState extends State {
           type: SymbolTypes.Meta
         }
       };
-      edges.push({ from: ModuleId, to: ExportsId });
+      edges.push({ from: currentModuleId, to: ExportsId });
     }
     const providers = this.module.getProviders().reduce((prev: any, p) => {
       const id = getProviderId(p.getMetadata());
@@ -162,7 +162,7 @@ export class ModuleState extends State {
       return prev;
     }, {});
     if (Object.keys(providers).length) {
-      edges.push({ from: ModuleId, to: ProvidersId });
+      edges.push({ from: currentModuleId, to: ProvidersId });
       nodes[ProvidersId] = {
         id: ProvidersId,
         label: 'Providers',
@@ -181,6 +181,7 @@ export class ModuleState extends State {
     });
     this.symbols = nodes;
     return {
+      title: this.module.symbol.name,
       graph: {
         nodes: Object.keys(nodes).map((key: string) => {
           const node: any = Object.assign({}, nodes[key]);

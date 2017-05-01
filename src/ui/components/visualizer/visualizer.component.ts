@@ -1,11 +1,10 @@
 import { Component, Input, OnDestroy, ViewChild, ElementRef, OnChanges, SimpleChanges, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Network, DataSet } from 'vis';
-import { StateProxy } from '../../states/state-proxy';
-import { VisualizationConfig, Layout, Metadata, Direction, SymbolTypes } from '../../../shared/data-format';
-import { NodeTypeColorMap, DefaultColor } from './color-map';
-
 import { remote, shell } from 'electron';
 
+import { StateProxy } from '../../states/state-proxy';
+import { VisualizationConfig, Layout, Metadata, Direction, SymbolTypes, Node } from '../../../shared/data-format';
+import { NodeTypeColorMap, DefaultColor } from './color-map';
 import { ColorLegend, Color } from './color-legend.component';
 
 export const TypeToNameMap = {
@@ -20,7 +19,6 @@ export const TypeToNameMap = {
   [SymbolTypes.LazyModule]: 'Lazy Module',
   [SymbolTypes.Provider]: 'Provider'
 };
-
 
 @Component({
   selector: 'ngrev-visualizer',

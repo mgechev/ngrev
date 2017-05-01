@@ -79,6 +79,7 @@ export class PipeState extends State {
       }
     });
     return {
+      title: this.pipe.symbol.name,
       layout: Layout.Regular,
       graph: { edges: resultEdges, nodes }
     };

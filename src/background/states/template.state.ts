@@ -50,9 +50,10 @@ export class TemplateState extends State {
   getData(): VisualizationConfig<any> {
     const s = this.directive.symbol;
     const nodeId = getId(s);
+    const label = `${this.directive.symbol.name}'s Template`;
     const nodes: Node<DirectiveSymbol>[] = [{
       id: TemplateId,
-      label: `${this.directive.symbol.name}'s Template`,
+      label,
       type: {
         type: SymbolTypes.Meta,
         angular: false
@@ -61,6 +62,7 @@ export class TemplateState extends State {
     const edges = [];
     this.addTemplateNodes(nodes, edges);
     return {
+      title: label,
       graph: {
         nodes, edges
       }

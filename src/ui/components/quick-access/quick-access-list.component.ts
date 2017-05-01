@@ -14,7 +14,7 @@ import {
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { Symbol } from 'ngast';
-import { KeyValuePair } from './quck-access.component';
+import { KeyValuePair } from './quick-access.component';
 
 const EnterKeyCode = 13;
 const UpArrowKeyCode = 38;

@@ -19,7 +19,7 @@ import { Metadata } from '../../../shared/data-format';
   `,
   styles: [`
   table {
-    top: 0;
+    bottom: 0;
     right: 0;
     position: absolute;
     background-color: rgba(255, 255, 255, 0.8);

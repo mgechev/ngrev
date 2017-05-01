@@ -50,6 +50,7 @@ export enum Layout {
 
 export interface VisualizationConfig<T> {
   layout?: Layout;
+  title: string;
   graph: Graph<T>;
 }
 

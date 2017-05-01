@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { APP_BASE_HREF } from '@angular/common';
-import { QuickAccessComponent } from './quck-access.component';
+import { QuickAccessComponent } from './quick-access.component';
 import { QuickAccessListComponent } from './quick-access-list.component';
 
 @NgModule({

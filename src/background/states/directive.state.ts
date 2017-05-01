@@ -86,6 +86,7 @@ export class DirectiveState extends State {
     this.addProviderNodes(nodes, edges, 'Providers', ProvidersId, this.directive.getProviders());
     this.addProviderNodes(nodes, edges, 'View Providers', ViewProvidersId, this.directive.getViewProviders());
     return {
+      title: this.directive.symbol.name,
       graph: {
         nodes, edges
       }

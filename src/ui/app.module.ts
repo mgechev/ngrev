@@ -9,11 +9,13 @@ import { ProjectProxy } from './model/project-proxy';
 import { StateProxy } from './states/state-proxy';
 import { SpinnerComponent } from './components/shared/spinner.component';
 import { QuickAccessModule } from './components/quick-access/quick-access.module';
+import { StateNavigationComponent } from './components/state-navigation/state-navigation.component';
+import { StateManager } from './model/state-manager';
 
 @NgModule({
   imports: [BrowserModule, VisualizerModule, QuickAccessModule],
-  declarations: [AppComponent, HomeComponent, SpinnerComponent],
+  declarations: [AppComponent, HomeComponent, SpinnerComponent, StateNavigationComponent],
   bootstrap: [AppComponent],
-  providers: [ProjectProxy, StateProxy]
+  providers: [ProjectProxy, StateProxy, StateManager]
 })
 export class AppModule { }

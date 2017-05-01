@@ -38,6 +38,7 @@ export class ModuleTreeState extends State {
       }
     });
     this.data = {
+      title: module.symbol.name,
       graph,
       layout: Layout.Regular
     }

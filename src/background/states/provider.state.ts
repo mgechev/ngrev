@@ -84,6 +84,7 @@ export class ProviderState extends State {
       }
     });
     return {
+      title: getProviderName(this.provider.getMetadata()),
       layout: Layout.Regular,
       graph: { edges: resultEdges, nodes }
     };

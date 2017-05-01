@@ -58,6 +58,7 @@ export interface QueryObject {
     width: 70%;
     max-width: 600px;
     height: calc(100% - 45px);
+    z-index: 15;
   }
   .fuzzy-box {
     padding: 5px;
