@@ -1,12 +1,13 @@
-import { State } from './state';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
+import { ProjectSymbols, ModuleSymbol } from 'ngast';
 import { DataSet } from 'vis';
+import { isAbsolute, normalize, join, sep } from 'path';
+
+import { State } from './state';
 import { ModuleState } from './module.state';
 import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction, isAngularSymbol, SymbolTypes, SymbolType } from '../../shared/data-format';
-import { ProjectSymbols, ModuleSymbol } from 'ngast';
 import { getModuleMetadata } from '../formatters/model-formatter';
 import { Trie } from '../utils/trie';
-import { isAbsolute, normalize, join, sep } from 'path';
 
 interface NodeMap {
   [id: string]: ModuleSymbol;
@@ -26,9 +27,7 @@ export class ModuleTreeState extends State {
 
     if (!ModuleIndex.size) {
       rootContext.getModules()
-        .forEach(m => {
-          ModuleIndex.insert(getId(m.symbol), m);
-        });
+        .forEach(m => ModuleIndex.insert(getId(m.symbol), m));
     }
 
     const graph = this._getModuleGraph(module);
@@ -124,9 +123,32 @@ export class ModuleTreeState extends State {
       moduleUriParts[0] = moduleUriParts[0] + '.ts';
     }
     if (!isAbsolute(moduleUriParts[0])) {
-      const parent = currentPath.split(sep);
-      parent.pop();
-      moduleUriParts[0] = normalize(join(parent.join(sep), moduleUriParts[0]));
+      const parentParts = currentPath.split(sep);
+      parentParts.pop();
+      const childParts = moduleUriParts[0].split(sep);
+      let longestMatch = 0;
+      const findLongestPrefix = (a: string[], b: string[], astart: number, bstart: number) => {
+        const max = Math.min(a.length - astart, b.length - bstart);
+        let matchLen = 0;
+        for (let i = 0; i < max; i += 1) {
+          if (a[i + astart] === b[i + bstart]) {
+            matchLen += 1;
+          } else {
+            return matchLen;
+          }
+        }
+        return matchLen;
+      };
+      for (let i = 0; i < parentParts.length; i += 1) {
+        for (let j = 0; j < childParts.length; j += 1) {
+          const currentPrefix = findLongestPrefix(parentParts, childParts, i, j);
+          if (currentPrefix > longestMatch) {
+            longestMatch = currentPrefix;
+          }
+        }
+      }
+      let parentPath = parentParts.slice(0, parentParts.length - longestMatch).join(sep);
+      moduleUriParts[0] = normalize(join(parentPath, moduleUriParts[0]));
     }
     return getId({
       name: moduleUriParts[1],
@@ -154,9 +176,8 @@ export class ModuleTreeState extends State {
           return [];
         } else {
           const result: ModuleSymbol[] = [];
-          declarations
-            .filter(d => !!d.loadChildren)
-            .map(d => this._loadChildrenToSymbolId(d.loadChildren))
+          _collectLoadChildren(declarations)
+            .map(loadChildren => this._loadChildrenToSymbolId(loadChildren))
             .map(id => ModuleIndex.get(id))
             .forEach(d => d && result.push(d));
           return result;
@@ -164,4 +185,18 @@ export class ModuleTreeState extends State {
       }
     }
   }
+}
+
+function _collectLoadChildren(routes: any[]): string[] {
+  return routes.reduce((m, r) => {
+    if (r.loadChildren && typeof r.loadChildren === 'string') {
+      return m.concat(r.loadChildren);
+    } else if (Array.isArray(r)) {
+      return m.concat(_collectLoadChildren(r));
+    } else if (r.children) {
+      return m.concat(_collectLoadChildren(r.children));
+    } else {
+      return m;
+    }
+  }, []);
 }
