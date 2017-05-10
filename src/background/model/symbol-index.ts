@@ -2,9 +2,9 @@ import { State } from '../states/state';
 import { ProjectSymbols, Symbol, ProviderSymbol } from 'ngast';
 import { getId, getProviderId } from '../../shared/data-format';
 import { PipeState } from '../states/pipe.state';
-import { ModuleState } from '../states/module.state';
 import { DirectiveState } from '../states/directive.state';
 import { ProviderState } from '../states/provider.state';
+import { ModuleTreeState } from '../states/module-tree.state';
 
 export interface StateFactory {
   (): State;
@@ -39,7 +39,7 @@ class SymbolIndexImpl {
     context.getModules()
       .forEach(symbol => this.symbolsIndex.set(getId(symbol.symbol), {
         symbol, stateFactory() {
-          return new ModuleState(context, symbol);
+          return new ModuleTreeState(context, symbol);
         }
       }));
     context.getDirectives()
