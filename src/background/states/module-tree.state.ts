@@ -123,10 +123,11 @@ export class ModuleTreeState extends State {
       moduleUriParts[0] = moduleUriParts[0] + '.ts';
     }
     if (!isAbsolute(moduleUriParts[0])) {
-      const parentParts = currentPath.split(sep);
+      const parentParts = currentPath.split('/');
       parentParts.pop();
-      const childParts = moduleUriParts[0].split(sep);
+      const childParts = moduleUriParts[0].split('/');
       let longestMatch = 0;
+      console.log(moduleUriParts[0], currentPath)
       const findLongestPrefix = (a: string[], b: string[], astart: number, bstart: number) => {
         const max = Math.min(a.length - astart, b.length - bstart);
         let matchLen = 0;
@@ -147,9 +148,10 @@ export class ModuleTreeState extends State {
           }
         }
       }
-      let parentPath = parentParts.slice(0, parentParts.length - longestMatch).join(sep);
-      moduleUriParts[0] = normalize(join(parentPath, moduleUriParts[0]));
+      let parentPath = parentParts.slice(0, parentParts.length - longestMatch).join('/');
+      moduleUriParts[0] = normalize(join(parentPath, moduleUriParts[0])).split(sep).join('/');
     }
+    console.log(moduleUriParts[0])
     return getId({
       name: moduleUriParts[1],
       filePath: moduleUriParts[0]
