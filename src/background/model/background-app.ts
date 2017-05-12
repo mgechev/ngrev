@@ -82,15 +82,22 @@ export class BackgroundApp {
     ipcMain.on(DirectStateTransition, (e, id: string) => {
       console.log('Direct state transition');
       const index = SymbolIndex.getIndex(this.project.projectSymbols);
+      const lastState = this.states[this.states.length - 1];
       const nextState = index.get(id);
       if (nextState) {
-        this.states.push(nextState.stateFactory());
-        console.log('Found next state');
-        success(e.sender, DirectStateTransition, true);
-      } else {
-        console.log('No next state');
-        error(e.sender, DirectStateTransition, false);
+        let state: State | null = nextState.stateFactory();
+        if (lastState instanceof state.constructor) {
+          state = lastState.nextState(id);
+        }
+        if (state) {
+          this.states.push(state);
+          console.log('Found next state');
+          success(e.sender, DirectStateTransition, true);
+          return;
+        }
       }
+      console.log('No next state');
+      error(e.sender, DirectStateTransition, false);
     });
 
     ipcMain.on(GetSymbols, e => {
