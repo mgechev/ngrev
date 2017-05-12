@@ -86,7 +86,8 @@ export class BackgroundApp {
       const nextState = index.get(id);
       if (nextState) {
         let state: State | null = nextState.stateFactory();
-        if (lastState instanceof state.constructor) {
+        if (lastState instanceof state.constructor &&
+            lastState.stateSymbolId === state.stateSymbolId) {
           state = lastState.nextState(id);
         }
         if (state) {

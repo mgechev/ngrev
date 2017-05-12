@@ -43,11 +43,12 @@ export class StateManager {
     if (!this.transitionInProgress) {
       this.transitionInProgress = id;
     }
-    if (this.lastTransition === id) {
-      const last = this.history[this.history.length - 1];
-      this.transitionInProgress = null;
-      return Promise.resolve(last);
-    }
+    // Not really required because of the logic in directStateTransfer in the background app
+    // if (this.lastTransition === id) {
+    //   const last = this.history[this.history.length - 1];
+    //   this.transitionInProgress = null;
+    //   return Promise.resolve(last);
+    // }
     return (!isMetaNodeId(id) ?
       this.state.directStateTransfer(id) :
       this.state.nextState(id))
