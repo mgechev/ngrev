@@ -9,7 +9,6 @@ import { app, dialog, Menu, ipcMain } from 'electron';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { applicationMenuTemplate } from './menu/application_menu_template';
 import createWindow from './helpers/window';
-import {ProjectSymbols} from 'ngast';
 import {createProgramFromTsConfig} from './create-program';
 import {readFileSync, readFile} from 'fs';
 
@@ -26,13 +25,13 @@ var mainWindow;
 const backgroundApp = new BackgroundApp();
 backgroundApp.init();
 
-var setApplicationMenu = function () {
-  var menus: any[] = [applicationMenuTemplate()];
-  if (env.name !== 'production') {
-    menus.push(devMenuTemplate());
-  }
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
-};
+
+const menuItems = [applicationMenuTemplate()];
+if (env.name !== 'production') {
+  menuItems.push(devMenuTemplate());
+}
+
+export const menus = Menu.buildFromTemplate(menuItems);
 
 // Save userData in separate folders for each environment.
 // Thanks to this you can use production and development versions of the app
@@ -44,7 +43,7 @@ if (env.name !== 'production') {
 
 app.on('ready', function () {
 
-  setApplicationMenu();
+  Menu.setApplicationMenu(menus);
 
   var mainWindow = createWindow('main', {
     width: 1000,

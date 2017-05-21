@@ -6,6 +6,7 @@ import { StateProxy } from '../../states/state-proxy';
 import { VisualizationConfig, Layout, Metadata, Direction, SymbolTypes, Node } from '../../../shared/data-format';
 import { NodeTypeColorMap, DefaultColor } from './color-map';
 import { ColorLegend, Color } from './color-legend.component';
+import { ExportToImage } from './export-to-image.service';
 
 export const TypeToNameMap = {
   [SymbolTypes.Component]: 'Component',
@@ -54,6 +55,8 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
 
   private network: Network | null;
 
+  constructor(private exportToImage: ExportToImage) {}
+
   ngOnChanges(changes: SimpleChanges) {
     if (this.stateChanged(changes)) {
       this.updateData(this.data);
@@ -64,6 +67,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
     if (this.network) {
       this.network.destroy();
       this.network = null;
+      this.exportToImage.disable();
     }
   }
 
@@ -141,6 +145,10 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
     this.network.on('doubleClick', this.selectNode.bind(this));
     this.network.on('click', this.highlightNode.bind(this));
     this.network.on('oncontext', this.nodeContext.bind(this));
+    this.exportToImage.enable({
+      title: this.data.title,
+      canvas: this.container.nativeElement.querySelector('canvas')
+    })
   }
 
   private nodeContext(e: any) {

@@ -15,4 +15,9 @@ export class IPCBus {
       ipcRenderer.send(method, data);
     });
   }
+
+  on(event: string, cb: any): Function {
+    ipcRenderer.addListener(event, cb);
+    return () => ipcRenderer.removeListener(event, cb);
+  }
 }

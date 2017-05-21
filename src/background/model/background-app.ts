@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { LoadProject, PrevState, GetMetadata, GetData, NextState, Success, Failure, GetSymbols, DirectStateTransition } from '../../shared/ipc-constants';
+import { LoadProject, PrevState, GetMetadata, GetData, NextState, Success, Failure, GetSymbols, DirectStateTransition, DisableExport, EnableExport } from '../../shared/ipc-constants';
 import { Project } from './project';
 import { State } from '../states/state';
 import { ModuleTreeState } from '../states/module-tree.state';
@@ -11,6 +11,7 @@ import { ModuleState } from '../states/module.state';
 import { DirectiveState } from '../states/directive.state';
 import { SymbolIndex, SymbolData } from './symbol-index';
 import { StaticSymbol } from '@angular/compiler';
+import { menus } from '../app';
 
 const success = (sender, msg, payload) => {
   sender.send(msg, Success, payload);
@@ -154,6 +155,17 @@ export class BackgroundApp {
           error(e.sender, NextState, false);
         }
       }
+    });
+
+    ipcMain.on(DisableExport, e => {
+      (menus.items[0].submenu as any).items[0].enabled = false;
+      success(e.sender, DisableExport, true);
+    });
+
+    ipcMain.on(EnableExport, e => {
+      (menus.items[0].submenu as any).items[0].enabled = true;
+      console.log('Enable!')
+      success(e.sender, EnableExport, true);
     });
   }
 

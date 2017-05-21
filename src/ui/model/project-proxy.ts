@@ -1,8 +1,10 @@
 import { IPCBus } from './ipc-bus';
 import { LoadProject, GetSymbols } from '../../shared/ipc-constants';
+import { Injectable } from '@angular/core';
 
+@Injectable()
 export class ProjectProxy {
-  private ipcBus: IPCBus = new IPCBus();
+  constructor(private ipcBus: IPCBus) {}
 
   load(tsconfig: string) {
     return this.ipcBus.send(LoadProject, tsconfig);

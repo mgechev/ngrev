@@ -1,13 +1,23 @@
-import { app, BrowserWindow, dialog } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { SaveImage, ImageData } from '../../shared/ipc-constants';
 
 export var applicationMenuTemplate = () => {
   return {
     label: 'ngrev',
     submenu: [
       {
+        label: 'Export',
+        accelerator: 'CmdOrCtrl+E',
+        enabled: false,
+        click() {
+          const window = BrowserWindow.getAllWindows()[0];
+          window.webContents.send(SaveImage);
+        }
+      },
+      {
         label: 'Reset',
         accelerator: 'CmdOrCtrl+R',
-        click: function () {
+        click() {
           dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
             type: 'warning',
             buttons: ['OK', 'Cancel'],
