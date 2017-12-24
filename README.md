@@ -48,11 +48,12 @@ Your application needs to be compatible with the Angular's AoT compiler (i.e. yo
 
 Demo [here](https://www.youtube.com/watch?v=sKdsxdeLWjM).
 
-<a href="https://s18.postimg.org/rvcikmxwp/1.png" target="_blank"><img src="https://s18.postimg.org/rvcikmxwp/1.png" alt="Module"/></a>
+<a href="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/1.png" target="_blank"><img src="https://s18.postimg.org/rvcikmxwp/1.png" alt="Component template"/></a>
 
-<a href="https://s18.postimg.org/aw3k5dmp5/2.png" target="_blank"><img src="https://s18.postimg.org/aw3k5dmp5/2.png" alt="Template with components"></a>
+<a href="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/2.png" target="_blank"><img src="https://s18.postimg.org/aw3k5dmp5/2.png" alt="Module Dependencies"></a>
+
+<a href="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/3.png" target="_blank"><img src="https://s18.postimg.org/aw3k5dmp5/2.png" alt="Command + P"></a>
 
 # License
 
 MIT
-
