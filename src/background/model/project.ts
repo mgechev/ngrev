@@ -1,5 +1,4 @@
 import { ProjectSymbols, ErrorReporter } from 'ngast';
-import { createProgramFromTsConfig } from '../create-program';
 import { readFile, readFileSync } from 'fs';
 
 export class Project {
