@@ -52,7 +52,8 @@ const spinner = {
     '(document:keydown)': 'onKeyDown($event)',
     '(window:resize)': 'onWindowResize($event)'
   },
-  styles: [`
+  styles: [
+    `
     :host {
       width: 100%;
       height: 100%;
@@ -82,7 +83,8 @@ const spinner = {
     button:active {
       background: #ccc;
     }
-  `]
+  `
+  ]
 })
 export class AppComponent {
   loading = false;
@@ -95,11 +97,13 @@ export class AppComponent {
 
   resolveMetadata = (nodeId: string) => {
     this.loading = true;
-    return this.manager.getMetadata(nodeId)
+    return this.manager
+      .getMetadata(nodeId)
       .then(metadata => {
         this.loading = false;
         return metadata;
-      }).catch(() => this.loading = false);
+      })
+      .catch(() => (this.loading = false));
   };
 
   private _currentData: VisualizationConfig<any>;
@@ -116,10 +120,11 @@ export class AppComponent {
     private ngZone: NgZone,
     private project: ProjectProxy,
     private manager: StateManager,
-    private cd: ChangeDetectorRef) {}
+    private cd: ChangeDetectorRef
+  ) {}
 
   ngAfterViewInit() {
-    // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    // this.onProject('/Users/mgechev/Projects/angular/aio/src/tsconfig.app.json');
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
@@ -130,14 +135,19 @@ export class AppComponent {
 
   onProject(tsconfig: string) {
     this.ngZone.run(() => {
-      this._startLoading()
-      this.manager.loadProject(tsconfig)
+      this._startLoading();
+      this.manager
+        .loadProject(tsconfig)
         .then(() => this.project.getSymbols())
-        .then((symbols) => this.queryList = symbols.map(s => ({ key: s.name, value: s })))
+        .then(symbols => (this.queryList = symbols.map(s => ({ key: s.name, value: s }))))
         .then(this._stopLoading)
         .catch(error => {
-          remote.dialog.showErrorBox('Error while parsing project', 'Cannot parse your project. Make sure it\'s ' +
-          'compatible with the Angular\'s AoT compiler. Error during parsing:\n\n' + formatError(error));
+          remote.dialog.showErrorBox(
+            'Error while parsing project',
+            "Cannot parse your project. Make sure it's " +
+              "compatible with the Angular's AoT compiler. Error during parsing:\n\n" +
+              formatError(error)
+          );
           this._stopLoading();
         });
     });
@@ -152,7 +162,8 @@ export class AppComponent {
   tryChangeState(id: string) {
     this.ngZone.run(() => {
       this._startLoading();
-      this.manager.tryChangeState(id)
+      this.manager
+        .tryChangeState(id)
         .then(this._stopLoading)
         .catch(this._stopLoading);
     });
@@ -165,7 +176,8 @@ export class AppComponent {
   }
 
   restoreMemento(memento: Memento) {
-    this.manager.restoreMemento(memento)
+    this.manager
+      .restoreMemento(memento)
       .then(this._stopLoading)
       .catch(this._stopLoading);
   }

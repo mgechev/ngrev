@@ -1,5 +1,17 @@
 import { ipcMain } from 'electron';
-import { LoadProject, PrevState, GetMetadata, GetData, NextState, Success, Failure, GetSymbols, DirectStateTransition, DisableExport, EnableExport } from '../../shared/ipc-constants';
+import {
+  LoadProject,
+  PrevState,
+  GetMetadata,
+  GetData,
+  NextState,
+  Success,
+  Failure,
+  GetSymbols,
+  DirectStateTransition,
+  DisableExport,
+  EnableExport
+} from '../../shared/ipc-constants';
 import { Project } from './project';
 import { State } from '../states/state';
 import { ModuleTreeState } from '../states/module-tree.state';
@@ -15,7 +27,7 @@ import { menus } from '../app';
 
 const success = (sender, msg, payload) => {
   sender.send(msg, Success, payload);
-}
+};
 
 const error = (sender, msg, payload) => {
   sender.send(msg, Failure, payload);
@@ -35,15 +47,15 @@ export class BackgroundApp {
       this.project = new Project();
       let parseError: string | null = null;
       try {
-        this.project.load(tsconfig, e => parseError = e);
+        this.project.load(tsconfig, e => (parseError = e));
         const allModules = this.project.projectSymbols.getModules();
         if (!parseError) {
-          const module =
-            allModules
-              .filter(m => {
-                console.log(m.symbol.name);
-                return m.getBootstrapComponents().length
-              }).pop();
+          const module = allModules
+            .filter(m => {
+              console.log(m.symbol.name);
+              return m.getBootstrapComponents().length;
+            })
+            .pop();
           if (module) {
             console.log('Project loaded');
             this.states.push(new ModuleTreeState(this.project.projectSymbols, module));
@@ -87,8 +99,7 @@ export class BackgroundApp {
       const nextState = index.get(id);
       if (nextState) {
         let state: State | null = nextState.stateFactory();
-        if (lastState instanceof state.constructor &&
-            lastState.stateSymbolId === state.stateSymbolId) {
+        if (lastState instanceof state.constructor && lastState.stateSymbolId === state.stateSymbolId) {
           state = lastState.nextState(id);
         }
         if (state) {
@@ -114,7 +125,7 @@ export class BackgroundApp {
             const staticSymbol = new StaticSymbol('', getProviderName(data.symbol.getMetadata()), []);
             res.push(Object.assign({}, staticSymbol, { id }));
           }
-        })
+        });
       } catch (e) {
         console.error(e);
       }
@@ -164,7 +175,7 @@ export class BackgroundApp {
 
     ipcMain.on(EnableExport, e => {
       (menus.items[0].submenu as any).items[0].enabled = true;
-      console.log('Enable!')
+      console.log('Enable!');
       success(e.sender, EnableExport, true);
     });
   }
