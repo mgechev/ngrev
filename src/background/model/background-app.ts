@@ -113,7 +113,7 @@ export class BackgroundApp {
             id
           })
           .then((data: DirectStateTransitionResponse) => {
-            console.log('Got response for direct state transition');
+            console.log('Got response for direct state transition', id, data.available);
             if (data.available) {
               success(e.sender, Message.DirectStateTransition, data.available);
             } else {

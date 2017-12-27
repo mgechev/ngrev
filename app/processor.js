@@ -1388,21 +1388,26 @@ var BackgroundApp = /** @class */ (function () {
             console.log('Direct state transition', data.id);
             var index = SymbolIndex.getIndex(_this.project.projectSymbols);
             var lastState = _this.states[_this.states.length - 1];
-            var nextState = index.get(data.id);
+            var nextSymbol = index.get(data.id);
+            var nextState;
+            if (nextSymbol) {
+                nextState = nextSymbol.stateFactory();
+                if (lastState instanceof nextState.constructor && lastState.stateSymbolId === nextState.stateSymbolId) {
+                    nextState = lastState.nextState(data.id);
+                }
+            }
+            else {
+                // Used for templates
+                nextState = lastState.nextState(data.id);
+            }
             if (nextState) {
-                var state = nextState.stateFactory();
-                if (lastState instanceof state.constructor && lastState.stateSymbolId === state.stateSymbolId) {
-                    state = lastState.nextState(data.id);
-                }
-                if (state) {
-                    _this.states.push(state);
-                    console.log('Found next state');
-                    responder({
-                        topic: Message.DirectStateTransition,
-                        available: true
-                    });
-                    return;
-                }
+                _this.states.push(nextState);
+                console.log('Found next state');
+                responder({
+                    topic: Message.DirectStateTransition,
+                    available: true
+                });
+                return;
             }
             console.log('No next state');
             responder({

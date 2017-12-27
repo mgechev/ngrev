@@ -102,21 +102,25 @@ export class BackgroundApp {
       console.log('Direct state transition', data.id);
       const index = SymbolIndex.getIndex(this.project.projectSymbols);
       const lastState = this.states[this.states.length - 1];
-      const nextState = index.get(data.id);
+      const nextSymbol = index.get(data.id);
+      let nextState: State;
+      if (nextSymbol) {
+        nextState = nextSymbol.stateFactory();
+        if (lastState instanceof nextState.constructor && lastState.stateSymbolId === nextState.stateSymbolId) {
+          nextState = lastState.nextState(data.id);
+        }
+      } else {
+        // Used for templates
+        nextState = lastState.nextState(data.id);
+      }
       if (nextState) {
-        let state: State | null = nextState.stateFactory();
-        if (lastState instanceof state.constructor && lastState.stateSymbolId === state.stateSymbolId) {
-          state = lastState.nextState(data.id);
-        }
-        if (state) {
-          this.states.push(state);
-          console.log('Found next state');
-          responder({
-            topic: Message.DirectStateTransition,
-            available: true
-          });
-          return;
-        }
+        this.states.push(nextState);
+        console.log('Found next state');
+        responder({
+          topic: Message.DirectStateTransition,
+          available: true
+        });
+        return;
       }
       console.log('No next state');
       responder({

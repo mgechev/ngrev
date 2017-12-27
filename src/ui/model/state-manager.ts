@@ -100,10 +100,6 @@ export class StateManager {
     });
   }
 
-  get loading() {
-    return this.bus.pending;
-  }
-
   private pushState(data: VisualizationConfig<any>) {
     this.history.push(new Memento(data));
   }

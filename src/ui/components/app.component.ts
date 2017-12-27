@@ -3,6 +3,7 @@ import { remote } from 'electron';
 import { ProjectProxy } from '../model/project-proxy';
 import { Network } from 'vis';
 import { ProjectSymbols, Symbol } from 'ngast';
+import { StateProxy } from '../states/state-proxy';
 import { VisualizationConfig, Metadata, SymbolTypes } from '../../shared/data-format';
 import { KeyValuePair, QuickAccessComponent } from './quick-access/quick-access.component';
 import { StaticSymbol } from '@angular/compiler';
@@ -19,28 +20,28 @@ const spinner = {
 @Component({
   selector: 'ngrev-app',
   template: `
-    <button [class.hidden]="manager.loading" (click)="prevState()" *ngIf="projectSet">Back</button>
+    <button [class.hidden]="loading" (click)="prevState()" *ngIf="initialized">Back</button>
     <ngrev-state-navigation
       [maxWidth]="maxStateNavigationWidth"
       [states]="manager.getHistory()"
       (select)="restoreMemento($event)"
     >
     </ngrev-state-navigation>
-    <ngrev-spinner
+    <ngrev-spinner [class.hidden]="!loading"
       [left]="spinner.left"
       [top]="spinner.top"
       [size]="spinner.size"
-      *ngIf="projectSet || manager.loading">
+      *ngIf="projectSet">
     </ngrev-spinner>
     <ngrev-home *ngIf="!projectSet" (project)="onProject($event)"></ngrev-home>
     <ngrev-visualizer
-      *ngIf="projectSet"
-      [data]="manager.getCurrentState()"
+      *ngIf="initialized"
+      [data]="initialized"
       [metadataResolver]="resolveMetadata"
       (select)="tryChangeState($event)">
     </ngrev-visualizer>
     <ngrev-quick-access
-      *ngIf="projectSet"
+      *ngIf="initialized"
       (select)="selectSymbol($event)"
       [queryList]="queryList"
       [queryObject]="queryObject"
@@ -76,7 +77,7 @@ const spinner = {
     }
     ngrev-spinner {
       transition: 0.2s opacity;
-      top: 100px;
+      top: 8px;
       left: 15px;
     }
     button:active {
@@ -86,6 +87,8 @@ const spinner = {
   ]
 })
 export class AppComponent {
+  projectSet: boolean = false;
+  loading = false;
   spinner = spinner;
   queryList: KeyValuePair<SymbolWithId>[] = [];
   queryObject = ['value.name', 'value.filePath'];
@@ -94,24 +97,36 @@ export class AppComponent {
   @ViewChild(QuickAccessComponent) quickAccess: QuickAccessComponent;
 
   resolveMetadata = (nodeId: string) => {
-    this.cd.detectChanges();
-    return this.manager.getMetadata(nodeId).then(metadata => {
-      this.cd.detectChanges();
-      return metadata;
-    });
+    this.loading = true;
+    return this.manager
+      .getMetadata(nodeId)
+      .then(metadata => {
+        this.loading = false;
+        return metadata;
+      })
+      .catch(() => (this.loading = false));
   };
 
   private _currentData: VisualizationConfig<any>;
+  private _stopLoading = () => {
+    this.loading = false;
+    this.cd.detectChanges();
+  };
+  private _startLoading = () => {
+    this.loading = true;
+    this.cd.detectChanges();
+  };
 
   constructor(
     private ngZone: NgZone,
     private project: ProjectProxy,
-    public manager: StateManager,
+    private manager: StateManager,
     private cd: ChangeDetectorRef
   ) {}
 
   ngAfterViewInit() {
-    this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    // this.onProject('/Users/mgechev/Projects/angular/aio/src/tsconfig.app.json');
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
@@ -121,11 +136,15 @@ export class AppComponent {
   }
 
   onProject(tsconfig: string) {
+    this.cd.detach();
+    this.projectSet = true;
     this.ngZone.run(() => {
+      this._startLoading();
       this.manager
         .loadProject(tsconfig)
         .then(() => this.project.getSymbols())
         .then(symbols => (this.queryList = symbols.map(s => ({ key: s.name, value: s }))))
+        .then(this._stopLoading)
         .catch(error => {
           remote.dialog.showErrorBox(
             'Error while parsing project',
@@ -133,9 +152,7 @@ export class AppComponent {
               "compatible with the Angular's AoT compiler. Error during parsing:\n\n" +
               formatError(error)
           );
-        })
-        .then(() => {
-          this.cd.detectChanges();
+          this._stopLoading();
         });
     });
   }
@@ -143,21 +160,16 @@ export class AppComponent {
   onKeyDown(e) {
     if (e.keyCode === BackspaceKeyCode && this.quickAccess && !this.quickAccess.visible()) {
       this.prevState();
-      this.cd.detectChanges();
     }
   }
 
   tryChangeState(id: string) {
     this.ngZone.run(() => {
-      this.cd.detectChanges();
-      this.manager.tryChangeState(id).then(
-        () => {
-          this.cd.detectChanges();
-        },
-        () => {
-          this.cd.detectChanges();
-        }
-      );
+      this._startLoading();
+      this.manager
+        .tryChangeState(id)
+        .then(this._stopLoading)
+        .catch(this._stopLoading);
     });
   }
 
@@ -168,18 +180,13 @@ export class AppComponent {
   }
 
   restoreMemento(memento: Memento) {
-    this.cd.detectChanges();
-    this.manager.restoreMemento(memento).then(
-      () => {
-        this.cd.detectChanges();
-      },
-      () => {
-        this.cd.detectChanges();
-      }
-    );
+    this.manager
+      .restoreMemento(memento)
+      .then(this._stopLoading)
+      .catch(this._stopLoading);
   }
 
-  get projectSet() {
+  get initialized() {
     return this.manager.getCurrentState();
   }
 
