@@ -59,7 +59,7 @@ export class BackgroundApp {
   private taskQueue: TaskQueue;
 
   init() {
-    this.slaveProcess = SlaveProcess.create('/Users/mgechev/Projects/ngrev/app/processor.js');
+    this.slaveProcess = SlaveProcess.create('./app/processor.js');
     this.taskQueue = new TaskQueue();
     ipcMain.on(Message.LoadProject, (e, tsconfig: string) => {
       if (!this.slaveProcess.connected) {
