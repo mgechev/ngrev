@@ -1,17 +1,14 @@
-import { ipcMain } from 'electron';
 import {
-  LoadProject,
-  PrevState,
-  GetMetadata,
-  GetData,
-  NextState,
-  Success,
-  Failure,
-  GetSymbols,
-  DirectStateTransition,
-  DisableExport,
-  EnableExport
-} from '../../shared/ipc-constants';
+  SlaveProcess,
+  LoadProjectResponse,
+  PrevStateResponse,
+  DirectStateTransitionResponse,
+  GetSymbolsResponse,
+  GetMetadataResponse,
+  GetDataResponse
+} from './../helpers/process';
+import { ipcMain } from 'electron';
+import { Message, Status } from '../../shared/ipc-constants';
 import { Project } from './project';
 import { State } from '../states/state';
 import { ModuleTreeState } from '../states/module-tree.state';
@@ -26,157 +23,168 @@ import { StaticSymbol } from '@angular/compiler';
 import { menus } from '../app';
 
 const success = (sender, msg, payload) => {
-  sender.send(msg, Success, payload);
+  sender.send(msg, Status.Success, payload);
 };
 
 const error = (sender, msg, payload) => {
-  sender.send(msg, Failure, payload);
+  sender.send(msg, Status.Failure, payload);
 };
+
+interface Task {
+  (): Promise<void>;
+}
+
+class TaskQueue {
+  private queue: Task[] = [];
+
+  push(task: Task) {
+    this.queue.unshift(task);
+    if (this.queue.length === 1) {
+      this.next();
+    }
+  }
+
+  private next() {
+    const task = this.queue.pop();
+    if (task) {
+      task().then(() => this.next(), () => this.next());
+    }
+  }
+}
 
 export class BackgroundApp {
   private project: Project;
   private states: State[] = [];
+  private slaveProcess: SlaveProcess;
+  private taskQueue: TaskQueue;
 
   init() {
-    ipcMain.on(LoadProject, (e, tsconfig: string) => {
-      this.states.forEach(s => s.destroy());
-      SymbolIndex.clear();
-
-      this.states = [];
-      console.log(`Loading project: "${tsconfig}"`);
-      this.project = new Project();
-      let parseError: string | null = null;
-      try {
-        this.project.load(tsconfig, e => (parseError = e));
-        const allModules = this.project.projectSymbols.getModules();
-        if (!parseError) {
-          const module = allModules
-            .filter(m => {
-              console.log(m.symbol.name);
-              return m.getBootstrapComponents().length;
-            })
-            .pop();
-          if (module) {
-            console.log('Project loaded');
-            this.states.push(new ModuleTreeState(this.project.projectSymbols, module));
-            success(e.sender, LoadProject, null);
-          } else {
-            error(e.sender, LoadProject, 'Cannot find the root module of your project.');
-          }
-        } else {
-          console.log(parseError);
-          error(e.sender, LoadProject, (parseError as Error).message);
-        }
-      } catch (exception) {
-        console.log(exception);
-        let message = exception.message;
-        if (parseError) {
-          if (parseError instanceof Error) {
-            parseError = (parseError as Error).message;
-          }
-          message = parseError;
-        }
-        error(e.sender, LoadProject, message);
-      }
-    });
-
-    ipcMain.on(PrevState, e => {
-      console.log('Going to previous state');
-      if (this.states.length > 1) {
-        this.states.pop();
-        console.log('Successfully moved to previous state');
-        success(e.sender, PrevState, true);
+    this.slaveProcess = SlaveProcess.create('/Users/mgechev/Projects/ngrev/app/processor.js');
+    this.taskQueue = new TaskQueue();
+    ipcMain.on(Message.LoadProject, (e, tsconfig: string) => {
+      if (!this.slaveProcess.connected) {
+        console.log('The slave process is not ready yet');
       } else {
-        console.log('Unsuccessfully moved to previous state');
-        error(e.sender, PrevState, false);
+        console.log('The slave process is connected');
       }
+      console.log('Loading project. Forwarding message to the background process.');
+      this.taskQueue.push(() => {
+        return this.slaveProcess
+          .send({
+            topic: Message.LoadProject,
+            tsconfig
+          })
+          .then((data: LoadProjectResponse) => {
+            if (data.err) {
+              console.log('Got error message while loading the project: ', data.err);
+              error(e.sender, Message.LoadProject, data.err);
+            } else {
+              console.log('The project was successfully loaded');
+              success(e.sender, Message.LoadProject, null);
+            }
+          });
+      });
     });
 
-    ipcMain.on(DirectStateTransition, (e, id: string) => {
-      console.log('Direct state transition');
-      const index = SymbolIndex.getIndex(this.project.projectSymbols);
-      const lastState = this.states[this.states.length - 1];
-      const nextState = index.get(id);
-      if (nextState) {
-        let state: State | null = nextState.stateFactory();
-        if (lastState instanceof state.constructor && lastState.stateSymbolId === state.stateSymbolId) {
-          state = lastState.nextState(id);
-        }
-        if (state) {
-          this.states.push(state);
-          console.log('Found next state');
-          success(e.sender, DirectStateTransition, true);
-          return;
-        }
-      }
-      console.log('No next state');
-      error(e.sender, DirectStateTransition, false);
+    ipcMain.on(Message.PrevState, e => {
+      console.log('Requesting previous state');
+      this.taskQueue.push(() => {
+        return this.slaveProcess
+          .send({
+            topic: Message.PrevState
+          })
+          .then((data: PrevStateResponse) => {
+            console.log('Got previous state');
+            if (data.available) {
+              success(e.sender, Message.PrevState, data.available);
+            } else {
+              error(e.sender, Message.PrevState, data.available);
+            }
+          });
+      });
     });
 
-    ipcMain.on(GetSymbols, e => {
-      console.log('Get symbols');
-      let res: any[] = [];
-      try {
-        const map = SymbolIndex.getIndex(this.project.projectSymbols);
-        map.forEach((data: SymbolData, id: string) => {
-          if (data.symbol instanceof Symbol) {
-            res.push(Object.assign({}, data.symbol.symbol, { id }));
-          } else {
-            const staticSymbol = new StaticSymbol('', getProviderName(data.symbol.getMetadata()), []);
-            res.push(Object.assign({}, staticSymbol, { id }));
-          }
-        });
-      } catch (e) {
-        console.error(e);
-      }
-      success(e.sender, GetSymbols, res);
+    ipcMain.on(Message.DirectStateTransition, (e, id: string) => {
+      console.log('Requesting direct state transition');
+      this.taskQueue.push(() => {
+        return this.slaveProcess
+          .send({
+            topic: Message.DirectStateTransition,
+            id
+          })
+          .then((data: DirectStateTransitionResponse) => {
+            console.log('Got response for direct state transition');
+            if (data.available) {
+              success(e.sender, Message.DirectStateTransition, data.available);
+            } else {
+              error(e.sender, Message.DirectStateTransition, data.available);
+            }
+          });
+      });
     });
 
-    ipcMain.on(GetMetadata, (e, id: string) => {
-      console.log('Getting metadata');
-      if (this.state) {
-        success(e.sender, GetMetadata, this.state.getMetadata(id));
-      } else {
-        error(e.sender, GetMetadata, null);
-      }
+    ipcMain.on(Message.GetSymbols, e => {
+      console.log('Requesting symbols...');
+      this.taskQueue.push(() => {
+        return this.slaveProcess
+          .send({
+            topic: Message.GetSymbols
+          })
+          .then((data: GetSymbolsResponse) => {
+            console.log('Got symbols response');
+            if (data.symbols) {
+              success(e.sender, Message.GetSymbols, data.symbols);
+            }
+          });
+      });
     });
 
-    ipcMain.on(GetData, e => {
-      console.log('Getting data');
-      if (this.state) {
-        success(e.sender, GetData, this.state.getData());
-      } else {
-        error(e.sender, GetData, null);
-      }
+    ipcMain.on(Message.GetMetadata, (e, id: string) => {
+      console.log('Requesting metadata...');
+      this.taskQueue.push(() => {
+        return this.slaveProcess
+          .send({
+            topic: Message.GetMetadata,
+            id
+          })
+          .then((response: GetMetadataResponse) => {
+            console.log('Got metadata from the child process');
+            if (response.data) {
+              success(e.sender, Message.GetMetadata, response.data);
+            } else {
+              error(e.sender, Message.GetMetadata, null);
+            }
+          });
+      });
     });
 
-    ipcMain.on(NextState, (e, id: string) => {
-      console.log('Moving to next state');
-      if (!this.state) {
-        console.log('No next state');
-        error(e.sender, NextState, false);
-      } else {
-        const nextState = this.state.nextState(id);
-        if (nextState) {
-          this.states.push(nextState);
-          console.log('Found next state');
-          success(e.sender, NextState, true);
-        } else {
-          console.log('No next state');
-          error(e.sender, NextState, false);
-        }
-      }
+    ipcMain.on(Message.GetData, e => {
+      console.log('Requesting data');
+      this.taskQueue.push(() => {
+        return this.slaveProcess
+          .send({
+            topic: Message.GetData
+          })
+          .then((response: GetDataResponse) => {
+            console.log('Got data response');
+            if (response.data) {
+              success(e.sender, Message.GetData, response.data);
+            } else {
+              error(e.sender, Message.GetData, null);
+            }
+          });
+      });
     });
 
-    ipcMain.on(DisableExport, e => {
+    ipcMain.on(Message.DisableExport, e => {
       (menus.items[0].submenu as any).items[0].enabled = false;
-      success(e.sender, DisableExport, true);
+      success(e.sender, Message.DisableExport, true);
     });
 
-    ipcMain.on(EnableExport, e => {
+    ipcMain.on(Message.EnableExport, e => {
       (menus.items[0].submenu as any).items[0].enabled = true;
       console.log('Enable!');
-      success(e.sender, EnableExport, true);
+      success(e.sender, Message.EnableExport, true);
     });
   }
 

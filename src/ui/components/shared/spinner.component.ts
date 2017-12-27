@@ -3,7 +3,8 @@ import { Component, Input } from '@angular/core';
 @Component({
   selector: 'ngrev-spinner',
   template: '<div [style.font-size]="size" [style.left]="left" [style.top]="top" class="loader">Loading...</div>',
-  styles: [`
+  styles: [
+    `
     .loader {
       z-index: 3;
       position: absolute;
@@ -87,7 +88,8 @@ import { Component, Input } from '@angular/core';
     :host {
       position: absolute;
     }
-  `]
+  `
+  ]
 })
 export class SpinnerComponent {
   @Input() size: number;

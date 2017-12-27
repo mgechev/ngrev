@@ -12,7 +12,7 @@ export abstract class State {
 
   abstract nextState(id: string): State | null;
 
-  destroy() {};
+  destroy() {}
 
   get stateSymbolId() {
     return this.symbolId;

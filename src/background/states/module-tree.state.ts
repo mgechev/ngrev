@@ -5,7 +5,18 @@ import { isAbsolute, normalize, join, sep } from 'path';
 
 import { State } from './state';
 import { ModuleState } from './module.state';
-import { VisualizationConfig, Layout, Node, Metadata, Graph, getId, Direction, isAngularSymbol, SymbolTypes, SymbolType } from '../../shared/data-format';
+import {
+  VisualizationConfig,
+  Layout,
+  Node,
+  Metadata,
+  Graph,
+  getId,
+  Direction,
+  isAngularSymbol,
+  SymbolTypes,
+  SymbolType
+} from '../../shared/data-format';
 import { getModuleMetadata } from '../formatters/model-formatter';
 import { Trie } from '../utils/trie';
 
@@ -26,8 +37,7 @@ export class ModuleTreeState extends State {
     super(getId(module.symbol), rootContext);
 
     if (!ModuleIndex.size) {
-      rootContext.getModules()
-        .forEach(m => ModuleIndex.insert(getId(m.symbol), m));
+      rootContext.getModules().forEach(m => ModuleIndex.insert(getId(m.symbol), m));
     }
 
     const graph = this._getModuleGraph(module);
@@ -40,7 +50,7 @@ export class ModuleTreeState extends State {
       title: `${module.symbol.name}'s imports & exports`,
       graph,
       layout: Layout.Regular
-    }
+    };
   }
 
   getMetadata(id: string): Metadata | null {
@@ -73,7 +83,8 @@ export class ModuleTreeState extends State {
     const imports = module.getImportedModules();
     const exports = module.getExportedModules();
     const lazyModules = this._getLazyModules();
-    const nodes: Node<ModuleSymbol>[] = [{
+    const nodes: Node<ModuleSymbol>[] = [
+      {
         id: getId(module.symbol),
         label: module.symbol.name,
         data: module,
@@ -81,27 +92,34 @@ export class ModuleTreeState extends State {
           angular: isAngularSymbol(module.symbol),
           type: SymbolTypes.Module
         }
-      }].concat(imports.map(m => {
-        return {
-          id: getId(m.symbol),
-          label: m.symbol.name,
-          data: m,
-          type: {
-            angular: isAngularSymbol(module.symbol),
-            type: SymbolTypes.Module
-          }
-        };
-      })).concat(lazyModules.map(m => {
-        return {
-          id: getId(m.symbol),
-          label: m.symbol.name,
-          data: m,
-          type: {
-            angular: isAngularSymbol(module.symbol),
-            type: SymbolTypes.LazyModule
-          }
-        };
-      }));
+      }
+    ]
+      .concat(
+        imports.map(m => {
+          return {
+            id: getId(m.symbol),
+            label: m.symbol.name,
+            data: m,
+            type: {
+              angular: isAngularSymbol(module.symbol),
+              type: SymbolTypes.Module
+            }
+          };
+        })
+      )
+      .concat(
+        lazyModules.map(m => {
+          return {
+            id: getId(m.symbol),
+            label: m.symbol.name,
+            data: m,
+            type: {
+              angular: isAngularSymbol(module.symbol),
+              type: SymbolTypes.LazyModule
+            }
+          };
+        })
+      );
     const edges = nodes.slice(1, nodes.length).map((n, idx) => {
       return {
         from: nodes[0].id,
@@ -113,7 +131,7 @@ export class ModuleTreeState extends State {
     return {
       nodes,
       edges
-    }
+    };
   }
 
   private _loadChildrenToSymbolId(moduleUri: string) {
@@ -127,7 +145,7 @@ export class ModuleTreeState extends State {
       parentParts.pop();
       const childParts = moduleUriParts[0].split('/');
       let longestMatch = 0;
-      console.log(moduleUriParts[0], currentPath)
+      console.log(moduleUriParts[0], currentPath);
       const findLongestPrefix = (a: string[], b: string[], astart: number, bstart: number) => {
         const max = Math.min(a.length - astart, b.length - bstart);
         let matchLen = 0;
@@ -149,9 +167,11 @@ export class ModuleTreeState extends State {
         }
       }
       let parentPath = parentParts.slice(0, parentParts.length - longestMatch).join('/');
-      moduleUriParts[0] = normalize(join(parentPath, moduleUriParts[0])).split(sep).join('/');
+      moduleUriParts[0] = normalize(join(parentPath, moduleUriParts[0]))
+        .split(sep)
+        .join('/');
     }
-    console.log(moduleUriParts[0])
+    console.log(moduleUriParts[0]);
     return getId({
       name: moduleUriParts[1],
       filePath: moduleUriParts[0]

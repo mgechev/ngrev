@@ -1,5 +1,5 @@
 export class Node<T> {
-  children: {[key: string]: Node<T>} = {};
+  children: { [key: string]: Node<T> } = {};
   data: T;
 }
 

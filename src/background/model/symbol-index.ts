@@ -30,30 +30,38 @@ class SymbolIndexImpl {
       return this.symbolsIndex;
     }
     this.symbolsIndex = new Map<string, SymbolData>();
-    context.getPipes()
-      .forEach(symbol => this.symbolsIndex.set(getId(symbol.symbol), {
-        symbol, stateFactory() {
+    context.getPipes().forEach(symbol =>
+      this.symbolsIndex.set(getId(symbol.symbol), {
+        symbol,
+        stateFactory() {
           return new PipeState(context, symbol);
         }
-      }));
-    context.getModules()
-      .forEach(symbol => this.symbolsIndex.set(getId(symbol.symbol), {
-        symbol, stateFactory() {
+      })
+    );
+    context.getModules().forEach(symbol =>
+      this.symbolsIndex.set(getId(symbol.symbol), {
+        symbol,
+        stateFactory() {
           return new ModuleTreeState(context, symbol);
         }
-      }));
-    context.getDirectives()
-      .forEach(symbol => this.symbolsIndex.set(getId(symbol.symbol), {
-        symbol, stateFactory() {
+      })
+    );
+    context.getDirectives().forEach(symbol =>
+      this.symbolsIndex.set(getId(symbol.symbol), {
+        symbol,
+        stateFactory() {
           return new DirectiveState(context, symbol);
         }
-      }));
-    context.getProviders()
-      .forEach(symbol => this.symbolsIndex.set(getProviderId(symbol.getMetadata()), {
-        symbol, stateFactory() {
+      })
+    );
+    context.getProviders().forEach(symbol =>
+      this.symbolsIndex.set(getProviderId(symbol.getMetadata()), {
+        symbol,
+        stateFactory() {
           return new ProviderState(context, symbol);
         }
-      }))
+      })
+    );
     return this.symbolsIndex;
   }
 

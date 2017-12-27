@@ -1,3 +1,4 @@
+import { IPCBus } from './ipc-bus';
 import { Injectable } from '@angular/core';
 import { VisualizationConfig, Metadata } from '../../shared/data-format';
 import { AppComponent } from '../components/app.component';
@@ -15,20 +16,18 @@ export class StateManager {
   private history: Memento[] = [];
   private lastTransition: string | null = null;
   private transitionInProgress: string | null = null;
+  private transitionResolveQueue: { resolve: Function; reject: Function }[] = [];
 
-  private transitionResolveQueue: { resolve: Function, reject: Function }[] = [];
-
-  constructor(
-    private project: ProjectProxy,
-    private state: StateProxy) {}
+  constructor(private project: ProjectProxy, private state: StateProxy, private bus: IPCBus) {}
 
   getHistory() {
     return this.history;
   }
 
   loadProject(tsconfig: string) {
-    return this.project.load(tsconfig)
-      .then((rootContext: ProjectSymbols) => this.state = new StateProxy())
+    return this.project
+      .load(tsconfig)
+      .then((rootContext: ProjectSymbols) => (this.state = new StateProxy()))
       .then((proxy: StateProxy) => proxy.getData())
       .then(data => this.history.push(new Memento(data)))
       .then(() => this.project.getSymbols());
@@ -43,38 +42,31 @@ export class StateManager {
     if (!this.transitionInProgress) {
       this.transitionInProgress = id;
     }
-    // Not really required because of the logic in directStateTransfer in the background app
-    // if (this.lastTransition === id) {
-    //   const last = this.history[this.history.length - 1];
-    //   this.transitionInProgress = null;
-    //   return Promise.resolve(last);
-    // }
-    return (!isMetaNodeId(id) ?
-      this.state.directStateTransfer(id) :
-      this.state.nextState(id))
-        .then(() => this.state.getData())
-        .then(data => {
-          this.lastTransition = id;
-          this.pushState(data);
-          while (this.transitionResolveQueue.length) {
-            const res = this.transitionResolveQueue.pop();
-            if (res) {
-              res.resolve(data);
-            }
+    return this.state
+      .directStateTransfer(id)
+      .then(() => this.state.getData())
+      .then(data => {
+        this.lastTransition = id;
+        this.pushState(data);
+        while (this.transitionResolveQueue.length) {
+          const res = this.transitionResolveQueue.pop();
+          if (res) {
+            res.resolve(data);
           }
-          this.transitionInProgress = null;
-          return data;
-        })
-        .catch(e => {
-          while (this.transitionResolveQueue.length) {
-            const res = this.transitionResolveQueue.pop();
-            if (res) {
-              res.reject(e);
-            }
+        }
+        this.transitionInProgress = null;
+        return data;
+      })
+      .catch(e => {
+        while (this.transitionResolveQueue.length) {
+          const res = this.transitionResolveQueue.pop();
+          if (res) {
+            res.reject(e);
           }
-          this.transitionInProgress = null;
-          return Promise.reject(e);
-        });
+        }
+        this.transitionInProgress = null;
+        return Promise.reject(e);
+      });
   }
 
   getCurrentState() {
@@ -98,7 +90,7 @@ export class StateManager {
           if (last === memento) {
             break;
           } else {
-            await this.popState()
+            await this.popState();
           }
         }
         resolve();
@@ -108,8 +100,8 @@ export class StateManager {
     });
   }
 
-  get ready() {
-    return !!this.getCurrentState();
+  get loading() {
+    return this.bus.pending;
   }
 
   private pushState(data: VisualizationConfig<any>) {
@@ -117,7 +109,6 @@ export class StateManager {
   }
 
   private popState() {
-    return this.state.prevState()
-      .then(() => this.history.pop());
+    return this.state.prevState().then(() => this.history.pop());
   }
 }

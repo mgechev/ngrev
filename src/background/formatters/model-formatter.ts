@@ -15,16 +15,18 @@ const _changeDetectionToString = (cd: ChangeDetectionStrategy | null): string | 
 
 export const getProviderMetadata = (provider: ProviderSymbol): Metadata => {
   const meta = provider.getMetadata();
-  const deps = (meta.deps || []).map(d => {
-    const t = d.token;
-    if (t) {
-      if (t.identifier) {
-        return t.identifier.reference.name;
+  const deps = (meta.deps || [])
+    .map(d => {
+      const t = d.token;
+      if (t) {
+        if (t.identifier) {
+          return t.identifier.reference.name;
+        }
+        return t.value;
       }
-      return t.value;
-    };
-    return 'Undefined';
-  }).join(', ');
+      return 'Undefined';
+    })
+    .join(', ');
   let filePath = null;
   let name = meta.token.value;
   if (meta.token.identifier) {
@@ -83,9 +85,6 @@ export const getElementMetadata = (el: ElementAst): Metadata => {
 export const getModuleMetadata = (node: StaticSymbol): Metadata => {
   return {
     filePath: node.filePath,
-    properties: [
-      { key: 'Name', value: node.name },
-      { key: 'Members', value: node.members.join('\n') }
-    ]
+    properties: [{ key: 'Name', value: node.name }, { key: 'Members', value: node.members.join('\n') }]
   };
 };

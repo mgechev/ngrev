@@ -9,4 +9,4 @@ import { QuickAccessListComponent } from './quick-access-list.component';
   declarations: [QuickAccessComponent, QuickAccessListComponent],
   exports: [QuickAccessComponent]
 })
-export class QuickAccessModule { }
+export class QuickAccessModule {}

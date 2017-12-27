@@ -3,9 +3,25 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { StaticSymbol, CompileNgModuleMetadata } from '@angular/compiler';
 import { DataSet } from 'vis';
 import { DirectiveState } from './directive.state';
-import { Node, Edge, Metadata, getId, Direction, SymbolTypes, isAngularSymbol, getProviderId, getProviderName, VisualizationConfig } from '../../shared/data-format';
+import {
+  Node,
+  Edge,
+  Metadata,
+  getId,
+  Direction,
+  SymbolTypes,
+  isAngularSymbol,
+  getProviderId,
+  getProviderName,
+  VisualizationConfig
+} from '../../shared/data-format';
 import { DirectiveSymbol, ModuleSymbol, ProjectSymbols, Symbol, ProviderSymbol, PipeSymbol } from 'ngast';
-import { getDirectiveMetadata, getModuleMetadata, getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
+import {
+  getDirectiveMetadata,
+  getModuleMetadata,
+  getProviderMetadata,
+  getPipeMetadata
+} from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';
 import { PipeState } from './pipe.state';
 
@@ -24,7 +40,6 @@ const ExportsId = '$$exports';
 const ProvidersId = '$$providers';
 
 export class ModuleState extends State {
-
   private symbols: NodeMap;
 
   constructor(context: ProjectSymbols, protected module: ModuleSymbol) {
@@ -193,7 +208,13 @@ export class ModuleState extends State {
     };
   }
 
-  private _appendSet(parentSet: string, node: Symbol | ProviderSymbol, nodes: NodeMap, symbolType: SymbolTypes, edges: Edge[]) {
+  private _appendSet(
+    parentSet: string,
+    node: Symbol | ProviderSymbol,
+    nodes: NodeMap,
+    symbolType: SymbolTypes,
+    edges: Edge[]
+  ) {
     let id: string = '';
     let name = '';
     if (node instanceof ProviderSymbol) {
@@ -220,5 +241,4 @@ export class ModuleState extends State {
       to: id
     });
   }
-
 }

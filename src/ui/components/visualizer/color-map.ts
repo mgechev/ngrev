@@ -8,7 +8,7 @@ export const NodeTypeColorMap = {
       border: '#1E88E5',
       highlight: {
         background: '#2196F3',
-        border: '#1E88E5',
+        border: '#1E88E5'
       }
     },
     labelHighlightBold: false,
@@ -23,7 +23,7 @@ export const NodeTypeColorMap = {
       border: '#E64A19',
       highlight: {
         background: '#FF5722',
-        border: '#E64A19',
+        border: '#E64A19'
       }
     },
     labelHighlightBold: false,

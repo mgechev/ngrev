@@ -34,7 +34,8 @@ const DownArrowKeyCode = 40;
   host: {
     '(document:keydown)': 'onKeyDown($event)'
   },
-  styles: [`
+  styles: [
+    `
     :host {
       background: white;
       display: block;
@@ -61,14 +62,16 @@ const DownArrowKeyCode = 40;
     .selected {
       background: #efefef;
     }
-  `],
+  `
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuickAccessListComponent {
   bindData: KeyValuePair<any>[] = [];
 
   @Input() highlight: string;
-  @Input() set data(val: KeyValuePair<any>[]) {
+  @Input()
+  set data(val: KeyValuePair<any>[]) {
     this.bindData = val;
     if (this.selection >= val.length) {
       this.highlightItem(0);
@@ -105,11 +108,13 @@ export class QuickAccessListComponent {
 
   formatText(text: string): SafeHtml {
     const map = {};
-    (this.highlight || '').split('').forEach(c => map[c.toLowerCase()] = true);
+    (this.highlight || '').split('').forEach(c => (map[c.toLowerCase()] = true));
     const textChars = text.split('');
-    return this.sanitizer.bypassSecurityTrustHtml(textChars.reduce((a, c) => {
-      return a + (map[c.toLowerCase()] ? `<b>${c}</b>` : c);
-    }, ''));
+    return this.sanitizer.bypassSecurityTrustHtml(
+      textChars.reduce((a, c) => {
+        return a + (map[c.toLowerCase()] ? `<b>${c}</b>` : c);
+      }, '')
+    );
   }
 
   private highlightItem(idx: number) {

@@ -2,7 +2,18 @@ import { DirectiveSymbol, ProjectSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
 import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
 import { DataSet } from 'vis';
-import { VisualizationConfig, Metadata, getId, Node, isAngularSymbol, SymbolTypes, Direction, getProviderId, getProviderName, Edge } from '../../shared/data-format';
+import {
+  VisualizationConfig,
+  Metadata,
+  getId,
+  Node,
+  isAngularSymbol,
+  SymbolTypes,
+  Direction,
+  getProviderId,
+  getProviderName,
+  Edge
+} from '../../shared/data-format';
 import { getDirectiveMetadata, getElementMetadata, getProviderMetadata } from '../formatters/model-formatter';
 import { TemplateState } from './template.state';
 import { ProviderState } from './provider.state';
@@ -59,15 +70,17 @@ export class DirectiveState extends State {
   getData(): VisualizationConfig<any> {
     const s = this.directive.symbol;
     const nodeId = getId(s);
-    const nodes: Node<DirectiveSymbol>[] = [{
-      id: nodeId,
-      label: s.name,
-      data: this.directive,
-      type: {
-        type: SymbolTypes.Component,
-        angular: isAngularSymbol(s)
+    const nodes: Node<DirectiveSymbol>[] = [
+      {
+        id: nodeId,
+        label: s.name,
+        data: this.directive,
+        type: {
+          type: SymbolTypes.Component,
+          angular: isAngularSymbol(s)
+        }
       }
-    }];
+    ];
     const edges: Edge[] = [];
     if (this.directive.isComponent()) {
       nodes.push({
@@ -83,19 +96,34 @@ export class DirectiveState extends State {
         to: TemplateId
       });
     }
-    const addedSymbols: {[key: string]: boolean} = {};
+    const addedSymbols: { [key: string]: boolean } = {};
     this.addProviderNodes(nodes, edges, addedSymbols, 'Dependencies', DependenciesId, this.directive.getDependencies());
     this.addProviderNodes(nodes, edges, addedSymbols, 'Providers', ProvidersId, this.directive.getProviders());
-    this.addProviderNodes(nodes, edges, addedSymbols, 'View Providers', ViewProvidersId, this.directive.getViewProviders());
+    this.addProviderNodes(
+      nodes,
+      edges,
+      addedSymbols,
+      'View Providers',
+      ViewProvidersId,
+      this.directive.getViewProviders()
+    );
     return {
       title: this.directive.symbol.name,
       graph: {
-        nodes, edges
+        nodes,
+        edges
       }
     };
   }
 
-  private addProviderNodes(nodes: Node<any>[], edges: any[], addedSymbols: {[key: string]: boolean}, rootLabel: string, rootId: string, providers: ProviderSymbol[]) {
+  private addProviderNodes(
+    nodes: Node<any>[],
+    edges: any[],
+    addedSymbols: { [key: string]: boolean },
+    rootLabel: string,
+    rootId: string,
+    providers: ProviderSymbol[]
+  ) {
     if (providers.length > 0) {
       nodes.push({
         id: rootId,
@@ -136,14 +164,14 @@ export class DirectiveState extends State {
         from: rootId,
         to: directiveId,
         direction: Direction.To
-      })
+      });
     }
     Object.keys(existing).forEach((key: string) => {
       edges.push({
         from: rootId,
         to: key,
         direction: Direction.To
-      })
+      });
     });
     nodes.forEach(n => {
       this.symbols[n.id] = n.data;

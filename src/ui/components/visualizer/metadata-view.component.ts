@@ -17,7 +17,8 @@ import { Metadata } from '../../../shared/data-format';
       </tbody>
     </table>
   `,
-  styles: [`
+  styles: [
+    `
   table {
     bottom: 7px;
     right: 3px;
@@ -37,7 +38,8 @@ import { Metadata } from '../../../shared/data-format';
   .hidden {
     opacity: 0;
   }
-  `]
+  `
+  ]
 })
 export class MetadataViewComponent {
   @Input() metadata: Metadata;

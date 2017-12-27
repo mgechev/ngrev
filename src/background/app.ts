@@ -9,10 +9,9 @@ import { app, dialog, Menu, ipcMain } from 'electron';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { applicationMenuTemplate } from './menu/application_menu_template';
 import createWindow from './helpers/window';
-import {createProgramFromTsConfig} from './create-program';
-import {readFileSync, readFile} from 'fs';
+import { readFileSync, readFile } from 'fs';
 
-import {BackgroundApp} from './model/background-app';
+import { BackgroundApp } from './model/background-app';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
@@ -24,7 +23,6 @@ var mainWindow;
 
 const backgroundApp = new BackgroundApp();
 backgroundApp.init();
-
 
 const menuItems = [applicationMenuTemplate()];
 if (env.name !== 'production') {
@@ -41,8 +39,7 @@ if (env.name !== 'production') {
   app.setPath('userData', userDataPath + ' (' + env.name + ')');
 }
 
-app.on('ready', function () {
-
+app.on('ready', function() {
   Menu.setApplicationMenu(menus);
 
   var mainWindow = createWindow('main', {
@@ -52,17 +49,19 @@ app.on('ready', function () {
 
   mainWindow.setTitle(require('../package.json').name);
 
-  mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'app.html'),
-    protocol: 'file:',
-    slashes: true
-  }));
+  mainWindow.loadURL(
+    url.format({
+      pathname: path.join(__dirname, 'app.html'),
+      protocol: 'file:',
+      slashes: true
+    })
+  );
 
   if (env.name === 'development') {
     mainWindow.openDevTools();
   }
 });
 
-app.on('window-all-closed', function () {
+app.on('window-all-closed', function() {
   app.quit();
 });

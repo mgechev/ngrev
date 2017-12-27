@@ -19,4 +19,4 @@ import { IPCBus } from './model/ipc-bus';
   bootstrap: [AppComponent],
   providers: [ProjectProxy, StateProxy, StateManager, IPCBus]
 })
-export class AppModule { }
+export class AppModule {}

@@ -4,12 +4,13 @@ export const devMenuTemplate = () => {
   return {
     label: 'Development',
     submenu: [
-    {
-      label: 'Quit',
-      accelerator: 'CmdOrCtrl+Q',
-      click() {
-        app.quit();
+      {
+        label: 'Quit',
+        accelerator: 'CmdOrCtrl+Q',
+        click() {
+          app.quit();
+        }
       }
-    }
-  ]};
+    ]
+  };
 };

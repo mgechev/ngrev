@@ -6,78 +6,79 @@
 import { app, BrowserWindow, screen } from 'electron';
 const jetpack = require('fs-jetpack');
 
-export default function (name, options) {
+export default function(name, options) {
+  var userDataDir = jetpack.cwd(app.getPath('userData'));
+  var stateStoreFile = 'window-state-' + name + '.json';
+  var defaultSize = {
+    width: options.width,
+    height: options.height
+  };
+  var state = {};
+  var win;
 
-    var userDataDir = jetpack.cwd(app.getPath('userData'));
-    var stateStoreFile = 'window-state-' + name +'.json';
-    var defaultSize = {
-        width: options.width,
-        height: options.height
+  var restore = function() {
+    var restoredState = {};
+    try {
+      restoredState = userDataDir.read(stateStoreFile, 'json');
+    } catch (err) {
+      // For some reason json can't be read (might be corrupted).
+      // No worries, we have defaults.
+    }
+    return Object.assign({}, defaultSize, restoredState);
+  };
+
+  var getCurrentPosition = function() {
+    var position = win.getPosition();
+    var size = win.getSize();
+    return {
+      x: position[0],
+      y: position[1],
+      width: size[0],
+      height: size[1]
     };
-    var state = {};
-    var win;
+  };
 
-    var restore = function () {
-        var restoredState = {};
-        try {
-            restoredState = userDataDir.read(stateStoreFile, 'json');
-        } catch (err) {
-            // For some reason json can't be read (might be corrupted).
-            // No worries, we have defaults.
-        }
-        return Object.assign({}, defaultSize, restoredState);
-    };
+  var windowWithinBounds = function(windowState, bounds) {
+    return (
+      windowState.x >= bounds.x &&
+      windowState.y >= bounds.y &&
+      windowState.x + windowState.width <= bounds.x + bounds.width &&
+      windowState.y + windowState.height <= bounds.y + bounds.height
+    );
+  };
 
-    var getCurrentPosition = function () {
-        var position = win.getPosition();
-        var size = win.getSize();
-        return {
-            x: position[0],
-            y: position[1],
-            width: size[0],
-            height: size[1]
-        };
-    };
+  var resetToDefaults = function(windowState) {
+    var bounds = screen.getPrimaryDisplay().bounds;
+    return Object.assign({}, defaultSize, {
+      x: (bounds.width - defaultSize.width) / 2,
+      y: (bounds.height - defaultSize.height) / 2
+    });
+  };
 
-    var windowWithinBounds = function (windowState, bounds) {
-        return windowState.x >= bounds.x &&
-            windowState.y >= bounds.y &&
-            windowState.x + windowState.width <= bounds.x + bounds.width &&
-            windowState.y + windowState.height <= bounds.y + bounds.height;
-    };
+  var ensureVisibleOnSomeDisplay = function(windowState) {
+    var visible = screen.getAllDisplays().some(function(display) {
+      return windowWithinBounds(windowState, display.bounds);
+    });
+    if (!visible) {
+      // Window is partially or fully not visible now.
+      // Reset it to safe defaults.
+      return resetToDefaults(windowState);
+    }
+    return windowState;
+  };
 
-    var resetToDefaults = function (windowState) {
-        var bounds = screen.getPrimaryDisplay().bounds;
-        return Object.assign({}, defaultSize, {
-            x: (bounds.width - defaultSize.width) / 2,
-            y: (bounds.height - defaultSize.height) / 2
-        });
-    };
+  var saveState = function() {
+    if (!win.isMinimized() && !win.isMaximized()) {
+      Object.assign(state, getCurrentPosition());
+    }
+    userDataDir.write(stateStoreFile, state, { atomic: true });
+  };
 
-    var ensureVisibleOnSomeDisplay = function (windowState) {
-        var visible = screen.getAllDisplays().some(function (display) {
-            return windowWithinBounds(windowState, display.bounds);
-        });
-        if (!visible) {
-            // Window is partially or fully not visible now.
-            // Reset it to safe defaults.
-            return resetToDefaults(windowState);
-        }
-        return windowState;
-    };
+  state = ensureVisibleOnSomeDisplay(restore());
 
-    var saveState = function () {
-        if (!win.isMinimized() && !win.isMaximized()) {
-            Object.assign(state, getCurrentPosition());
-        }
-        userDataDir.write(stateStoreFile, state, { atomic: true });
-    };
+  win = new BrowserWindow(Object.assign({}, options, state));
 
-    state = ensureVisibleOnSomeDisplay(restore());
+  win.on('close', saveState);
 
-    win = new BrowserWindow(Object.assign({}, options, state));
-
-    win.on('close', saveState);
-
-    return win;
+  return win;
 }

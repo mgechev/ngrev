@@ -1,4 +1,16 @@
-import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes, getProviderId, getProviderName, Edge } from '../../shared/data-format';
+import {
+  Node,
+  Metadata,
+  getId,
+  VisualizationConfig,
+  Layout,
+  Direction,
+  isAngularSymbol,
+  SymbolTypes,
+  getProviderId,
+  getProviderName,
+  Edge
+} from '../../shared/data-format';
 import { StaticSymbol } from '@angular/compiler';
 import { ProjectSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
@@ -15,7 +27,6 @@ enum SymbolType {
 }
 
 export class ProviderState extends State {
-
   private symbols: NodeMap = {};
 
   constructor(context: ProjectSymbols, protected provider: ProviderSymbol) {
@@ -39,36 +50,37 @@ export class ProviderState extends State {
 
   getData(): VisualizationConfig<ProviderSymbol> {
     const metadata = this.provider.getMetadata();
-    const existing: {[key: string]: number} = {};
+    const existing: { [key: string]: number } = {};
     const currentId = getProviderId(metadata);
-    const nodes: Node<ProviderSymbol>[] = [{
-      id: currentId,
-      data: this.provider,
-      label: getProviderName(metadata),
-      type: {
-        angular: isAngularSymbol(metadata),
-        type: SymbolTypes.Provider
-      }
-    }];
-    existing[currentId] = 1;
-    (this.provider.getDependencies() || [])
-      .forEach(p => {
-        const dependencyMetadata = p.getMetadata();
-        // Handle @SkipSelf()
-        const id = getProviderId(dependencyMetadata);
-        if (!existing[id]) {
-          nodes.push({
-            id,
-            data: p,
-            label: getProviderName(dependencyMetadata),
-            type: {
-              angular: isAngularSymbol(p.getMetadata()),
-              type: SymbolTypes.Provider
-            }
-          });
+    const nodes: Node<ProviderSymbol>[] = [
+      {
+        id: currentId,
+        data: this.provider,
+        label: getProviderName(metadata),
+        type: {
+          angular: isAngularSymbol(metadata),
+          type: SymbolTypes.Provider
         }
-        existing[id] = (existing[id] || 0) + 1;
-      });
+      }
+    ];
+    existing[currentId] = 1;
+    (this.provider.getDependencies() || []).forEach(p => {
+      const dependencyMetadata = p.getMetadata();
+      // Handle @SkipSelf()
+      const id = getProviderId(dependencyMetadata);
+      if (!existing[id]) {
+        nodes.push({
+          id,
+          data: p,
+          label: getProviderName(dependencyMetadata),
+          type: {
+            angular: isAngularSymbol(p.getMetadata()),
+            type: SymbolTypes.Provider
+          }
+        });
+      }
+      existing[id] = (existing[id] || 0) + 1;
+    });
     existing[currentId] -= 1;
     nodes.forEach(n => n.data && (this.symbols[n.id] = n.data));
     const resultEdges: Edge[] = [];
@@ -89,5 +101,4 @@ export class ProviderState extends State {
       graph: { edges: resultEdges, nodes }
     };
   }
-
 }

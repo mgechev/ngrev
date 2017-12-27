@@ -8,7 +8,8 @@ import { remote } from 'electron';
   template: `
     <button (click)="loadProject()">Select Project</button>
   `,
-  styles: [`
+  styles: [
+    `
     :host {
       width: 100%;
       display: flex;
@@ -34,7 +35,8 @@ import { remote } from 'electron';
     button:active {
       background: #1976D2;
     }
-  `]
+  `
+  ]
 })
 export class HomeComponent {
   @Output() project = new EventEmitter<string>();

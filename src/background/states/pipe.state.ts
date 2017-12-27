@@ -1,4 +1,16 @@
-import { Node, Metadata, getId, VisualizationConfig, Layout, Direction, isAngularSymbol, SymbolTypes, getProviderId, getProviderName, Edge } from '../../shared/data-format';
+import {
+  Node,
+  Metadata,
+  getId,
+  VisualizationConfig,
+  Layout,
+  Direction,
+  isAngularSymbol,
+  SymbolTypes,
+  getProviderId,
+  getProviderName,
+  Edge
+} from '../../shared/data-format';
 import { StaticSymbol } from '@angular/compiler';
 import { ProjectSymbols, ProviderSymbol, PipeSymbol } from 'ngast';
 import { State } from './state';
@@ -10,7 +22,6 @@ interface NodeMap {
 }
 
 export class PipeState extends State {
-
   private symbols: NodeMap = {};
 
   constructor(context: ProjectSymbols, protected pipe: PipeSymbol) {
@@ -42,28 +53,29 @@ export class PipeState extends State {
 
   getData(): VisualizationConfig<ProviderSymbol> {
     const symbol = this.pipe.symbol;
-    const nodes: Node<ProviderSymbol>[] = [{
-      id: getId(symbol),
-      data: this.pipe as any,
-      label: symbol.name,
-      type: {
-        angular: isAngularSymbol(symbol),
-        type: SymbolTypes.Pipe
+    const nodes: Node<ProviderSymbol>[] = [
+      {
+        id: getId(symbol),
+        data: this.pipe as any,
+        label: symbol.name,
+        type: {
+          angular: isAngularSymbol(symbol),
+          type: SymbolTypes.Pipe
+        }
       }
-    }];
-    (this.pipe.getDependencies() || [])
-      .forEach(p => {
-        const m = p.getMetadata();
-        nodes.push({
-          id: getProviderId(m),
-          data: p,
-          label: getProviderName(m),
-          type: {
-            angular: isAngularSymbol(m),
-            type: SymbolTypes.Provider
-          }
-        });
+    ];
+    (this.pipe.getDependencies() || []).forEach(p => {
+      const m = p.getMetadata();
+      nodes.push({
+        id: getProviderId(m),
+        data: p,
+        label: getProviderName(m),
+        type: {
+          angular: isAngularSymbol(m),
+          type: SymbolTypes.Provider
+        }
       });
+    });
     nodes.forEach(n => n.data && (this.symbols[n.id] = n.data));
     const resultEdges: Edge[] = [];
     const edges = nodes.slice(1, nodes.length).forEach(n => {
@@ -84,5 +96,4 @@ export class PipeState extends State {
       graph: { edges: resultEdges, nodes }
     };
   }
-
 }

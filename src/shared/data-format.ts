@@ -54,15 +54,14 @@ export interface VisualizationConfig<T> {
   graph: Graph<T>;
 }
 
-export type StringPair = { key: string, value: string | null};
+export type StringPair = { key: string; value: string | null };
 
 export interface Metadata {
-  properties: {[key: number]: StringPair};
+  properties: { [key: number]: StringPair };
   filePath?: string | null;
 }
 
-
-export const getId = (symbol: { name: string, filePath: string }) => {
+export const getId = (symbol: { name: string; filePath: string }) => {
   return `${symbol.filePath}#${symbol.name}`;
 };
 

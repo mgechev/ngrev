@@ -1,5 +1,5 @@
+import { Message } from './../../../shared/ipc-constants';
 import { IPCBus } from '../../model/ipc-bus';
-import { SaveImage, DisableExport, EnableExport } from '../../../shared/ipc-constants';
 import { remote } from 'electron';
 import { writeFileSync } from 'fs';
 import { Injectable } from '@angular/core';
@@ -9,7 +9,7 @@ function arrayBufferToBuffer(ab) {
   var buffer = new Buffer(ab.byteLength);
   var view = new Uint8Array(ab);
   for (var i = 0; i < buffer.length; ++i) {
-      buffer[i] = view[i];
+    buffer[i] = view[i];
   }
   return buffer;
 }
@@ -21,7 +21,6 @@ export interface VisualizerState {
 
 @Injectable()
 export class ExportToImage {
-
   private ipcCallback: Function;
   private visState: VisualizerState;
 
@@ -31,18 +30,18 @@ export class ExportToImage {
     this.disable();
     this.visState = state;
     this.init();
-    this.ipcBus.send(EnableExport);
+    this.ipcBus.send(Message.EnableExport);
   }
 
   disable() {
     if (typeof this.ipcCallback === 'function') {
       this.ipcCallback();
     }
-    this.ipcBus.send(DisableExport);
+    this.ipcBus.send(Message.DisableExport);
   }
 
   private init() {
-    this.ipcCallback = this.ipcBus.on(SaveImage, () => {
+    this.ipcCallback = this.ipcBus.on(Message.SaveImage, () => {
       const self = this;
 
       function blobCallback(b) {
@@ -53,12 +52,16 @@ export class ExportToImage {
             image: r.result,
             format: 'png'
           };
-          remote.dialog.showSaveDialog(remote.BrowserWindow.getAllWindows()[0], {
-            title: 'Export to Image',
-            defaultPath: sanitizeFilename(data.name + '.' + data.format)
-          }, (name: string) => {
-            name && writeFileSync(name, arrayBufferToBuffer(data.image));
-          });
+          remote.dialog.showSaveDialog(
+            remote.BrowserWindow.getAllWindows()[0],
+            {
+              title: 'Export to Image',
+              defaultPath: sanitizeFilename(data.name + '.' + data.format)
+            },
+            (name: string) => {
+              name && writeFileSync(name, arrayBufferToBuffer(data.image));
+            }
+          );
         };
         r.readAsArrayBuffer(b);
       }

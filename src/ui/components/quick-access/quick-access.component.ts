@@ -47,9 +47,10 @@ export interface QueryObject {
   host: {
     '(document:keydown)': 'onKeyDown($event)',
     '(document:keyup)': 'onKeyUp($event)',
-    '(document:click)': 'onDocumentClick($event)',
+    '(document:click)': 'onDocumentClick($event)'
   },
-  styles: [`
+  styles: [
+    `
   :host {
     margin: auto;
     margin-top: 45px;
@@ -76,17 +77,19 @@ export interface QueryObject {
     border: 1px solid #ccc;
     padding: 7px;
   }
-  `]
+  `
+  ]
 })
 export class QuickAccessComponent implements AfterViewInit {
   private metaKeyDown = 0;
   private fuzzyBoxVisible = false;
   private symbolName = '';
-  private fuse = new Fuse([], { keys: ["name", "filePath"] });
+  private fuse = new Fuse([], { keys: ['name', 'filePath'] });
 
   constructor(private element: ElementRef, private renderer: Renderer2, private cd: ChangeDetectorRef) {}
 
-  @Input() set queryObject(query: QueryObject) {
+  @Input()
+  set queryObject(query: QueryObject) {
     let list = [];
     if (this.fuse) {
       list = this.fuse.list;
@@ -94,7 +97,8 @@ export class QuickAccessComponent implements AfterViewInit {
     this.fuse = new Fuse(list, { keys: query });
   }
 
-  @Input() set queryList(symbols: KeyValuePair<any>[]) {
+  @Input()
+  set queryList(symbols: KeyValuePair<any>[]) {
     this.fuse.set(symbols);
   }
 
@@ -130,8 +134,7 @@ export class QuickAccessComponent implements AfterViewInit {
     if (!this.fuzzyBoxVisible) {
       this.hide();
     }
-    this.input.changes
-      .subscribe(e => e.first ? e.first.nativeElement.focus() : void 0);
+    this.input.changes.subscribe(e => (e.first ? e.first.nativeElement.focus() : void 0));
   }
 
   search() {

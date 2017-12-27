@@ -1,7 +1,7 @@
 import { SymbolTypes } from '../../../shared/data-format';
 import { Component, Input } from '@angular/core';
 
-export type Color = { color: string, label: string };
+export type Color = { color: string; label: string };
 export type ColorLegend = Color[];
 
 @Component({
@@ -15,7 +15,8 @@ export type ColorLegend = Color[];
       </div>
     </section>
   `,
-  styles: [`
+  styles: [
+    `
     :host {
       display: block;
       position: relative;
@@ -54,7 +55,8 @@ export type ColorLegend = Color[];
     .hidden {
       opacity: 0;
     }
-  `]
+  `
+  ]
 })
 export class ColorLegendComponent {
   private _colors: ColorLegend = [];
@@ -63,7 +65,8 @@ export class ColorLegendComponent {
     return this._colors || [];
   }
 
-  @Input() set colors(val: ColorLegend) {
+  @Input()
+  set colors(val: ColorLegend) {
     this._colors = val;
   }
 }

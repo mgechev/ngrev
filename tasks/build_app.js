@@ -17,50 +17,57 @@ var srcDir = jetpack.cwd('./src');
 var distDir = jetpack.cwd('./dist');
 var destDir = jetpack.cwd('./app');
 
-gulp.task('bundle', function () {
-    return Promise.all([
-        bundle(distDir.path('background', 'app.js'), destDir.path('background.js')),
-        bundle(distDir.path('ui', 'app.js'), destDir.path('app.js')),
-    ]);
+gulp.task('bundle', function() {
+  return Promise.all([
+    bundle(distDir.path('background', 'model', 'background-processor.js'), destDir.path('processor.js')),
+    bundle(distDir.path('background', 'app.js'), destDir.path('background.js')),
+    bundle(distDir.path('ui', 'app.js'), destDir.path('app.js'))
+  ]);
 });
 
 var tsProject = ts.createProject('tsconfig.json');
 
 gulp.task('ts', function() {
-    var tsResult = gulp.src('src/**/*.ts')
-        .pipe(tsProject());
- 
-    return tsResult.js.pipe(gulp.dest('dist'));
+  var tsResult = gulp.src('src/**/*.ts').pipe(tsProject());
+
+  return tsResult.js.pipe(gulp.dest('dist'));
 });
 
-gulp.task('less', function () {
-    return gulp.src(srcDir.path('stylesheets/main.less'))
-        .pipe(plumber())
-        .pipe(less())
-        .pipe(gulp.dest(destDir.path('stylesheets')));
+gulp.task('less', function() {
+  return gulp
+    .src(srcDir.path('stylesheets/main.less'))
+    .pipe(plumber())
+    .pipe(less())
+    .pipe(gulp.dest(destDir.path('stylesheets')));
 });
 
-gulp.task('environment', function () {
-    var configFile = 'config/env_' + utils.getEnvName() + '.json';
-    projectDir.copy(configFile, destDir.path('env.json'), { overwrite: true });
+gulp.task('environment', function() {
+  var configFile = 'config/env_' + utils.getEnvName() + '.json';
+  projectDir.copy(configFile, destDir.path('env.json'), { overwrite: true });
 });
 
-gulp.task('watch', function () {
-    var beepOnError = function (done) {
-        return function (err) {
-            if (err) {
-                utils.beepSound();
-            }
-            done(err);
-        };
+gulp.task('watch', function() {
+  var beepOnError = function(done) {
+    return function(err) {
+      if (err) {
+        utils.beepSound();
+      }
+      done(err);
     };
+  };
 
-    watch('src/**/*.ts', batch(function (events, done) {
-        runsequence('ts', 'bundle', done);
-    }));
-    watch('src/**/*.less', batch(function (events, done) {
-        gulp.start('less', beepOnError(done));
-    }));
+  watch(
+    'src/**/*.ts',
+    batch(function(events, done) {
+      runsequence('ts', 'bundle', done);
+    })
+  );
+  watch(
+    'src/**/*.less',
+    batch(function(events, done) {
+      gulp.start('less', beepOnError(done));
+    })
+  );
 });
 
 gulp.task('build', runsequence('ts', 'bundle', 'less', 'environment'));

@@ -1,13 +1,17 @@
-export const LoadProject = 'load-project';
-export const PrevState = 'prev-state';
-export const GetMetadata = 'get-metadata';
-export const GetData = 'get-data';
-export const NextState = 'next-state';
-export const GetSymbols = 'get-symbols';
-export const DirectStateTransition = 'direct-state-transition';
-export const SaveImage = 'save-image';
-export const ImageData = 'image-data';
-export const DisableExport = 'image-data';
-export const EnableExport = 'image-data';
-export const Failure = 0;
-export const Success = 1;
+export enum Message {
+  LoadProject = 'load-project',
+  PrevState = 'prev-state',
+  GetMetadata = 'get-metadata',
+  GetData = 'get-data',
+  GetSymbols = 'get-symbols',
+  DirectStateTransition = 'direct-state-transition',
+  SaveImage = 'save-image',
+  ImageData = 'image-data',
+  DisableExport = 'disable-export',
+  EnableExport = 'enable-export'
+}
+
+export enum Status {
+  Failure = 0,
+  Success = 1
+}

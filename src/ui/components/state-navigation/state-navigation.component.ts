@@ -38,7 +38,8 @@ const MetaMemento = new Memento(dummyConfig);
       </li>
     </ul>
   `,
-  styles: [`
+  styles: [
+    `
     :host {
       position: absolute;
       top: 30px;
@@ -124,7 +125,8 @@ const MetaMemento = new Memento(dummyConfig);
       font-size: 16px;
       display: block;
     }
-  `]
+  `
+  ]
 })
 export class StateNavigationComponent {
   @Input() states: Memento[] = [];
@@ -184,9 +186,10 @@ export class StateNavigationComponent {
       const firstHalf = Math.floor(maxBoxes / 2);
       // -1 because of the meta box
       const secondHalf = maxBoxes - firstHalf - 1;
-      return this.states.slice(0, firstHalf)
+      return this.states
+        .slice(0, firstHalf)
         .concat(MetaMemento)
-        .concat(this.states.slice(this.states.length - secondHalf, this.states.length))
+        .concat(this.states.slice(this.states.length - secondHalf, this.states.length));
     }
   }
 }
