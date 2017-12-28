@@ -21,10 +21,7 @@ import { DirectiveState } from '../states/directive.state';
 import { SymbolIndex, SymbolData } from './symbol-index';
 import { StaticSymbol } from '@angular/compiler';
 import { menus } from '../app';
-import { existsSync } from 'fs';
 import { join } from 'path';
-
-const cwd = join(__dirname, '..');
 
 const success = (sender, msg, payload) => {
   sender.send(msg, Status.Success, payload);
@@ -63,12 +60,7 @@ export class BackgroundApp {
   private taskQueue: TaskQueue;
 
   init() {
-    let script = './app/parser.js';
-    if (existsSync(join(cwd, 'app.asar'))) {
-      script = 'app.asar/app/parser.js';
-    }
-
-    this.slaveProcess = SlaveProcess.create(script);
+    this.slaveProcess = SlaveProcess.create(join(__dirname, 'parser.js'));
     this.taskQueue = new TaskQueue();
     ipcMain.on(Message.LoadProject, (e, tsconfig: string) => {
       if (!this.slaveProcess.connected) {
