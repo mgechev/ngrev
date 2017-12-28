@@ -53,7 +53,7 @@ export interface GetMetadataRequest {
 
 export interface GetMetadataResponse {
   topic: Message.GetMetadata;
-  data: Metadata;
+  data: Metadata | null;
 }
 
 export interface GetDataRequest {
@@ -62,7 +62,7 @@ export interface GetDataRequest {
 
 export interface GetDataResponse {
   topic: Message.GetData;
-  data: VisualizationConfig<any>;
+  data: VisualizationConfig<any> | null;
 }
 
 export type IPCRequest =

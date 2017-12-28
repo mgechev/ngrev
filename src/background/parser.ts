@@ -1,4 +1,4 @@
-import { getProviderName } from './../shared/data-format';
+import { getProviderName, Metadata } from './../shared/data-format';
 import { ModuleTreeState } from './states/module-tree.state';
 import { SymbolIndex, SymbolData } from './model/symbol-index';
 import { Status, Message } from './../shared/ipc-constants';
@@ -103,7 +103,7 @@ export class BackgroundApp {
       const index = SymbolIndex.getIndex(this.project.projectSymbols);
       const lastState = this.states[this.states.length - 1];
       const nextSymbol = index.get(data.id);
-      let nextState: State;
+      let nextState: State | null;
       if (nextSymbol) {
         nextState = nextSymbol.stateFactory();
         if (lastState instanceof nextState.constructor && lastState.stateSymbolId === nextState.stateSymbolId) {

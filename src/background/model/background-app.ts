@@ -21,6 +21,10 @@ import { DirectiveState } from '../states/directive.state';
 import { SymbolIndex, SymbolData } from './symbol-index';
 import { StaticSymbol } from '@angular/compiler';
 import { menus } from '../app';
+import { existsSync } from 'fs';
+import { join } from 'path';
+
+const cwd = join(__dirname, '..');
 
 const success = (sender, msg, payload) => {
   sender.send(msg, Status.Success, payload);
@@ -59,7 +63,12 @@ export class BackgroundApp {
   private taskQueue: TaskQueue;
 
   init() {
-    this.slaveProcess = SlaveProcess.create('./app/parser.js');
+    let script = './app/parser.js';
+    if (existsSync(join(cwd, 'app.asar'))) {
+      script = 'app.asar/app/parser.js';
+    }
+
+    this.slaveProcess = SlaveProcess.create(script);
     this.taskQueue = new TaskQueue();
     ipcMain.on(Message.LoadProject, (e, tsconfig: string) => {
       if (!this.slaveProcess.connected) {
@@ -177,12 +186,12 @@ export class BackgroundApp {
     });
 
     ipcMain.on(Message.DisableExport, e => {
-      (menus.items[0].submenu as any).items[0].enabled = false;
+      (menus.items[0] as any).submenu.items[0].enabled = false;
       success(e.sender, Message.DisableExport, true);
     });
 
     ipcMain.on(Message.EnableExport, e => {
-      (menus.items[0].submenu as any).items[0].enabled = true;
+      (menus.items[0] as any).submenu.items[0].enabled = true;
       console.log('Enable!');
       success(e.sender, Message.EnableExport, true);
     });

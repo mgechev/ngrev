@@ -3,6 +3,7 @@ export enum Message {
   PrevState = 'prev-state',
   GetMetadata = 'get-metadata',
   GetData = 'get-data',
+  NextState = 'next-state',
   GetSymbols = 'get-symbols',
   DirectStateTransition = 'direct-state-transition',
   SaveImage = 'save-image',

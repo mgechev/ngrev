@@ -10,11 +10,15 @@
     "declaration": true,
     "strictNullChecks": true,
     "outDir": "./dist",
-    "lib": ["es2015", "dom"]
+    "lib": [
+      "es2015",
+      "dom"
+    ]
   },
   "files": [
     "./src/ui/app.ts",
-    "./src/background/app.ts"
+    "./src/background/app.ts",
+    "./src/background/parser.ts"
   ],
   "angularCompilerOptions": {
     "skipTemplateCodegen": true
