@@ -1,9 +1,9 @@
-import { getProviderName } from './../../shared/data-format';
-import { ModuleTreeState } from './../states/module-tree.state';
-import { SymbolIndex, SymbolData } from './symbol-index';
-import { Status, Message } from './../../shared/ipc-constants';
-import { State } from '../states/state';
-import { Project } from './project';
+import { getProviderName } from './../shared/data-format';
+import { ModuleTreeState } from './states/module-tree.state';
+import { SymbolIndex, SymbolData } from './model/symbol-index';
+import { Status, Message } from './../shared/ipc-constants';
+import { State } from './states/state';
+import { Project } from './model/project';
 import { Symbol } from 'ngast';
 import {
   ParentProcess,
@@ -15,7 +15,7 @@ import {
   GetSymbolsRequest,
   GetMetadataRequest,
   GetDataRequest
-} from './../helpers/process';
+} from './helpers/process';
 import { StaticSymbol } from '@angular/compiler';
 
 export class BackgroundApp {
