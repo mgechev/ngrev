@@ -201,7 +201,11 @@ export class ModuleState extends State {
         nodes: Object.keys(nodes).map((key: string) => {
           const node: any = Object.assign({}, nodes[key]);
           node.id = key;
-          return node;
+          return {
+            id: node.id,
+            type: node.type,
+            label: node.label
+          };
         }),
         edges: edges
       }

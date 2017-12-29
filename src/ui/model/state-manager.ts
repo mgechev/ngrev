@@ -29,8 +29,7 @@ export class StateManager {
       .load(tsconfig)
       .then((rootContext: ProjectSymbols) => (this.state = new StateProxy()))
       .then((proxy: StateProxy) => proxy.getData())
-      .then(data => this.history.push(new Memento(data)))
-      .then(() => this.project.getSymbols());
+      .then(data => this.history.push(new Memento(data)));
   }
 
   tryChangeState(id: string) {

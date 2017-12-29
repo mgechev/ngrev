@@ -110,7 +110,11 @@ export class DirectiveState extends State {
     return {
       title: this.directive.symbol.name,
       graph: {
-        nodes,
+        nodes: nodes.map(n => ({
+          id: n.id,
+          type: n.type,
+          label: n.label
+        })),
         edges
       }
     };

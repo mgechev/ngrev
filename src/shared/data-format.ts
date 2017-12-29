@@ -1,4 +1,5 @@
 import { StaticSymbol, CompileProviderMetadata } from '@angular/compiler';
+
 export interface Graph<T> {
   nodes: Node<T>[];
   edges: Edge[];

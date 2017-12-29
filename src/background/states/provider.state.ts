@@ -98,7 +98,14 @@ export class ProviderState extends State {
     return {
       title: getProviderName(this.provider.getMetadata()),
       layout: Layout.Regular,
-      graph: { edges: resultEdges, nodes }
+      graph: {
+        edges: resultEdges,
+        nodes: nodes.map(n => ({
+          id: n.id,
+          label: n.label,
+          type: n.type
+        }))
+      }
     };
   }
 }

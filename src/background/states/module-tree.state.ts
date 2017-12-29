@@ -26,6 +26,17 @@ interface NodeMap {
 
 const ModuleIndex = new Trie<ModuleSymbol>((str: string) => str.split(/\/|#/));
 
+const formatModuleGraph = (data: Graph<ModuleSymbol>) => {
+  return {
+    edges: data.edges,
+    nodes: data.nodes.map(n => ({
+      id: n.id,
+      type: n.type,
+      label: n.label
+    }))
+  };
+};
+
 export class ModuleTreeState extends State {
   private data: VisualizationConfig<ModuleSymbol>;
   private symbols: NodeMap = {};
@@ -48,7 +59,7 @@ export class ModuleTreeState extends State {
     });
     this.data = {
       title: `${module.symbol.name}'s imports & exports`,
-      graph,
+      graph: formatModuleGraph(graph),
       layout: Layout.Regular
     };
   }

@@ -15,6 +15,7 @@ export class IPCBus {
       return Promise.reject('Pending requests');
     }
     this.blocked = true;
+    console.log('Sending method call', method);
     return new Promise((resolve, reject) => {
       ipcRenderer.once(method, (e, code, payload) => {
         console.log('Got response of type', method);
