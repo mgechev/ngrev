@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/mgechev/ngrev/master/build/ngrev-512.png" alt="ngrev" width="250">
 </p>
 
-Graphical tool for reverse engineering of Angular projects. It allows you to navigate in the structure of your application and observe the relationship between the different modules, providers and directives. The tool performs **static code analysis** which means that you **don't have to run your application** in order to use it.
+Graphical tool for reverse engineering of Angular projects. It allows you to navigate in the structure of your application and observe the relationship between the different modules, providers, and directives. The tool performs **static code analysis** which means that you **don't have to run your application** in order to use it.
 
 # How to use?
 
