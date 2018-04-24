@@ -10,6 +10,7 @@ import {
   Input,
   ChangeDetectorRef
 } from '@angular/core';
+import { Theme } from '../../../shared/themes/color-map';
 
 const Fuse = require('fuse.js');
 
@@ -32,10 +33,18 @@ export interface QueryObject {
 @Component({
   selector: 'ngrev-quick-access',
   template: `
-    <div class="fuzzy-box" *ngIf="fuzzyBoxVisible" (click)="$event.stopImmediatePropagation()">
-      <input autofocus #input type="text" (keydown)="updateKeyword($event)">
+    <div class="fuzzy-box"
+      [style.boxShadow]="boxShadow"
+      [style.color]="theme.fuzzySearch.font"
+      [style.background]="theme.fuzzySearch.background"
+      *ngIf="fuzzyBoxVisible" (click)="$event.stopImmediatePropagation()">
+      <input [style.background]="theme.fuzzySearch.background"
+        [style.color]="theme.fuzzySearch.font"
+        [style.border]="theme.fuzzySearch.border"
+        autofocus #input type="text" (keydown)="updateKeyword($event)">
       <ngrev-quick-access-list
         *ngIf="search() as results"
+        [theme]="theme"
         [style.display]="results.length ? 'block' : 'none'"
         [data]="results"
         [highlight]="symbolName"
@@ -65,7 +74,6 @@ export interface QueryObject {
     padding: 5px;
     width: 100%;
     max-height: 80%;
-    box-shadow: 0 0 11px 3px #ccc;
     background: #fff;
     display: flex;
     flex-direction: column;
@@ -74,7 +82,6 @@ export interface QueryObject {
     max-height: 60px;
     font-size: 35px;
     outline: none;
-    border: 1px solid #ccc;
     padding: 7px;
   }
   `
@@ -87,6 +94,8 @@ export class QuickAccessComponent implements AfterViewInit {
   private fuse = new Fuse([], { keys: ['name', 'filePath'] });
 
   constructor(private element: ElementRef, private renderer: Renderer2, private cd: ChangeDetectorRef) {}
+
+  @Input() theme: Theme;
 
   @Input()
   set queryObject(query: QueryObject) {
@@ -152,6 +161,10 @@ export class QuickAccessComponent implements AfterViewInit {
 
   visible() {
     return this.fuzzyBoxVisible;
+  }
+
+  get boxShadow() {
+    return `0 0 11px 3px ${this.theme.fuzzySearch.shadowColor}`;
   }
 
   private show() {

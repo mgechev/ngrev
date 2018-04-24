@@ -47,6 +47,14 @@ export interface ArrowTheme {
   highlight: string;
 }
 
+export interface FuzzySearchTheme {
+  font: string;
+  background: string;
+  border: string;
+  shadowColor: string;
+  selected: string;
+}
+
 export interface Theme {
   name: string;
   historyLabel: string;
@@ -54,6 +62,7 @@ export interface Theme {
   backButton: BackButtonTheme;
   background: string;
   arrow: ArrowTheme;
+  fuzzySearch: FuzzySearchTheme;
   [SymbolTypes.Component]: BoxTheme;
   [SymbolTypes.ComponentOrDirective]: BoxTheme;
   [SymbolTypes.ComponentWithDirective]: BoxTheme;

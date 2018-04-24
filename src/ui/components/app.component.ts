@@ -51,6 +51,7 @@ const spinner = {
     <ngrev-quick-access
       *ngIf="initialized"
       (select)="selectSymbol($event)"
+      [theme]="theme"
       [queryList]="queryList"
       [queryObject]="queryObject"
     >

@@ -15,6 +15,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { Symbol } from 'ngast';
 import { KeyValuePair } from './quick-access.component';
+import { Theme } from '../../../shared/themes/color-map';
 
 const EnterKeyCode = 13;
 const UpArrowKeyCode = 38;
@@ -25,6 +26,10 @@ const DownArrowKeyCode = 40;
   template: `
     <ul *ngIf="bindData.length">
       <li #items *ngFor="let element of bindData; let i=index"
+        [style.borderTopColor]="theme.fuzzySearch.border"
+        [style.borderLeftColor]="theme.fuzzySearch.border"
+        [style.borderRightColor]="theme.fuzzySearch.border"
+        [style.backgroundColor]="i === selection ? theme.fuzzySearch.selected : theme.fuzzySearch.background"
         [class.selected]="i === selection"
         (click)="selectItem($event, element)"
         [innerHtml]="formatText(element.key)">
@@ -69,6 +74,7 @@ const DownArrowKeyCode = 40;
 export class QuickAccessListComponent {
   bindData: KeyValuePair<any>[] = [];
 
+  @Input() theme: Theme;
   @Input() highlight: string;
   @Input()
   set data(val: KeyValuePair<any>[]) {

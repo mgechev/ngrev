@@ -4,6 +4,13 @@ import { SymbolTypes } from '../../shared/data-format';
 export const MaterialTheme: Theme = {
   name: 'Material',
   background: '#ffffff',
+  fuzzySearch: {
+    font: '#000',
+    background: '#fff',
+    border: '#ccc',
+    shadowColor: '#000',
+    selected: '#ccc'
+  },
   historyLabel: '#000',
   legend: {
     background: 'rgba(255, 255, 255, 0.8)',
