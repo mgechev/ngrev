@@ -75,9 +75,12 @@ export function getConfig() {
 }
 
 function onThemeChange(theme: string) {
+  let config = { theme: 'Material' };
+  const path = app.getPath('userData');
   try {
-    const path = app.getPath('userData');
-    const config = JSON.parse(readFileSync(join(path, 'config.json')).toString());
+    config = JSON.parse(readFileSync(join(path, 'config.json')).toString());
+  } catch (e) {}
+  try {
     config.theme = theme;
     writeFileSync(join(path, 'config.json'), JSON.stringify(config, null, 2));
   } catch (e) {
