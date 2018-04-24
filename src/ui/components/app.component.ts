@@ -145,14 +145,14 @@ export class AppComponent {
       config = conf;
       this.theme = config.themes[config.theme];
       this.selectionDisabled = false;
-      this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+      // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+      // this.onProject('/Users/mgechev/Projects/angular/aio/src/tsconfig.app.json');
+      // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
     });
     this.ipcBus.on(Message.ChangeTheme, (_: any, theme: string) => {
       this.theme = config.themes[theme];
       this.cd.detectChanges();
     });
-    // this.onProject('/Users/mgechev/Projects/angular/aio/src/tsconfig.app.json');
-    // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }
 
   onWindowResize(e: any) {
