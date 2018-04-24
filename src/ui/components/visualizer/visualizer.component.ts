@@ -227,7 +227,10 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
   }
 
   private stateChanged(changes: SimpleChanges) {
-    if (changes && changes.data && changes.data.currentValue !== changes.data.previousValue) {
+    if (
+      (changes && changes.data && changes.data.currentValue !== changes.data.previousValue) ||
+      changes.theme.currentValue !== changes.theme.previousValue
+    ) {
       return true;
     }
     return false;

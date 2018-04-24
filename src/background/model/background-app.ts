@@ -184,12 +184,12 @@ export class BackgroundApp {
     });
 
     ipcMain.on(Message.DisableExport, e => {
-      (menus.items[0] as any).submenu.items[0].enabled = false;
+      (menus.items[0] as any).submenu.items[1].enabled = false;
       success(e.sender, Message.DisableExport, true);
     });
 
     ipcMain.on(Message.EnableExport, e => {
-      (menus.items[0] as any).submenu.items[0].enabled = true;
+      (menus.items[0] as any).submenu.items[1].enabled = true;
       console.log('Enable!');
       success(e.sender, Message.EnableExport, true);
     });

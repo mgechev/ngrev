@@ -2,7 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { Message } from '../../shared/ipc-constants';
 import { getConfig } from '../app';
 
-export var applicationMenuTemplate = () => {
+export var applicationMenuTemplate = (onThemeChange: (name: string) => void) => {
   return {
     label: 'ngrev',
     submenu: [
@@ -10,7 +10,12 @@ export var applicationMenuTemplate = () => {
         label: 'Themes',
         submenu: Object.keys(getConfig().themes || []).map(label => {
           return {
-            label
+            label,
+            click() {
+              const window = BrowserWindow.getAllWindows()[0];
+              onThemeChange(label);
+              window.webContents.send(Message.ChangeTheme, label);
+            }
           };
         })
       },
