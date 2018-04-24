@@ -1,11 +1,6 @@
 import { SymbolTypes, Direction, SymbolType } from '../../shared/data-format';
-import { MaterialTheme } from './material';
 
-export const DefaultTheme = MaterialTheme.name;
-
-export const BuiltInThemesMap = {
-  [MaterialTheme.name]: MaterialTheme
-};
+export const DefaultTheme = 'Material';
 
 export interface BoxHighlightColor {
   background: string;
@@ -63,15 +58,15 @@ export interface Theme {
   background: string;
   arrow: ArrowTheme;
   fuzzySearch: FuzzySearchTheme;
-  [SymbolTypes.Component]: BoxTheme;
-  [SymbolTypes.ComponentOrDirective]: BoxTheme;
-  [SymbolTypes.ComponentWithDirective]: BoxTheme;
-  [SymbolTypes.HtmlElement]: BoxTheme;
-  [SymbolTypes.HtmlElementWithDirective]: BoxTheme;
-  [SymbolTypes.Module]: BoxTheme;
-  [SymbolTypes.LazyModule]: BoxTheme;
-  [SymbolTypes.Provider]: BoxTheme;
-  [SymbolTypes.Pipe]: BoxTheme;
+  component: BoxTheme;
+  'component-or-directive': BoxTheme;
+  'component-with-directive': BoxTheme;
+  'html-element': BoxTheme;
+  'html-element-with-directive': BoxTheme;
+  module: BoxTheme;
+  'lazy-module': BoxTheme;
+  provider: BoxTheme;
+  pipe: BoxTheme;
 }
 
 export const DefaultColor = {

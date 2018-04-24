@@ -10,6 +10,8 @@ import { SymbolWithId, isMetaNodeId, formatError } from '../shared/utils';
 import { StateManager, Memento } from '../model/state-manager';
 import { Theme } from '../../shared/themes/color-map';
 import { Configuration } from '../model/configuration';
+import { IPCBus } from '../model/ipc-bus';
+import { Message } from '../../shared/ipc-constants';
 
 const BackspaceKeyCode = 8;
 const spinner = {
@@ -133,14 +135,21 @@ export class AppComponent {
     private project: ProjectProxy,
     private manager: StateManager,
     private cd: ChangeDetectorRef,
-    private config: Configuration
+    private config: Configuration,
+    private ipcBus: IPCBus
   ) {}
 
   ngAfterViewInit() {
-    this.config.getConfig().then((config: Config) => {
+    let config: Config;
+    this.config.getConfig().then((conf: Config) => {
+      config = conf;
       this.theme = config.themes[config.theme];
       this.selectionDisabled = false;
       this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    });
+    this.ipcBus.on(Message.ChangeTheme, (_: any, theme: string) => {
+      this.theme = config.themes[theme];
+      this.cd.detectChanges();
     });
     // this.onProject('/Users/mgechev/Projects/angular/aio/src/tsconfig.app.json');
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');

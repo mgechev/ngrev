@@ -73,7 +73,8 @@ const MetaMemento = new Memento(dummyConfig);
       margin-left: 2px;
       position: relative;
       cursor: pointer;
-      border-width: 2px;
+      border-width: 1px;
+      border-style: solid;
     }
     .tooltip {
       display: none;

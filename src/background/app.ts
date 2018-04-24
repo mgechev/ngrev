@@ -9,19 +9,29 @@ import { app, dialog, Menu, ipcMain } from 'electron';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { applicationMenuTemplate } from './menu/application_menu_template';
 import createWindow from './helpers/window';
-import { readFileSync, readFile, readdirSync } from 'fs';
+import { readFileSync, readFile, readdirSync, writeFileSync, readdir } from 'fs';
 
 import { BackgroundApp } from './model/background-app';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from './env';
-import { Theme, BuiltInThemesMap } from '../shared/themes/color-map';
+import { Theme } from '../shared/themes/color-map';
 import { Config } from '../shared/data-format';
 
 console.log(env);
 
 var mainWindow;
+
+const builtInThemesMap = readdirSync(__dirname)
+  .filter(f => f.endsWith('.theme.json'))
+  .map(f => JSON.parse(readFileSync(join(__dirname, f)).toString()))
+  .reduce((a, theme) => {
+    a[theme.name] = theme;
+    return a;
+  }, {});
+
+console.log(Object.keys(builtInThemesMap));
 
 // Save userData in separate folders for each environment.
 // Thanks to this you can use production and development versions of the app
@@ -50,7 +60,7 @@ export function getConfig() {
     console.log('Found themes');
   } catch (_) {
     console.log('Themes not found', _);
-    return { theme: (config as any).theme, themes: BuiltInThemesMap } as Partial<Config>;
+    return { theme: (config as any).theme, themes: builtInThemesMap } as Partial<Config>;
   }
   return {
     theme: (config as any).theme,
@@ -59,15 +69,26 @@ export function getConfig() {
         a[t.name] = t as Theme;
         return a;
       }, {}),
-      BuiltInThemesMap
+      builtInThemesMap
     )
   } as Partial<Config>;
+}
+
+function onThemeChange(theme: string) {
+  try {
+    const path = app.getPath('userData');
+    const config = JSON.parse(readFileSync(join(path, 'config.json')).toString());
+    config.theme = theme;
+    writeFileSync(join(path, 'config.json'), JSON.stringify(config, null, 2));
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 const backgroundApp = new BackgroundApp();
 backgroundApp.init(app, getConfig());
 
-const menuItems = [applicationMenuTemplate()];
+const menuItems = [applicationMenuTemplate(onThemeChange)];
 if (env.name !== 'production') {
   menuItems.push(devMenuTemplate());
 }
