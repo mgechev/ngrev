@@ -14,7 +14,7 @@ import { Network, DataSet } from 'vis';
 import { remote, shell } from 'electron';
 
 import { VisualizationConfig, Layout, Metadata, Direction, SymbolTypes, Node } from '../../../shared/data-format';
-import { NodeTypeColorMap, DefaultColor } from './color-map';
+import { DefaultColor, Theme } from '../../../shared/themes/color-map';
 import { ColorLegend, Color } from './color-legend.component';
 import { ExportToImage } from './export-to-image.service';
 
@@ -34,9 +34,9 @@ export const TypeToNameMap = {
 @Component({
   selector: 'ngrev-visualizer',
   template: `
-    <div class="container" #container></div>
-    <ngrev-metadata-view [metadata]="(metadata || {}).properties"></ngrev-metadata-view>
-    <ngrev-color-legend [colors]="usedColors"></ngrev-color-legend>
+    <div class="container" #container [style.backgroundColor]="theme.background"></div>
+    <ngrev-metadata-view [theme]="theme" [metadata]="(metadata || {}).properties"></ngrev-metadata-view>
+    <ngrev-color-legend [theme]="theme" [colors]="usedColors"></ngrev-color-legend>
   `,
   styles: [
     `
@@ -56,6 +56,7 @@ export const TypeToNameMap = {
 export class VisualizerComponent implements OnChanges, OnDestroy {
   @Input() data: VisualizationConfig<any>;
   @Input() metadataResolver: (id: string) => Promise<Metadata>;
+  @Input() theme: Theme;
 
   @Output() select = new EventEmitter<string>();
   @Output() highlight = new EventEmitter<string>();
@@ -91,8 +92,8 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
     const colors = new Map<SymbolTypes, Color>();
     const nodes = new DataSet(
       graph.nodes.map(n => {
-        const type = (n.type || { type: -1 }).type;
-        const styles = NodeTypeColorMap[type] || DefaultColor;
+        const type = (n.type || { type: SymbolTypes.Unknown }).type;
+        const styles = this.theme[type] || DefaultColor;
         const color = styles.color.background;
         const label = TypeToNameMap[type] || 'Unknown';
         colors.set(type, { color, label });
@@ -111,10 +112,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
         } else if (e.direction === Direction.Both) {
           (e as any).arrows = 'from, to';
         }
-        (e as any).color = {
-          color: '#555555',
-          highlight: '#333333'
-        };
+        (e as any).color = this.theme.arrow;
         (e as any).labelHighlightBold = false;
         (e as any).selectionWidth = 0.5;
         return e;

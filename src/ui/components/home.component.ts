@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 
 import { Network } from 'vis';
 import { remote } from 'electron';
@@ -6,7 +6,7 @@ import { remote } from 'electron';
 @Component({
   selector: 'ngrev-home',
   template: `
-    <button (click)="loadProject()">Select Project</button>
+    <button [disabled]="disabled" (click)="loadProject()">Select Project</button>
   `,
   styles: [
     `
@@ -39,6 +39,7 @@ import { remote } from 'electron';
   ]
 })
 export class HomeComponent {
+  @Input() disabled: boolean;
   @Output() project = new EventEmitter<string>();
 
   loadProject() {

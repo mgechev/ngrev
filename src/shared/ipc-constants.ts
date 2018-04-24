@@ -7,9 +7,11 @@ export enum Message {
   GetSymbols = 'get-symbols',
   DirectStateTransition = 'direct-state-transition',
   SaveImage = 'save-image',
+  ChangeTheme = 'change-theme',
   ImageData = 'image-data',
   DisableExport = 'disable-export',
-  EnableExport = 'enable-export'
+  EnableExport = 'enable-export',
+  Config = 'config'
 }
 
 export enum Status {

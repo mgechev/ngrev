@@ -1,4 +1,5 @@
 import { StaticSymbol, CompileProviderMetadata } from '@angular/compiler';
+import { Theme } from './themes/color-map';
 
 export interface Graph<T> {
   nodes: Node<T>[];
@@ -6,16 +7,17 @@ export interface Graph<T> {
 }
 
 export enum SymbolTypes {
-  Provider,
-  HtmlElement,
-  HtmlElementWithDirective,
-  ComponentWithDirective,
-  Component,
-  ComponentOrDirective,
-  Pipe,
-  Module,
-  LazyModule,
-  Meta
+  Provider = 'provider',
+  HtmlElement = 'html-element',
+  HtmlElementWithDirective = 'html-element-with-directive',
+  ComponentWithDirective = 'component-with-directive',
+  Component = 'component',
+  ComponentOrDirective = 'component-or-directive',
+  Pipe = 'pipe',
+  Module = 'module',
+  LazyModule = 'lazy-module',
+  Meta = 'meta',
+  Unknown = 'unknown'
 }
 
 export interface SymbolType {
@@ -47,6 +49,11 @@ export interface Edge {
 export enum Layout {
   HierarchicalDirected,
   Regular
+}
+
+export interface Config {
+  theme: string;
+  themes: { [key: string]: Theme };
 }
 
 export interface VisualizationConfig<T> {

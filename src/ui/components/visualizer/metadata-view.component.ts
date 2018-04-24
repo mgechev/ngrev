@@ -1,18 +1,19 @@
 import { Component, Input } from '@angular/core';
 import { Metadata } from '../../../shared/data-format';
+import { Theme } from '../../../shared/themes/color-map';
 
 @Component({
   selector: 'ngrev-metadata-view',
   template: `
-    <table [class.hidden]="!metadata">
-      <thead>
-        <th>Name</th>
-        <th>Value</th>
+    <table [class.hidden]="!metadata" [style.background]="theme.legend.background">
+      <thead [style.color]="theme.legend.title">
+        <th [style.border]="theme.legend.border">Name</th>
+        <th [style.border]="theme.legend.border">Value</th>
       </thead>
-      <tbody>
+      <tbody [style.color]="theme.legend.font">
         <tr *ngFor="let pair of metadata">
-          <td *ngIf="pair.value">{{pair.key}}</td>
-          <td *ngIf="pair.value">{{pair.value}}</td>
+          <td [style.border]="theme.legend.border" *ngIf="pair.value">{{pair.key}}</td>
+          <td [style.border]="theme.legend.border" *ngIf="pair.value">{{pair.value}}</td>
         </tr>
       </tbody>
     </table>
@@ -42,5 +43,6 @@ import { Metadata } from '../../../shared/data-format';
   ]
 })
 export class MetadataViewComponent {
+  @Input() theme: Theme;
   @Input() metadata: Metadata;
 }

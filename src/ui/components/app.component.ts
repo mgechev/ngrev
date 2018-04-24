@@ -3,12 +3,13 @@ import { remote } from 'electron';
 import { ProjectProxy } from '../model/project-proxy';
 import { Network } from 'vis';
 import { ProjectSymbols, Symbol } from 'ngast';
-import { StateProxy } from '../states/state-proxy';
-import { VisualizationConfig, Metadata, SymbolTypes } from '../../shared/data-format';
+import { VisualizationConfig, Metadata, SymbolTypes, Config } from '../../shared/data-format';
 import { KeyValuePair, QuickAccessComponent } from './quick-access/quick-access.component';
 import { StaticSymbol } from '@angular/compiler';
 import { SymbolWithId, isMetaNodeId, formatError } from '../shared/utils';
 import { StateManager, Memento } from '../model/state-manager';
+import { Theme } from '../../shared/themes/color-map';
+import { Configuration } from '../model/configuration';
 
 const BackspaceKeyCode = 8;
 const spinner = {
@@ -20,10 +21,16 @@ const spinner = {
 @Component({
   selector: 'ngrev-app',
   template: `
-    <button [class.hidden]="loading" (click)="prevState()" *ngIf="initialized">Back</button>
+    <button [class.hidden]="loading"
+      [style.color]="theme.backButton.font"
+      [style.background]="theme.backButton.background"
+      [style.border]="theme.backButton.border"
+      (click)="prevState()"
+      *ngIf="initialized">Back</button>
     <ngrev-state-navigation
       [maxWidth]="maxStateNavigationWidth"
       [states]="manager.getHistory()"
+      [theme]="theme"
       (select)="restoreMemento($event)"
     >
     </ngrev-state-navigation>
@@ -33,10 +40,11 @@ const spinner = {
       [size]="spinner.size"
       *ngIf="projectSet">
     </ngrev-spinner>
-    <ngrev-home *ngIf="!projectSet" (project)="onProject($event)"></ngrev-home>
+    <ngrev-home *ngIf="!projectSet" [disabled]="selectionDisabled" (project)="onProject($event)"></ngrev-home>
     <ngrev-visualizer
       *ngIf="initialized"
       [data]="initialized"
+      [theme]="theme"
       [metadataResolver]="resolveMetadata"
       (select)="tryChangeState($event)">
     </ngrev-visualizer>
@@ -69,10 +77,10 @@ const spinner = {
       z-index: 1;
       width: 60px;
       height: 30px;
-      background: #eee;
       border: none;
       outline: none;
       border-bottom-right-radius: 7px;
+      background: #eee;
       transition: 0.2s opacity;
     }
     ngrev-spinner {
@@ -93,6 +101,8 @@ export class AppComponent {
   queryList: KeyValuePair<SymbolWithId>[] = [];
   queryObject = ['value.name', 'value.filePath'];
   maxStateNavigationWidth = window.innerWidth;
+  theme: Theme;
+  selectionDisabled = true;
 
   @ViewChild(QuickAccessComponent) quickAccess: QuickAccessComponent;
 
@@ -121,11 +131,16 @@ export class AppComponent {
     private ngZone: NgZone,
     private project: ProjectProxy,
     private manager: StateManager,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private config: Configuration
   ) {}
 
   ngAfterViewInit() {
-    // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    this.config.getConfig().then((config: Config) => {
+      this.theme = config.themes[config.theme];
+      this.selectionDisabled = false;
+      this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
+    });
     // this.onProject('/Users/mgechev/Projects/angular/aio/src/tsconfig.app.json');
     // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
   }

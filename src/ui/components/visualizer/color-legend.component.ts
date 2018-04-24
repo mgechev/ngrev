@@ -1,5 +1,6 @@
 import { SymbolTypes } from '../../../shared/data-format';
 import { Component, Input } from '@angular/core';
+import { Theme } from '../../../shared/themes/color-map';
 
 export type Color = { color: string; label: string };
 export type ColorLegend = Color[];
@@ -7,11 +8,17 @@ export type ColorLegend = Color[];
 @Component({
   selector: 'ngrev-color-legend',
   template: `
-    <section [class.hidden]="!colors.length" [style.height]="(colors.length * 12 + 20) + 'px'">
-      <h1>Legend</h1>
+    <section
+      [class.hidden]="!colors.length"
+      [style.height]="(colors.length * 12 + 20) + 'px'"
+      [style.background]="theme.legend.background"
+      [style.color]="theme.legend.font"
+      [style.border]="theme.legend.border"
+      >
+      <h1 [style.color]="theme.legend.title">Legend</h1>
       <div *ngFor="let color of colors" class="colors-wrapper">
-        <div class="color" [style.background-color]="color.color"></div>
-        <div class="color-label">{{ color.label }}</div>
+        <div class="color" [style.backgroundColor]="color.color"></div>
+        <div class="color-label" [style.font]="theme.legend.font">{{ color.label }}</div>
       </div>
     </section>
   `,
@@ -59,6 +66,8 @@ export type ColorLegend = Color[];
   ]
 })
 export class ColorLegendComponent {
+  @Input() theme: Theme;
+
   private _colors: ColorLegend = [];
 
   get colors() {

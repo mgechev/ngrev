@@ -1,4 +1,4 @@
-import { Metadata, VisualizationConfig } from './../../shared/data-format';
+import { Metadata, VisualizationConfig, Config } from './../../shared/data-format';
 import { fork, ChildProcess } from 'child_process';
 import { EventEmitter } from 'events';
 import { Message } from '../../shared/ipc-constants';
@@ -65,13 +65,23 @@ export interface GetDataResponse {
   data: VisualizationConfig<any> | null;
 }
 
+export interface ConfigRequest {
+  topic: Message.Config;
+}
+
+export interface ConfigResponse {
+  topic: Message.Config;
+  data: Config;
+}
+
 export type IPCRequest =
   | LoadProjectRequest
   | PrevStateRequest
   | DirectStateTransitionRequest
   | GetSymbolsRequest
   | GetMetadataRequest
-  | GetDataRequest;
+  | GetDataRequest
+  | ConfigRequest;
 
 export type IPCResponse =
   | LoadProjectResponse
@@ -79,7 +89,8 @@ export type IPCResponse =
   | DirectStateTransitionResponse
   | GetSymbolsResponse
   | GetMetadataResponse
-  | GetDataResponse;
+  | GetDataResponse
+  | ConfigResponse;
 
 export interface Responder {
   (data: IPCResponse): void;

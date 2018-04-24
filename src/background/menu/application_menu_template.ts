@@ -1,10 +1,19 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { Message } from '../../shared/ipc-constants';
+import { getConfig } from '../app';
 
 export var applicationMenuTemplate = () => {
   return {
     label: 'ngrev',
     submenu: [
+      {
+        label: 'Themes',
+        submenu: Object.keys(getConfig().themes || []).map(label => {
+          return {
+            label
+          };
+        })
+      },
       {
         label: 'Export',
         accelerator: 'CmdOrCtrl+E',

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { SymbolTypes, VisualizationConfig } from '../../../shared/data-format';
-import { NodeTypeColorMap, DefaultColor } from '../visualizer/color-map';
+import { Theme, DefaultColor } from '../../../shared/themes/color-map';
 import { AppComponent } from '../app.component';
 import { Memento } from '../../model/state-manager';
 
@@ -19,12 +19,13 @@ const MetaMemento = new Memento(dummyConfig);
 @Component({
   selector: 'ngrev-state-navigation',
   template: `
-    <h2 *ngIf="states.length">History</h2>
+    <h2 *ngIf="states.length" [style.color]="theme.historyLabel">History</h2>
     <ul *ngIf="states.length">
       <li
         [class.state]="!isMetaState(memento)"
         [class.meta]="isMetaState(memento)"
         [style.backgroundColor]="getBackgroundColor(memento)"
+        [style.borderColor]="theme.background"
         (click)="changeState(memento)"
         (mouseenter)="showTooltip(index)"
         (mouseleave)="hideTooltip(index)"
@@ -65,38 +66,14 @@ const MetaMemento = new Memento(dummyConfig);
       display: block;
     }
     li.state {
-      width: 30px;
+      width: 20px;
       height: 20px;
+      border-radius: 50%;
       display: inline-block;
       margin-left: 2px;
       position: relative;
       cursor: pointer;
-    }
-    li.state:before {
-      display: inline-block;
-      width: 0px;
-      height: 0px;
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent;
-      border-left: 10px solid white;
-      content: ' ';
-      position: absolute;
-      left: 32px;
-      z-index: 9;
-      cursor: pointer;
-    }
-    li.state .next-arrow {
-      display: inline-block;
-      width: 0px;
-      height: 0px;
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent;
-      border-left: 10px solid red;
-      content: ' ';
-      position: absolute;
-      left: 30px;
-      z-index: 10;
-      cursor: pointer;
+      border-width: 2px;
     }
     .tooltip {
       display: none;
@@ -131,6 +108,7 @@ const MetaMemento = new Memento(dummyConfig);
 export class StateNavigationComponent {
   @Input() states: Memento[] = [];
   @Input() maxWidth: number;
+  @Input() theme: Theme;
   @Output() select = new EventEmitter<Memento>();
 
   visibleTooltip: number = -1;
@@ -162,7 +140,7 @@ export class StateNavigationComponent {
       const nodes = memento.state.graph.nodes;
       const first = nodes[0];
       if (first && first.type) {
-        const config = NodeTypeColorMap[first.type.type];
+        const config = this.theme[first.type.type];
         if (config) {
           return config.color.background;
         }

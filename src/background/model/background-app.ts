@@ -7,13 +7,13 @@ import {
   GetMetadataResponse,
   GetDataResponse
 } from './../helpers/process';
-import { ipcMain } from 'electron';
+import { ipcMain, App } from 'electron';
 import { Message, Status } from '../../shared/ipc-constants';
 import { Project } from './project';
 import { State } from '../states/state';
 import { ModuleTreeState } from '../states/module-tree.state';
 import { getModuleMetadata } from '../formatters/model-formatter';
-import { getId, getProviderName } from '../../shared/data-format';
+import { getId, getProviderName, Config } from '../../shared/data-format';
 import { Symbol, ProjectSymbols } from 'ngast';
 import { PipeState } from '../states/pipe.state';
 import { ModuleState } from '../states/module.state';
@@ -22,6 +22,7 @@ import { SymbolIndex, SymbolData } from './symbol-index';
 import { StaticSymbol } from '@angular/compiler';
 import { menus } from '../app';
 import { join } from 'path';
+import { readFileSync, readdirSync } from 'fs';
 
 const success = (sender, msg, payload) => {
   sender.send(msg, Status.Success, payload);
@@ -59,9 +60,14 @@ export class BackgroundApp {
   private slaveProcess: SlaveProcess;
   private taskQueue: TaskQueue;
 
-  init() {
+  init(app: App, config: Partial<Config>) {
     this.slaveProcess = SlaveProcess.create(join(__dirname, 'parser.js'));
     this.taskQueue = new TaskQueue();
+
+    ipcMain.on(Message.Config, (e, more) => {
+      success(e.sender, Message.Config, config);
+    });
+
     ipcMain.on(Message.LoadProject, (e, tsconfig: string) => {
       if (!this.slaveProcess.connected) {
         console.log('The slave process is not ready yet');

@@ -3,33 +3,25 @@
 // It doesn't have any windows which you can see on screen, but we can open
 // window from here.
 
-import * as path from 'path';
+import { join } from 'path';
 import * as url from 'url';
 import { app, dialog, Menu, ipcMain } from 'electron';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { applicationMenuTemplate } from './menu/application_menu_template';
 import createWindow from './helpers/window';
-import { readFileSync, readFile } from 'fs';
+import { readFileSync, readFile, readdirSync } from 'fs';
 
 import { BackgroundApp } from './model/background-app';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from './env';
+import { Theme, BuiltInThemesMap } from '../shared/themes/color-map';
+import { Config } from '../shared/data-format';
 
 console.log(env);
 
 var mainWindow;
-
-const backgroundApp = new BackgroundApp();
-backgroundApp.init();
-
-const menuItems = [applicationMenuTemplate()];
-if (env.name !== 'production') {
-  menuItems.push(devMenuTemplate());
-}
-
-export const menus = Menu.buildFromTemplate(menuItems);
 
 // Save userData in separate folders for each environment.
 // Thanks to this you can use production and development versions of the app
@@ -38,6 +30,49 @@ if (env.name !== 'production') {
   var userDataPath = app.getPath('userData');
   app.setPath('userData', userDataPath + ' (' + env.name + ')');
 }
+
+export function getConfig() {
+  const path = app.getPath('userData');
+  console.log('Looking for config file in', path);
+  let config = null;
+  let themes: Theme[] = [];
+  try {
+    config = JSON.parse(readFileSync(join(path, 'config.json')).toString());
+    console.log('Found config file');
+  } catch (_) {
+    console.log('Config file not found');
+    return {} as Partial<Config>;
+  }
+  try {
+    themes = readdirSync(join(path, 'themes'))
+      .filter(f => f.endsWith('.json'))
+      .map(f => JSON.parse(readFileSync(join(path, 'themes', f)).toString()));
+    console.log('Found themes');
+  } catch (_) {
+    console.log('Themes not found', _);
+    return { theme: (config as any).theme, themes: BuiltInThemesMap } as Partial<Config>;
+  }
+  return {
+    theme: (config as any).theme,
+    themes: Object.assign(
+      themes.reduce((a, t) => {
+        a[t.name] = t as Theme;
+        return a;
+      }, {}),
+      BuiltInThemesMap
+    )
+  } as Partial<Config>;
+}
+
+const backgroundApp = new BackgroundApp();
+backgroundApp.init(app, getConfig());
+
+const menuItems = [applicationMenuTemplate()];
+if (env.name !== 'production') {
+  menuItems.push(devMenuTemplate());
+}
+
+export const menus = Menu.buildFromTemplate(menuItems);
 
 app.on('ready', function() {
   Menu.setApplicationMenu(menus);
@@ -51,7 +86,7 @@ app.on('ready', function() {
 
   mainWindow.loadURL(
     url.format({
-      pathname: path.join(__dirname, 'app.html'),
+      pathname: join(__dirname, 'app.html'),
       protocol: 'file:',
       slashes: true
     })

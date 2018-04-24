@@ -1,6 +1,25 @@
-import { SymbolTypes, Direction, SymbolType } from '../../../shared/data-format';
+import { Theme } from './color-map';
+import { SymbolTypes } from '../../shared/data-format';
 
-export const NodeTypeColorMap = {
+export const MaterialTheme: Theme = {
+  name: 'Material',
+  background: '#ffffff',
+  historyLabel: '#000',
+  legend: {
+    background: 'rgba(255, 255, 255, 0.8)',
+    font: '#fff',
+    title: '#555',
+    border: '1px solid #999'
+  },
+  backButton: {
+    border: 'none',
+    background: '#eee',
+    font: '#000'
+  },
+  arrow: {
+    color: '#555555',
+    highlight: '#333333'
+  },
   [SymbolTypes.Component]: {
     margin: 10,
     color: {
@@ -135,21 +154,5 @@ export const NodeTypeColorMap = {
     font: {
       color: '#FFFFFF'
     }
-  }
-};
-
-export const DefaultColor = {
-  margin: 10,
-  color: {
-    background: '#90A4AE',
-    border: '#607D8B',
-    highlight: {
-      background: '#90A4AE',
-      border: '#607D8B'
-    }
-  },
-  labelHighlightBold: false,
-  font: {
-    color: '#FFFFFF'
   }
 };
