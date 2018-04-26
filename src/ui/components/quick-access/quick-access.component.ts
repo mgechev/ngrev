@@ -147,6 +147,7 @@ export class QuickAccessComponent implements AfterViewInit {
   }
 
   search() {
+    setTimeout(() => this.cd.detectChanges());
     return this.fuse.search(this.symbolName);
   }
 
