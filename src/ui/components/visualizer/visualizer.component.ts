@@ -40,28 +40,34 @@ export const TypeToNameMap = {
   `,
   styles: [
     `
-    .container {
-      width: 100%;
-      height: 100%;
-    }
-    :host {
-      width: 100%;
-      height: 100%;
-      display: block;
-      position: relative;
-    }
-  `
+      .container {
+        width: 100%;
+        height: 100%;
+      }
+      :host {
+        width: 100%;
+        height: 100%;
+        display: block;
+        position: relative;
+      }
+    `
   ]
 })
 export class VisualizerComponent implements OnChanges, OnDestroy {
-  @Input() data: VisualizationConfig<any>;
-  @Input() metadataResolver: (id: string) => Promise<Metadata>;
-  @Input() theme: Theme;
+  @Input()
+  data: VisualizationConfig<any>;
+  @Input()
+  metadataResolver: (id: string) => Promise<Metadata>;
+  @Input()
+  theme: Theme;
 
-  @Output() select = new EventEmitter<string>();
-  @Output() highlight = new EventEmitter<string>();
+  @Output()
+  select = new EventEmitter<string>();
+  @Output()
+  highlight = new EventEmitter<string>();
 
-  @ViewChild('container') container: ElementRef;
+  @ViewChild('container')
+  container: ElementRef;
 
   usedColors: ColorLegend;
   metadata: Metadata | null;
@@ -223,7 +229,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
         })
       );
     }
-    menu.popup(remote.getCurrentWindow());
+    menu.popup({ window: remote.getCurrentWindow() });
   }
 
   private stateChanged(changes: SimpleChanges) {

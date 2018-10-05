@@ -21,8 +21,6 @@ import { Config } from '../shared/data-format';
 
 console.log(env);
 
-var mainWindow;
-
 const builtInThemesMap = readdirSync(__dirname)
   .filter(f => f.endsWith('.theme.json'))
   .map(f => JSON.parse(readFileSync(join(__dirname, f)).toString()))
@@ -51,7 +49,7 @@ export function getConfig() {
     console.log('Found config file');
   } catch (_) {
     console.log('Config file not found');
-    return {} as Partial<Config>;
+    return { theme: 'Material', themes: builtInThemesMap } as Partial<Config>;
   }
   try {
     themes = readdirSync(join(path, 'themes'))
@@ -89,7 +87,7 @@ function onThemeChange(theme: string) {
 }
 
 const backgroundApp = new BackgroundApp();
-backgroundApp.init(app, getConfig());
+backgroundApp.init(getConfig());
 
 const menuItems = [applicationMenuTemplate(onThemeChange)];
 if (env.name !== 'production') {

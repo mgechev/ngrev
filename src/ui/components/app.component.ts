@@ -1,12 +1,9 @@
 import { Component, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
 import { remote } from 'electron';
 import { ProjectProxy } from '../model/project-proxy';
-import { Network } from 'vis';
-import { ProjectSymbols, Symbol } from 'ngast';
 import { VisualizationConfig, Metadata, SymbolTypes, Config } from '../../shared/data-format';
 import { KeyValuePair, QuickAccessComponent } from './quick-access/quick-access.component';
-import { StaticSymbol } from '@angular/compiler';
-import { SymbolWithId, isMetaNodeId, formatError } from '../shared/utils';
+import { SymbolWithId, formatError } from '../shared/utils';
 import { StateManager, Memento } from '../model/state-manager';
 import { Theme } from '../../shared/themes/color-map';
 import { Configuration } from '../model/configuration';
@@ -65,36 +62,36 @@ const spinner = {
   },
   styles: [
     `
-    :host {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-    .hidden {
-      opacity: 0;
-    }
-    button {
-      top: 0;
-      left: 0;
-      position: absolute;
-      z-index: 1;
-      width: 60px;
-      height: 30px;
-      border: none;
-      outline: none;
-      border-bottom-right-radius: 7px;
-      background: #eee;
-      transition: 0.2s opacity;
-    }
-    ngrev-spinner {
-      transition: 0.2s opacity;
-      top: 8px;
-      left: 15px;
-    }
-    button:active {
-      background: #ccc;
-    }
-  `
+      :host {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .hidden {
+        opacity: 0;
+      }
+      button {
+        top: 0;
+        left: 0;
+        position: absolute;
+        z-index: 1;
+        width: 60px;
+        height: 30px;
+        border: none;
+        outline: none;
+        border-bottom-right-radius: 7px;
+        background: #eee;
+        transition: 0.2s opacity;
+      }
+      ngrev-spinner {
+        transition: 0.2s opacity;
+        top: 8px;
+        left: 15px;
+      }
+      button:active {
+        background: #ccc;
+      }
+    `
   ]
 })
 export class AppComponent {
@@ -107,7 +104,8 @@ export class AppComponent {
   theme: Theme;
   selectionDisabled = true;
 
-  @ViewChild(QuickAccessComponent) quickAccess: QuickAccessComponent;
+  @ViewChild(QuickAccessComponent)
+  quickAccess: QuickAccessComponent;
 
   resolveMetadata = (nodeId: string) => {
     this.loading = true;

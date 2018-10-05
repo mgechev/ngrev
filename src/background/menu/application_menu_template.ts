@@ -33,7 +33,7 @@ export var applicationMenuTemplate = (onThemeChange: (name: string) => void) => 
         accelerator: 'CmdOrCtrl+R',
         click() {
           dialog.showMessageBox(
-            BrowserWindow.getFocusedWindow(),
+            BrowserWindow.getFocusedWindow() as BrowserWindow,
             {
               type: 'warning',
               buttons: ['OK', 'Cancel'],

@@ -27,7 +27,7 @@ export class StateManager {
   loadProject(tsconfig: string) {
     return this.project
       .load(tsconfig)
-      .then((rootContext: ProjectSymbols) => (this.state = new StateProxy()))
+      .then(() => (this.state = new StateProxy()))
       .then((proxy: StateProxy) => proxy.getData())
       .then(data => this.history.push(new Memento(data)));
   }

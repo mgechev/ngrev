@@ -55,16 +55,15 @@ class TaskQueue {
 }
 
 export class BackgroundApp {
-  private project: Project;
   private states: State[] = [];
   private slaveProcess: SlaveProcess;
   private taskQueue: TaskQueue;
 
-  init(app: App, config: Partial<Config>) {
+  init(config: Partial<Config>) {
     this.slaveProcess = SlaveProcess.create(join(__dirname, 'parser.js'));
     this.taskQueue = new TaskQueue();
 
-    ipcMain.on(Message.Config, (e, more) => {
+    ipcMain.on(Message.Config, e => {
       success(e.sender, Message.Config, config);
     });
 
