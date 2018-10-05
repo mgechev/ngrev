@@ -16,7 +16,7 @@ import { BackgroundApp } from './model/background-app';
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from './env';
-import { Theme } from '../shared/themes/color-map';
+import { Theme, DefaultTheme } from '../shared/themes/color-map';
 import { Config } from '../shared/data-format';
 
 console.log(env);
@@ -49,7 +49,7 @@ export function getConfig() {
     console.log('Found config file');
   } catch (_) {
     console.log('Config file not found');
-    return { theme: 'Light', themes: builtInThemesMap } as Partial<Config>;
+    return { theme: DefaultTheme, themes: builtInThemesMap } as Partial<Config>;
   }
   try {
     themes = readdirSync(join(path, 'themes'))
