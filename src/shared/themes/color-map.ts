@@ -1,6 +1,4 @@
-import { SymbolTypes, Direction, SymbolType } from '../../shared/data-format';
-
-export const DefaultTheme = 'Material';
+export const DefaultTheme = 'Light';
 
 export interface BoxHighlightColor {
   background: string;
