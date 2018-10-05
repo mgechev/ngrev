@@ -17,7 +17,6 @@ const Fuse = require('fuse.js');
 const MetaKeyCodes = [91, 17];
 const PKeyCode = 80;
 const ESCKeyCode = 27;
-const BackspaceKeyCode = 8;
 const UpArrowKeyCode = 38;
 const DownArrowKeyCode = 40;
 
@@ -60,31 +59,34 @@ export interface QueryObject {
   },
   styles: [
     `
-  :host {
-    margin: auto;
-    margin-top: 45px;
-    position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
-    width: 70%;
-    max-width: 600px;
-    height: calc(100% - 45px);
-    z-index: 15;
-  }
-  .fuzzy-box {
-    padding: 5px;
-    width: 100%;
-    max-height: 80%;
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-  }
-  .fuzzy-box input {
-    max-height: 60px;
-    font-size: 35px;
-    outline: none;
-    padding: 7px;
-  }
-  `
+      :host {
+        margin: auto;
+        margin-top: 45px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 70%;
+        max-width: 600px;
+        height: calc(100% - 45px);
+        z-index: 15;
+      }
+      .fuzzy-box {
+        padding: 5px;
+        width: 100%;
+        max-height: 80%;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      .fuzzy-box input {
+        max-height: 60px;
+        font-size: 35px;
+        outline: none;
+        padding: 7px;
+      }
+    `
   ]
 })
 export class QuickAccessComponent implements AfterViewInit {
@@ -95,7 +97,8 @@ export class QuickAccessComponent implements AfterViewInit {
 
   constructor(private element: ElementRef, private renderer: Renderer2, private cd: ChangeDetectorRef) {}
 
-  @Input() theme: Theme;
+  @Input()
+  theme: Theme;
 
   @Input()
   set queryObject(query: QueryObject) {
@@ -111,8 +114,10 @@ export class QuickAccessComponent implements AfterViewInit {
     this.fuse.set(symbols);
   }
 
-  @Output() select = new EventEmitter<string>();
-  @ViewChildren('input') input: QueryList<ElementRef>;
+  @Output()
+  select = new EventEmitter<string>();
+  @ViewChildren('input')
+  input: QueryList<ElementRef>;
 
   onKeyDown(e) {
     if (MetaKeyCodes.indexOf(e.keyCode) >= 0) {
