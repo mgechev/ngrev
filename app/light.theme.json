@@ -1,37 +1,37 @@
 {
-  "name": "Nord",
-  "background": "#2E3440",
-  "historyLabel": "#D8DEE9",
+  "name": "Light",
+  "background": "#ffffff",
   "fuzzySearch": {
-    "font": "#D8DEE9",
-    "background": "#2E3440",
-    "border": "1px solid #999",
-    "shadowColor": "#D8DEE9",
-    "selected": "#4C5669"
+    "font": "#000",
+    "background": "#fff",
+    "border": "#ccc",
+    "shadowColor": "#ccc",
+    "selected": "#ccc"
   },
+  "historyLabel": "#000",
   "legend": {
-    "background": "#3D4455",
-    "font": "#7EB7BB",
-    "title": "#7EB7BB",
+    "background": "rgba(255, 255, 255, 0.8)",
+    "font": "#000",
+    "title": "#555",
     "border": "1px solid #999"
   },
   "backButton": {
     "border": "none",
-    "background": "#4C5669",
-    "font": "#D8DEE9"
+    "background": "#eee",
+    "font": "#000"
   },
   "arrow": {
-    "color": "#D8DEE9",
-    "highlight": "#E5E9F0"
+    "color": "#555555",
+    "highlight": "#333333"
   },
   "component": {
     "margin": 10,
     "color": {
-      "background": "#BE616B",
-      "border": "#914A52",
+      "background": "#2196F3",
+      "border": "#1E88E5",
       "highlight": {
-        "background": "#BE616B",
-        "border": "#914A52"
+        "background": "#2196F3",
+        "border": "#1E88E5"
       }
     },
     "labelHighlightBold": false,
@@ -42,11 +42,11 @@
   "component-or-directive": {
     "margin": 10,
     "color": {
-      "background": "#CF8772",
-      "border": "#A16959",
+      "background": "#FF5722",
+      "border": "#E64A19",
       "highlight": {
-        "background": "#CF8772",
-        "border": "#A16959"
+        "background": "#FF5722",
+        "border": "#E64A19"
       }
     },
     "labelHighlightBold": false,
@@ -57,11 +57,11 @@
   "component-with-directive": {
     "margin": 10,
     "color": {
-      "background": "#EACA8F",
-      "border": "#B89F70",
+      "background": "#03A9F4",
+      "border": "#039BE5",
       "highlight": {
-        "background": "#EACA8F",
-        "border": "#B89F70"
+        "background": "#03A9F4",
+        "border": "#039BE5"
       }
     },
     "labelHighlightBold": false,
@@ -72,11 +72,11 @@
   "html-element": {
     "margin": 10,
     "color": {
-      "background": "#A4BD8E",
-      "border": "#849872",
+      "background": "#00BCD4",
+      "border": "#00ACC1",
       "highlight": {
-        "background": "#A4BD8E",
-        "border": "#849872"
+        "background": "#00BCD4",
+        "border": "#00ACC1"
       }
     },
     "labelHighlightBold": false,
@@ -87,11 +87,11 @@
   "html-element-with-directive": {
     "margin": 10,
     "color": {
-      "background": "#B38FAC",
-      "border": "#8B6F86",
+      "background": "#009688",
+      "border": "#00897B",
       "highlight": {
-        "background": "#B38FAC",
-        "border": "#8B6F86"
+        "background": "#009688",
+        "border": "#00897B"
       }
     },
     "labelHighlightBold": false,
@@ -102,11 +102,11 @@
   "module": {
     "margin": 10,
     "color": {
-      "background": "#5F82AA",
-      "border": "#496483",
+      "background": "#8BC34A",
+      "border": "#7CB342",
       "highlight": {
-        "background": "#5F82AA",
-        "border": "#496483"
+        "background": "#8BC34A",
+        "border": "#7CB342"
       }
     },
     "labelHighlightBold": false,
@@ -117,11 +117,11 @@
   "lazy-module": {
     "margin": 10,
     "color": {
-      "background": "#90BCBB",
-      "border": "#749897",
+      "background": "#009688",
+      "border": "#7FCAC3",
       "highlight": {
-        "background": "#90BCBB",
-        "border": "#749897"
+        "background": "#009688",
+        "border": "#7FCAC3"
       }
     },
     "labelHighlightBold": false,
@@ -132,11 +132,11 @@
   "provider": {
     "margin": 10,
     "color": {
-      "background": "#8AC0CF",
-      "border": "#6B95A1",
+      "background": "#CDDC39",
+      "border": "#9E9D24",
       "highlight": {
-        "background": "#8AC0CF",
-        "border": "#6B95A1"
+        "background": "#CDDC39",
+        "border": "#9E9D24"
       }
     },
     "labelHighlightBold": false,
@@ -147,11 +147,11 @@
   "pipe": {
     "margin": 10,
     "color": {
-      "background": "#82A1C0",
-      "border": "#637B92",
+      "background": "#FF9800",
+      "border": "#F57C00",
       "highlight": {
-        "background": "#82A1C0",
-        "border": "#637B92"
+        "background": "#FF9800",
+        "border": "#F57C00"
       }
     },
     "labelHighlightBold": false,

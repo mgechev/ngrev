@@ -49,7 +49,7 @@ export function getConfig() {
     console.log('Found config file');
   } catch (_) {
     console.log('Config file not found');
-    return { theme: 'Material', themes: builtInThemesMap } as Partial<Config>;
+    return { theme: 'Light', themes: builtInThemesMap } as Partial<Config>;
   }
   try {
     themes = readdirSync(join(path, 'themes'))
@@ -73,7 +73,7 @@ export function getConfig() {
 }
 
 function onThemeChange(theme: string) {
-  let config = { theme: 'Material' };
+  let config = { theme: 'Light' };
   const path = app.getPath('userData');
   try {
     config = JSON.parse(readFileSync(join(path, 'config.json')).toString());

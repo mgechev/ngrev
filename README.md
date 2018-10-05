@@ -28,7 +28,7 @@ Graphical tool for reverse engineering of Angular projects. It allows you to nav
 
 # Creating a custom theme
 
-You can add your own theme by creating a `[theme-name].theme.json` file in Electron `[userData]/themes`. For a sample theme see [Nord](https://github.com/mgechev/ngrev/blob/master/app/nord.theme.json).
+You can add your own theme by creating a `[theme-name].theme.json` file in Electron `[userData]/themes`. For a sample theme see [Dark](https://github.com/mgechev/ngrev/blob/master/app/dark.theme.json).
 
 ## Application Requirements
 
