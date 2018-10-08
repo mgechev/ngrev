@@ -8,7 +8,8 @@ import {
   SimpleChanges,
   Output,
   EventEmitter,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  ChangeDetectorRef
 } from '@angular/core';
 import { Network, DataSet } from 'vis';
 import { remote, shell } from 'electron';
@@ -76,7 +77,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
 
   private clickTimeout = 0;
 
-  constructor(private exportToImage: ExportToImage) {}
+  constructor(private exportToImage: ExportToImage, private cd: ChangeDetectorRef) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.stateChanged(changes)) {
@@ -256,7 +257,10 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
       if (e.nodes && e.nodes[0]) {
         this.highlight.next(e.nodes[0]);
         this.metadata = null;
-        this.metadataResolver(e.nodes[0]).then((metadata: Metadata) => (this.metadata = metadata));
+        this.metadataResolver(e.nodes[0]).then((metadata: Metadata) => {
+          this.metadata = metadata;
+          this.cd.detectChanges();
+        });
       }
     }, 200) as any;
   }

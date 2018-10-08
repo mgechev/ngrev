@@ -1,17 +1,8 @@
 import { DirectiveSymbol, ProjectSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
-import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
-import { DataSet } from 'vis';
-import {
-  VisualizationConfig,
-  Metadata,
-  getId,
-  Node,
-  isAngularSymbol,
-  SymbolTypes,
-  Direction
-} from '../../shared/data-format';
-import { getDirectiveMetadata, getElementMetadata, getProviderMetadata } from '../formatters/model-formatter';
+import { ElementAst, DirectiveAst } from '@angular/compiler';
+import { VisualizationConfig, Metadata, getId, Node, SymbolTypes } from '../../shared/data-format';
+import { getDirectiveMetadata, getElementMetadata } from '../formatters/model-formatter';
 import { DirectiveState } from './directive.state';
 
 interface NodeMap {

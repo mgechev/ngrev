@@ -1,5 +1,3 @@
-import { DataSet } from 'vis';
-import { StaticSymbol } from '@angular/compiler';
 import { VisualizationConfig, Metadata } from '../../shared/data-format';
 import { ProjectSymbols } from 'ngast';
 

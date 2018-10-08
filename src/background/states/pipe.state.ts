@@ -11,7 +11,6 @@ import {
   getProviderName,
   Edge
 } from '../../shared/data-format';
-import { StaticSymbol } from '@angular/compiler';
 import { ProjectSymbols, ProviderSymbol, PipeSymbol } from 'ngast';
 import { State } from './state';
 import { getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
