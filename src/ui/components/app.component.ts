@@ -1,7 +1,7 @@
 import { Component, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
 import { remote } from 'electron';
 import { ProjectProxy } from '../model/project-proxy';
-import { VisualizationConfig, Metadata, SymbolTypes, Config } from '../../shared/data-format';
+import { VisualizationConfig, Config } from '../../shared/data-format';
 import { KeyValuePair, QuickAccessComponent } from './quick-access/quick-access.component';
 import { SymbolWithId, formatError } from '../shared/utils';
 import { StateManager, Memento } from '../model/state-manager';

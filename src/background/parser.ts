@@ -1,14 +1,14 @@
 import { getProviderName, Metadata } from './../shared/data-format';
 import { ModuleTreeState } from './states/module-tree.state';
+import { AppState } from './states/app.state';
 import { SymbolIndex, SymbolData } from './model/symbol-index';
-import { Status, Message } from './../shared/ipc-constants';
+import { Message } from './../shared/ipc-constants';
 import { State } from './states/state';
 import { Project } from './model/project';
 import { Symbol } from 'ngast';
 import {
   ParentProcess,
   LoadProjectRequest,
-  RequestHandler,
   Responder,
   PrevStateRequest,
   DirectStateTransitionRequest,
@@ -44,7 +44,9 @@ export class BackgroundApp {
             .pop();
           if (module) {
             console.log('Project loaded');
-            this.states.push(new ModuleTreeState(this.project.projectSymbols, module));
+            // this.states.push(new ModuleTreeState(this.project.projectSymbols, module));
+            this.states.push(new AppState(this.project.projectSymbols));
+            console.log('Initial state created');
             responder({
               topic: Message.LoadProject,
               err: null

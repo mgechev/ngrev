@@ -20,12 +20,6 @@ interface NodeMap {
   [id: string]: ProviderSymbol;
 }
 
-enum SymbolType {
-  Directive,
-  Provider,
-  Meta
-}
-
 export class ProviderState extends State {
   private symbols: NodeMap = {};
 

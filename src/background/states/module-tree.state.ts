@@ -14,8 +14,7 @@ import {
   getId,
   Direction,
   isAngularSymbol,
-  SymbolTypes,
-  SymbolType
+  SymbolTypes
 } from '../../shared/data-format';
 import { getModuleMetadata } from '../formatters/model-formatter';
 import { Trie } from '../utils/trie';

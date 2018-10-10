@@ -99,7 +99,7 @@ export const isAngularSymbol = (symbol: StaticSymbol | CompileProviderMetadata) 
   if (symbol instanceof StaticSymbol) {
     return /node_modules\/@angular/.test(symbol.filePath);
   } else {
-    if (symbol.token.value) {
+    if (!symbol || !symbol.token || symbol.token.value) {
       // We can't be completely sure since we don't know
       // the filePath but Angular doesn't have any non-reference tokens.
       return false;

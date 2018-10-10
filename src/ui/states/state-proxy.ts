@@ -4,7 +4,6 @@ import { Metadata, VisualizationConfig } from '../../shared/data-format';
 
 export class StateProxy {
   private ipcBus: IPCBus = new IPCBus();
-  private currentMetadata: Metadata | null;
   private currentData: VisualizationConfig<any>;
   private dataDirty = true;
   private _active: boolean;
@@ -34,11 +33,7 @@ export class StateProxy {
   }
 
   getMetadata(id: string): Promise<Metadata> {
-    this.currentMetadata = null;
-    return this.ipcBus.send(Message.GetMetadata, id).then(metadata => {
-      this.currentMetadata = metadata;
-      return metadata;
-    });
+    return this.ipcBus.send(Message.GetMetadata, id);
   }
 
   prevState(): Promise<void> {

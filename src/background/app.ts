@@ -5,11 +5,11 @@
 
 import { join } from 'path';
 import * as url from 'url';
-import { app, dialog, Menu, ipcMain } from 'electron';
+import { app, Menu } from 'electron';
 import { devMenuTemplate } from './menu/dev_menu_template';
 import { applicationMenuTemplate } from './menu/application_menu_template';
 import createWindow from './helpers/window';
-import { readFileSync, readFile, readdirSync, writeFileSync, readdir } from 'fs';
+import { readFileSync, readdirSync, writeFileSync } from 'fs';
 
 import { BackgroundApp } from './model/background-app';
 

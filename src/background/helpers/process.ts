@@ -117,7 +117,7 @@ export class ParentProcess {
       try {
         cb(request, responder);
       } catch (e) {
-        console.log('Error while responding to a message');
+        console.log('Error while responding to a message', e);
         responder({
           topic: topic
         } as any);

@@ -1,7 +1,6 @@
 import { DirectiveSymbol, ProjectSymbols, ProviderSymbol } from 'ngast';
 import { State } from './state';
 import { ElementAst, StaticSymbol, DirectiveAst } from '@angular/compiler';
-import { DataSet } from 'vis';
 import {
   VisualizationConfig,
   Metadata,
@@ -23,7 +22,6 @@ interface NodeMap {
 }
 
 const TemplateId = 'template';
-const TemplateErrorId = 'template-error';
 const DependenciesId = 'dependencies';
 const ViewProvidersId = 'view-providers';
 const ProvidersId = 'providers';
@@ -31,7 +29,7 @@ const ProvidersId = 'providers';
 export class DirectiveState extends State {
   private symbols: NodeMap = {};
 
-  constructor(context: ProjectSymbols, protected directive: DirectiveSymbol) {
+  constructor(context: ProjectSymbols, protected directive: DirectiveSymbol, private showControl = true) {
     super(getId(directive.symbol), context);
   }
 
@@ -82,31 +80,40 @@ export class DirectiveState extends State {
       }
     ];
     const edges: Edge[] = [];
-    if (this.directive.isComponent()) {
-      nodes.push({
-        id: TemplateId,
-        label: 'Template',
-        type: {
-          type: SymbolTypes.Meta,
-          angular: false
-        }
-      });
-      edges.push({
-        from: nodeId,
-        to: TemplateId
-      });
+    if (this.showControl) {
+      if (this.directive.isComponent()) {
+        nodes.push({
+          id: TemplateId,
+          label: 'Template',
+          type: {
+            type: SymbolTypes.Meta,
+            angular: false
+          }
+        });
+        edges.push({
+          from: nodeId,
+          to: TemplateId
+        });
+      }
+      const addedSymbols: { [key: string]: boolean } = {};
+      this.addProviderNodes(
+        nodes,
+        edges,
+        addedSymbols,
+        'Dependencies',
+        DependenciesId,
+        this.directive.getDependencies()
+      );
+      this.addProviderNodes(nodes, edges, addedSymbols, 'Providers', ProvidersId, this.directive.getProviders());
+      this.addProviderNodes(
+        nodes,
+        edges,
+        addedSymbols,
+        'View Providers',
+        ViewProvidersId,
+        this.directive.getViewProviders()
+      );
     }
-    const addedSymbols: { [key: string]: boolean } = {};
-    this.addProviderNodes(nodes, edges, addedSymbols, 'Dependencies', DependenciesId, this.directive.getDependencies());
-    this.addProviderNodes(nodes, edges, addedSymbols, 'Providers', ProvidersId, this.directive.getProviders());
-    this.addProviderNodes(
-      nodes,
-      edges,
-      addedSymbols,
-      'View Providers',
-      ViewProvidersId,
-      this.directive.getViewProviders()
-    );
     return {
       title: this.directive.symbol.name,
       graph: {
