@@ -25,6 +25,11 @@ export class StateProxy {
     }
   }
 
+  reload() {
+    this.dataDirty = true;
+    return this.getData();
+  }
+
   nextState(id: string): Promise<void> {
     return this.ipcBus.send(Message.NextState, id).then(state => {
       this.dataDirty = true;

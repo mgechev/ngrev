@@ -8,13 +8,18 @@ import { ProviderState } from './provider.state';
 import { PipeState } from './pipe.state';
 
 const CompositeStateID = '$$$composite-state$$$';
+export const Title = 'Application view';
 
 export class AppState extends State {
   private states: State[] = [];
 
-  constructor(context: ProjectSymbols) {
+  constructor(context: ProjectSymbols, private _showLibs: boolean) {
     super(CompositeStateID, context);
     this.init();
+  }
+
+  get showLibs() {
+    return this._showLibs;
   }
 
   getMetadata(id: string): Metadata | null {
@@ -30,7 +35,7 @@ export class AppState extends State {
 
   getData(): VisualizationConfig<any> {
     const data: VisualizationConfig<any> = {
-      title: 'Application view',
+      title: Title,
       graph: {
         nodes: [],
         edges: []
@@ -41,20 +46,27 @@ export class AppState extends State {
     this.states.forEach(s => {
       const { graph } = s.getData();
       graph.nodes.forEach(n => {
-        if (!existingNodes.has(n.id) && n.id.indexOf('node_modules') < 0) {
+        if (!existingNodes.has(n.id) && this.showSymbol(n.id)) {
           data.graph.nodes.push(n);
           existingNodes.add(n.id);
         }
       });
       graph.edges.forEach(e => {
         const edge = `${e.from}->${e.to}`;
-        if (!existingEdges.has(edge) && edge.indexOf('node_modules') < 0) {
+        if (!existingEdges.has(edge) && this.showSymbol(edge)) {
           data.graph.edges.push(e);
           existingEdges.add(edge);
         }
       });
     });
     return data;
+  }
+
+  private showSymbol(id: string) {
+    if (this.showLibs) {
+      return true;
+    }
+    return id.indexOf('node_modules') < 0;
   }
 
   private init() {

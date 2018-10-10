@@ -1,5 +1,4 @@
-import { getProviderName, Metadata } from './../shared/data-format';
-import { ModuleTreeState } from './states/module-tree.state';
+import { getProviderName } from './../shared/data-format';
 import { AppState } from './states/app.state';
 import { SymbolIndex, SymbolData } from './model/symbol-index';
 import { Message } from './../shared/ipc-constants';
@@ -44,8 +43,7 @@ export class BackgroundApp {
             .pop();
           if (module) {
             console.log('Project loaded');
-            // this.states.push(new ModuleTreeState(this.project.projectSymbols, module));
-            this.states.push(new AppState(this.project.projectSymbols));
+            this.states.push(new AppState(this.project.projectSymbols, data.showLibs));
             console.log('Initial state created');
             responder({
               topic: Message.LoadProject,
@@ -168,19 +166,32 @@ export class BackgroundApp {
       }
     });
 
-    this.parentProcess.on(Message.GetData, (data: GetDataRequest, responder: Responder) => {
+    this.parentProcess.on(Message.GetData, (_: GetDataRequest, responder: Responder) => {
       console.log('Getting data');
       if (this.state) {
+        const data = this.state.getData();
+        console.log('Getting data from state:', this.state.constructor.name, 'Got', data.graph.nodes.length, 'items');
         responder({
           topic: Message.GetData,
-          data: this.state.getData()
+          data
         });
       } else {
+        console.log('No state to get data from');
         responder({
           topic: Message.GetData,
           data: null
         });
       }
+    });
+
+    this.parentProcess.on(Message.ToggleLibs, (_: any, responder: Responder) => {
+      console.log('Toggle libraries');
+      const state = this.states.shift() as AppState;
+      const newState = new AppState(this.project.projectSymbols, !state.showLibs);
+      this.states.unshift(newState);
+      responder({
+        topic: Message.ToggleLibs
+      });
     });
   }
 

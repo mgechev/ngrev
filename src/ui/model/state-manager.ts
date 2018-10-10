@@ -1,20 +1,17 @@
 import { IPCBus } from './ipc-bus';
 import { Injectable } from '@angular/core';
-import { VisualizationConfig, Metadata } from '../../shared/data-format';
-import { AppComponent } from '../components/app.component';
+import { VisualizationConfig } from '../../shared/data-format';
 import { ProjectProxy } from './project-proxy';
 import { StateProxy } from '../states/state-proxy';
-import { ProjectSymbols } from 'ngast';
-import { isMetaNodeId } from '../shared/utils';
+import { Message } from '../../shared/ipc-constants';
 
 export class Memento {
-  constructor(public state: VisualizationConfig<any>) {}
+  constructor(public state: VisualizationConfig<any>, public dirty = false) {}
 }
 
 @Injectable()
 export class StateManager {
   private history: Memento[] = [];
-  private lastTransition: string | null = null;
   private transitionInProgress: string | null = null;
   private transitionResolveQueue: { resolve: Function; reject: Function }[] = [];
 
@@ -24,12 +21,16 @@ export class StateManager {
     return this.history;
   }
 
-  loadProject(tsconfig: string) {
+  loadProject(tsconfig: string, showLibs: boolean) {
     return this.project
-      .load(tsconfig)
+      .load(tsconfig, showLibs)
       .then(() => (this.state = new StateProxy()))
       .then((proxy: StateProxy) => proxy.getData())
       .then(data => this.history.push(new Memento(data)));
+  }
+
+  toggleLibs() {
+    return this.bus.send(Message.ToggleLibs);
   }
 
   tryChangeState(id: string) {
@@ -45,7 +46,6 @@ export class StateManager {
       .directStateTransfer(id)
       .then(() => this.state.getData())
       .then(data => {
-        this.lastTransition = id;
         this.pushState(data);
         while (this.transitionResolveQueue.length) {
           const res = this.transitionResolveQueue.pop();
@@ -68,9 +68,21 @@ export class StateManager {
       });
   }
 
-  getCurrentState() {
+  reloadAppState() {
+    this.history[0].dirty = true;
+  }
+
+  getCurrentState(reloadOnDirty: () => void) {
     const last = this.history[this.history.length - 1];
     if (last) {
+      if (last.dirty) {
+        last.dirty = false;
+        this.state.reload().then(state => {
+          this.history[this.history.length - 1] = new Memento(state);
+          reloadOnDirty();
+          return state;
+        });
+      }
       return last.state;
     } else {
       return null;

@@ -9,6 +9,7 @@ export interface IdentifiedStaticSymbol extends StaticSymbol {
 }
 
 export interface LoadProjectRequest {
+  showLibs: boolean;
   topic: Message.LoadProject;
   tsconfig: string;
 }
@@ -74,6 +75,14 @@ export interface ConfigResponse {
   data: Config;
 }
 
+export interface ToggleLibsResponse {
+  topic: Message.ToggleLibs;
+}
+
+export interface ToggleLibsRequest {
+  topic: Message.ToggleLibs;
+}
+
 export type IPCRequest =
   | LoadProjectRequest
   | PrevStateRequest
@@ -81,7 +90,8 @@ export type IPCRequest =
   | GetSymbolsRequest
   | GetMetadataRequest
   | GetDataRequest
-  | ConfigRequest;
+  | ConfigRequest
+  | ToggleLibsRequest;
 
 export type IPCResponse =
   | LoadProjectResponse
@@ -90,7 +100,8 @@ export type IPCResponse =
   | GetSymbolsResponse
   | GetMetadataResponse
   | GetDataResponse
-  | ConfigResponse;
+  | ConfigResponse
+  | ToggleLibsResponse;
 
 export interface Responder {
   (data: IPCResponse): void;
@@ -107,6 +118,7 @@ export class ParentProcess {
     process.on('message' as any, (request: IPCRequest) => {
       console.log('Got message from the parent process with topic:', request.topic);
       this.emitter.emit(request.topic, request, ((response: IPCResponse) => {
+        console.log('Sending response for message:', request.topic);
         (process as any).send(response);
       }) as Responder);
     });

@@ -1,4 +1,6 @@
 export enum Message {
+  ToggleLibsMenuAction = 'toggle-libs-menu-action',
+  ToggleLibs = 'toggle-libs',
   LoadProject = 'load-project',
   PrevState = 'prev-state',
   GetMetadata = 'get-metadata',

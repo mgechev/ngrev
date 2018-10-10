@@ -5,24 +5,15 @@ import {
   DirectStateTransitionResponse,
   GetSymbolsResponse,
   GetMetadataResponse,
-  GetDataResponse
+  GetDataResponse,
+  ToggleLibsResponse
 } from './../helpers/process';
-import { ipcMain, App } from 'electron';
+import { ipcMain } from 'electron';
 import { Message, Status } from '../../shared/ipc-constants';
-import { Project } from './project';
 import { State } from '../states/state';
-import { ModuleTreeState } from '../states/module-tree.state';
-import { getModuleMetadata } from '../formatters/model-formatter';
-import { getId, getProviderName, Config } from '../../shared/data-format';
-import { Symbol, ProjectSymbols } from 'ngast';
-import { PipeState } from '../states/pipe.state';
-import { ModuleState } from '../states/module.state';
-import { DirectiveState } from '../states/directive.state';
-import { SymbolIndex, SymbolData } from './symbol-index';
-import { StaticSymbol } from '@angular/compiler';
+import { Config } from '../../shared/data-format';
 import { menus } from '../app';
 import { join } from 'path';
-import { readFileSync, readdirSync } from 'fs';
 
 const success = (sender, msg, payload) => {
   sender.send(msg, Status.Success, payload);
@@ -67,7 +58,7 @@ export class BackgroundApp {
       success(e.sender, Message.Config, config);
     });
 
-    ipcMain.on(Message.LoadProject, (e, tsconfig: string) => {
+    ipcMain.on(Message.LoadProject, (e, { tsconfig, showLibs }: { tsconfig: string; showLibs: boolean }) => {
       if (!this.slaveProcess.connected) {
         console.log('The slave process is not ready yet');
       } else {
@@ -78,7 +69,8 @@ export class BackgroundApp {
         return this.slaveProcess
           .send({
             topic: Message.LoadProject,
-            tsconfig
+            tsconfig,
+            showLibs
           })
           .then((data: LoadProjectResponse) => {
             if (data.err) {
@@ -172,12 +164,26 @@ export class BackgroundApp {
             topic: Message.GetData
           })
           .then((response: GetDataResponse) => {
-            console.log('Got data response');
+            console.log('Got data response', response.data);
             if (response.data) {
               success(e.sender, Message.GetData, response.data);
             } else {
               error(e.sender, Message.GetData, null);
             }
+          });
+      });
+    });
+
+    ipcMain.on(Message.ToggleLibs, e => {
+      console.log('Toggle libs!');
+      this.taskQueue.push(() => {
+        return this.slaveProcess
+          .send({
+            topic: Message.ToggleLibs
+          })
+          .then(() => {
+            console.log('The slave process toggled the libs');
+            success(e.sender, Message.ToggleLibs, true);
           });
       });
     });

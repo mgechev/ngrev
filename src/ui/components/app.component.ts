@@ -1,12 +1,11 @@
 import { Component, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
 import { remote } from 'electron';
 import { ProjectProxy } from '../model/project-proxy';
-import { VisualizationConfig, Config } from '../../shared/data-format';
+import { Config } from '../../shared/data-format';
 import { KeyValuePair, QuickAccessComponent } from './quick-access/quick-access.component';
 import { SymbolWithId, formatError } from '../shared/utils';
 import { StateManager, Memento } from '../model/state-manager';
 import { Theme } from '../../shared/themes/color-map';
-import { Configuration } from '../model/configuration';
 import { IPCBus } from '../model/ipc-bus';
 import { Message } from '../../shared/ipc-constants';
 
@@ -39,7 +38,7 @@ const spinner = {
       [size]="spinner.size"
       *ngIf="projectSet">
     </ngrev-spinner>
-    <ngrev-home *ngIf="!projectSet" [disabled]="selectionDisabled" (project)="onProject($event)"></ngrev-home>
+    <ngrev-home *ngIf="!projectSet" (project)="onProject($event)"></ngrev-home>
     <ngrev-visualizer
       *ngIf="initialized"
       [data]="initialized"
@@ -102,7 +101,8 @@ export class AppComponent {
   queryObject = ['value.name', 'value.filePath'];
   maxStateNavigationWidth = window.innerWidth;
   theme: Theme;
-  selectionDisabled = true;
+  themes: { [name: string]: Theme };
+  showLibs: boolean;
 
   @ViewChild(QuickAccessComponent)
   quickAccess: QuickAccessComponent;
@@ -118,7 +118,6 @@ export class AppComponent {
       .catch(() => (this.loading = false));
   };
 
-  private _currentData: VisualizationConfig<any>;
   private _stopLoading = () => {
     this.loading = false;
     this.cd.detectChanges();
@@ -133,23 +132,19 @@ export class AppComponent {
     private project: ProjectProxy,
     private manager: StateManager,
     private cd: ChangeDetectorRef,
-    private config: Configuration,
     private ipcBus: IPCBus
   ) {}
 
   ngAfterViewInit() {
-    let config: Config;
-    this.config.getConfig().then((conf: Config) => {
-      config = conf;
-      this.theme = config.themes[config.theme];
-      this.selectionDisabled = false;
-      // this.onProject('/Users/mgechev/Projects/angular-seed/src/client/tsconfig.json');
-      // this.onProject('/Users/mgechev/Projects/angular/aio/src/tsconfig.app.json');
-      // this.onProject('/Users/mgechev/Projects/ngrev/tsconfig.json');
-    });
     this.ipcBus.on(Message.ChangeTheme, (_: any, theme: string) => {
-      this.theme = config.themes[theme];
+      this.theme = this.themes[theme];
       this.cd.detectChanges();
+    });
+    this.ipcBus.on(Message.ToggleLibsMenuAction, (_: any) => {
+      this.manager.toggleLibs().then(() => {
+        this.manager.reloadAppState();
+        this.cd.detectChanges();
+      });
     });
   }
 
@@ -158,13 +153,18 @@ export class AppComponent {
     this.cd.detectChanges();
   }
 
-  onProject(tsconfig: string) {
+  onProject({ tsconfig, config }: { tsconfig: string; config: Config }) {
+    this.themes = config.themes;
+    this.theme = config.themes[config.theme];
+    this.showLibs = config.showLibs;
+
     this.cd.detach();
+
     this.projectSet = true;
     this.ngZone.run(() => {
       this._startLoading();
       this.manager
-        .loadProject(tsconfig)
+        .loadProject(tsconfig, this.showLibs)
         .then(() => this.project.getSymbols())
         .then(symbols => (this.queryList = symbols.map(s => ({ key: s.name, value: s }))))
         .then(this._stopLoading)
@@ -210,7 +210,7 @@ export class AppComponent {
   }
 
   get initialized() {
-    return this.manager.getCurrentState();
+    return this.manager.getCurrentState(() => this.cd.detectChanges());
   }
 
   private prevState() {
