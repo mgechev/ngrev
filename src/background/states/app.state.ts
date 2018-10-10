@@ -1,5 +1,5 @@
 import { State } from './state';
-import { Metadata, VisualizationConfig, Graph } from '../../shared/data-format';
+import { Metadata, VisualizationConfig, Graph, Layout } from '../../shared/data-format';
 import { ProjectSymbols } from 'ngast';
 import { ModuleTreeState } from './module-tree.state';
 import { AppModuleState } from './app-module.state';
@@ -8,7 +8,7 @@ import { ProviderState } from './provider.state';
 import { PipeState } from './pipe.state';
 
 const CompositeStateID = '$$$composite-state$$$';
-export const Title = 'Application view';
+const Title = 'Application View';
 
 export class AppState extends State {
   private states: State[] = [];
@@ -35,6 +35,7 @@ export class AppState extends State {
 
   getData(): VisualizationConfig<any> {
     const data: VisualizationConfig<any> = {
+      layout: Layout.Regular,
       title: Title,
       graph: {
         nodes: [],
