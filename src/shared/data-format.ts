@@ -47,7 +47,8 @@ export interface Edge {
 }
 
 export enum Layout {
-  HierarchicalDirected,
+  HierarchicalLRDirected,
+  HierarchicalUDDirected,
   Regular
 }
 

@@ -35,7 +35,7 @@ export class AppState extends State {
 
   getData(): VisualizationConfig<any> {
     const data: VisualizationConfig<any> = {
-      layout: Layout.Regular,
+      layout: Layout.HierarchicalUDDirected,
       title: Title,
       graph: {
         nodes: [],

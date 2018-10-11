@@ -140,8 +140,15 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
         hierarchical: {
           enabled: false
         },
+        improvedLayout: true,
         randomSeed: 2
       };
+    }
+    if (data.layout === Layout.HierarchicalUDDirected) {
+      layout.improvedLayout = true;
+      layout.hierarchical.direction = 'UD';
+      layout.hierarchical.nodeSpacing = 200;
+      layout.hierarchical.sortMethod = 'directed';
     }
     if (this.network) {
       this.network.destroy();
