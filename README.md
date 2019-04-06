@@ -62,9 +62,9 @@ Demo [here](https://www.youtube.com/watch?v=sKdsxdeLWjM).
 
 # Contributors
 
-| [<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) | [<img alt="MichalMaM" src="https://avatars0.githubusercontent.com/u/417576?v=4&s=117" width="117">](https://github.com/MichalMaM) |
-| :---------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------: |
-|                                             [mgechev](https://github.com/mgechev)                                             |                                             [MichalMaM](https://github.com/MichalMaM)                                             |
+[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="MichalMaM" src="https://avatars0.githubusercontent.com/u/417576?v=4&s=117" width="117">](https://github.com/MichalMaM) |
+:---: |:---: |
+[mgechev](https://github.com/mgechev) |[MichalMaM](https://github.com/MichalMaM) |
 
 # License
 
