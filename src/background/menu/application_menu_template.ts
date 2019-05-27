@@ -2,7 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { Message } from '../../shared/ipc-constants';
 import { getConfig } from '../config';
 
-export const applicationMenuTemplate = (onThemeChange: (name: string) => void, onLibraryToggle: () => void) => {
+export const applicationMenuTemplate = (onThemeChange: (name: string) => void, onLibraryToggle: () => void, onModulesToggle: () => void) => {
   return {
     label: 'ngrev',
     submenu: [
@@ -35,6 +35,15 @@ export const applicationMenuTemplate = (onThemeChange: (name: string) => void, o
           const window = BrowserWindow.getAllWindows()[0];
           onLibraryToggle();
           window.webContents.send(Message.ToggleLibsMenuAction);
+        }
+      },
+      {
+        label: 'Show modules only',
+        accelerator: 'CmdOrCtrl+M',
+        click() {
+          const window = BrowserWindow.getAllWindows()[0];
+          onModulesToggle();
+          window.webContents.send(Message.ToggleModulesMenuAction);
         }
       },
       {

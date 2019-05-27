@@ -21,9 +21,9 @@ export class StateManager {
     return this.history;
   }
 
-  loadProject(tsconfig: string, showLibs: boolean) {
+  loadProject(tsconfig: string, showLibs: boolean, showModules: boolean) {
     return this.project
-      .load(tsconfig, showLibs)
+      .load(tsconfig, showLibs, showModules)
       .then(() => (this.state = new StateProxy()))
       .then((proxy: StateProxy) => proxy.getData())
       .then(data => this.history.push(new Memento(data)));
@@ -31,6 +31,10 @@ export class StateManager {
 
   toggleLibs() {
     return this.bus.send(Message.ToggleLibs);
+  }
+
+  toggleModules() {
+    return this.bus.send(Message.ToggleModules);
   }
 
   tryChangeState(id: string) {

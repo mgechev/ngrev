@@ -34,7 +34,13 @@ const onAngularToggle = () => {
   setConfigProps({ showLibs });
 };
 
-const menuItems = [applicationMenuTemplate(onThemeChange, onAngularToggle)];
+const onModulesToggle = () => {
+  const config = getConfig();
+  const showModules = !config.showModules;
+  setConfigProps({ showModules });
+};
+
+const menuItems = [applicationMenuTemplate(onThemeChange, onAngularToggle, onModulesToggle)];
 if (env.name !== 'production') {
   menuItems.push(devMenuTemplate());
 }

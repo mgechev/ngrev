@@ -54,6 +54,7 @@ export enum Layout {
 
 export interface Config {
   showLibs: boolean;
+  showModules: boolean;
   theme: string;
   themes: { [key: string]: Theme };
 }

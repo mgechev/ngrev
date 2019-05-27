@@ -10,6 +10,7 @@ export interface IdentifiedStaticSymbol extends StaticSymbol {
 
 export interface LoadProjectRequest {
   showLibs: boolean;
+  showModules: boolean;
   topic: Message.LoadProject;
   tsconfig: string;
 }
@@ -83,6 +84,15 @@ export interface ToggleLibsRequest {
   topic: Message.ToggleLibs;
 }
 
+export interface ToggleModulesResponse {
+  topic: Message.ToggleModules;
+}
+
+export interface ToggleModulesRequest {
+  topic: Message.ToggleModules;
+}
+
+
 export type IPCRequest =
   | LoadProjectRequest
   | PrevStateRequest
@@ -91,7 +101,8 @@ export type IPCRequest =
   | GetMetadataRequest
   | GetDataRequest
   | ConfigRequest
-  | ToggleLibsRequest;
+  | ToggleLibsRequest
+  | ToggleModulesRequest;
 
 export type IPCResponse =
   | LoadProjectResponse
@@ -101,7 +112,8 @@ export type IPCResponse =
   | GetMetadataResponse
   | GetDataResponse
   | ConfigResponse
-  | ToggleLibsResponse;
+  | ToggleLibsResponse
+  | ToggleModulesResponse;
 
 export interface Responder {
   (data: IPCResponse): void;

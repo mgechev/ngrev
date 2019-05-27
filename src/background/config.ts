@@ -22,7 +22,7 @@ export const getConfig = () => {
     console.log('Found config file');
   } catch (_) {
     console.log('Config file not found');
-    return { showLibs: false, theme: DefaultTheme, themes: builtInThemesMap } as Partial<Config>;
+    return { showLibs: false, showModules: false, theme: DefaultTheme, themes: builtInThemesMap } as Partial<Config>;
   }
   try {
     themes = readdirSync(join(path, 'themes'))
@@ -31,12 +31,13 @@ export const getConfig = () => {
     console.log('Found themes');
   } catch (_) {
     console.log('Themes not found', _);
-    return { showLibs: !!(config as any).showLibs, theme: (config as any).theme, themes: builtInThemesMap } as Partial<
+    return { showLibs: !!(config as any).showLibs, showModules: !!(config as any).showModules, theme: (config as any).theme, themes: builtInThemesMap } as Partial<
       Config
     >;
   }
   return {
     showLibs: !!(config as any).showLibs,
+    showModules: !!(config as any).showModules,
     theme: (config as any).theme,
     themes: Object.assign(
       themes.reduce((a, t) => {

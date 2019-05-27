@@ -13,13 +13,17 @@ const Title = 'Application View';
 export class AppState extends State {
   private states: State[] = [];
 
-  constructor(context: ProjectSymbols, private _showLibs: boolean) {
+  constructor(context: ProjectSymbols, private _showLibs: boolean, private _showModules: boolean) {
     super(CompositeStateID, context);
     this.init();
   }
 
   get showLibs() {
     return this._showLibs;
+  }
+
+  get showModules() {
+    return this._showModules;
   }
 
   getMetadata(id: string): Metadata | null {
@@ -74,17 +78,19 @@ export class AppState extends State {
     this.context.getModules().forEach(m => {
       this.states.push(new ModuleTreeState(this.context, m));
     });
-    this.context.getModules().forEach(m => {
-      this.states.push(new AppModuleState(this.context, m));
-    });
-    this.context.getDirectives().forEach(d => {
-      this.states.push(new DirectiveState(this.context, d, false));
-    });
-    this.context.getProviders().forEach(p => {
-      this.states.push(new ProviderState(this.context, p));
-    });
-    this.context.getPipes().forEach(p => {
-      this.states.push(new PipeState(this.context, p));
-    });
+    if (!this.showModules) {
+      this.context.getModules().forEach(m => {
+        this.states.push(new AppModuleState(this.context, m));
+      });
+      this.context.getDirectives().forEach(d => {
+        this.states.push(new DirectiveState(this.context, d, false));
+      });
+      this.context.getProviders().forEach(p => {
+        this.states.push(new ProviderState(this.context, p));
+      });
+      this.context.getPipes().forEach(p => {
+        this.states.push(new PipeState(this.context, p));
+      });
+    }
   }
 }
