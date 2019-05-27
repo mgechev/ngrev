@@ -103,6 +103,7 @@ export class AppComponent {
   theme: Theme;
   themes: { [name: string]: Theme };
   showLibs: boolean;
+  showModules: boolean;
 
   @ViewChild(QuickAccessComponent)
   quickAccess: QuickAccessComponent;
@@ -146,6 +147,12 @@ export class AppComponent {
         this.cd.detectChanges();
       });
     });
+    this.ipcBus.on(Message.ToggleModulesMenuAction, (_: any) => {
+      this.manager.toggleModules().then(() => {
+        this.manager.reloadAppState();
+        this.cd.detectChanges();
+      });
+    });
   }
 
   onWindowResize(e: any) {
@@ -157,6 +164,7 @@ export class AppComponent {
     this.themes = config.themes;
     this.theme = config.themes[config.theme];
     this.showLibs = config.showLibs;
+    this.showModules = config.showModules;
 
     this.cd.detach();
 
@@ -164,7 +172,7 @@ export class AppComponent {
     this.ngZone.run(() => {
       this._startLoading();
       this.manager
-        .loadProject(tsconfig, this.showLibs)
+        .loadProject(tsconfig, this.showLibs, this.showModules)
         .then(() => this.project.getSymbols())
         .then(symbols => (this.queryList = symbols.map(s => ({ key: s.name, value: s }))))
         .then(this._stopLoading)

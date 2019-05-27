@@ -43,7 +43,7 @@ export class BackgroundApp {
             .pop();
           if (module) {
             console.log('Project loaded');
-            this.states.push(new AppState(this.project.projectSymbols, data.showLibs));
+            this.states.push(new AppState(this.project.projectSymbols, data.showLibs, data.showModules));
             console.log('Initial state created');
             responder({
               topic: Message.LoadProject,
@@ -187,10 +187,20 @@ export class BackgroundApp {
     this.parentProcess.on(Message.ToggleLibs, (_: any, responder: Responder) => {
       console.log('Toggle libraries');
       const state = this.states.shift() as AppState;
-      const newState = new AppState(this.project.projectSymbols, !state.showLibs);
+      const newState = new AppState(this.project.projectSymbols, !state.showLibs, !state.showModules);
       this.states.unshift(newState);
       responder({
         topic: Message.ToggleLibs
+      });
+    });
+
+    this.parentProcess.on(Message.ToggleModules, (_: any, responder: Responder) => {
+      console.log('Toggle modules');
+      const state = this.states.shift() as AppState;
+      const newState = new AppState(this.project.projectSymbols, state.showLibs, !state.showModules);
+      this.states.unshift(newState);
+      responder({
+        topic: Message.ToggleModules
       });
     });
   }

@@ -6,8 +6,8 @@ import { Injectable } from '@angular/core';
 export class ProjectProxy {
   constructor(private ipcBus: IPCBus) {}
 
-  load(tsconfig: string, showLibs: boolean) {
-    return this.ipcBus.send(Message.LoadProject, { tsconfig, showLibs });
+  load(tsconfig: string, showLibs: boolean, showModules: boolean) {
+    return this.ipcBus.send(Message.LoadProject, { tsconfig, showLibs, showModules });
   }
 
   getSymbols() {

@@ -58,7 +58,7 @@ export class BackgroundApp {
       success(e.sender, Message.Config, config);
     });
 
-    ipcMain.on(Message.LoadProject, (e, { tsconfig, showLibs }: { tsconfig: string; showLibs: boolean }) => {
+    ipcMain.on(Message.LoadProject, (e, { tsconfig, showLibs, showModules }: { tsconfig: string; showLibs: boolean; showModules: boolean }) => {
       if (!this.slaveProcess.connected) {
         console.log('The slave process is not ready yet');
       } else {
@@ -70,7 +70,8 @@ export class BackgroundApp {
           .send({
             topic: Message.LoadProject,
             tsconfig,
-            showLibs
+            showLibs,
+            showModules
           })
           .then((data: LoadProjectResponse) => {
             if (data.err) {
@@ -184,6 +185,20 @@ export class BackgroundApp {
           .then(() => {
             console.log('The slave process toggled the libs');
             success(e.sender, Message.ToggleLibs, true);
+          });
+      });
+    });
+
+    ipcMain.on(Message.ToggleModules, e => {
+      console.log('Toggle modules!');
+      this.taskQueue.push(() => {
+        return this.slaveProcess
+          .send({
+            topic: Message.ToggleModules
+          })
+          .then(() => {
+            console.log('The slave process toggled the modules');
+            success(e.sender, Message.ToggleModules, true);
           });
       });
     });
