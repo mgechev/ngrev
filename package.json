@@ -37,7 +37,11 @@
     "release:all": "npm run setenv && npm run build:mac && npm run build:win && npm run build:linux",
     "build:mac": "npm run pack:mac && build \"dist/mac/ngrev-darwin-x64/ngrev.app\" --platform=mac",
     "build:win": "npm run pack:win && build \"dist/win/ngrev-win32-ia32\" --platform=win",
-    "build:linux": "npm run pack:linux && build \"dist/win/ngrev-linux-x64\" --platform=linux"
+    "build:linux": "npm run pack:linux && build \"dist/win/ngrev-linux-x64\" --platform=linux",
+    "vscode:prepublish": "npm run compile",
+    "vscode:compile": "tsc -p tsconfig.vscode.json",
+    "vscode:lint": "tslint -p tsconfig.vscode.json",
+    "vscode:watch": "tsc -watch -p tsconfig.vscode.json"
   },
   "dependencies": {
     "@angular/common": "7.0.0-rc.0",
@@ -60,6 +64,7 @@
   "devDependencies": {
     "@types/node": "^7.0.7",
     "@types/sanitize-filename": "^1.1.28",
+    "@types/vscode": "^1.34.0",
     "chai": "^3.5.0",
     "electron": "3.0.2",
     "electron-builder": "^20.28.0",

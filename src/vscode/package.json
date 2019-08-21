@@ -1,0 +1,19 @@
+{
+ "name": "ngrev",
+ "main": "../../out/extension.js",
+ "version": "0.0.1",
+ "engines": {
+  "vscode": "^1.34.0"
+  },
+  "activationEvents": [
+    "onCommand:extension.ngrev"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.ngrev",
+        "title": "Reverse Engineering for Angular"
+      }
+    ]
+  }
+}
