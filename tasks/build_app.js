@@ -26,7 +26,11 @@ gulp.task('bundle', function() {
 var tsProject = ts.createProject('tsconfig.json');
 
 gulp.task('ts', function() {
-  var tsResult = gulp.src('src/**/*.ts').pipe(tsProject());
+  var tsResult = gulp.src([
+                  'src/**/*.ts',
+                  '!src/vscode/*.*'
+                ])
+                .pipe(tsProject());
 
   return tsResult.js.pipe(gulp.dest('dist'));
 });
