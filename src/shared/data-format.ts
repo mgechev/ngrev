@@ -79,18 +79,20 @@ export const getId = (symbol: { name: string; path: string }) => {
 
 export const getProviderId = (provider: R3InjectableMetadata) => {
   if (provider.type.value) {
-    return provider.type.value;
+    return provider.name;
   }
   return null;
 };
 
 export const getProviderName = (provider: R3InjectableMetadata) => {
   if (provider.type.value) {
-    return provider.type.value;
+    return provider.name;
   }
   return null;
 };
 
-export const isAngularSymbol = (symbol: Symbol<AnnotationNames>) => {
-  return /node_modules\/@angular/.test(symbol.path);
+export const isAngularSymbol = (symbol: any) => {
+  // TODO
+  return false;
+  // return /node_modules\/@angular/.test(s);
 };

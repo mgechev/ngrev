@@ -5,7 +5,7 @@ import {
   InjectableSymbol,
 } from "ngast";
 import { State } from "./state";
-import { ElementAst } from "@angular/compiler";
+import { TmplAstElement } from "@angular/compiler";
 import {
   VisualizationConfig,
   Metadata,
@@ -25,7 +25,7 @@ import {
 import { TemplateState } from "./template.state";
 
 interface NodeMap {
-  [id: string]: DirectiveSymbol | ElementAst;
+  [id: string]: DirectiveSymbol | TmplAstElement;
 }
 
 const TemplateId = "template";
@@ -48,7 +48,7 @@ export class DirectiveState extends State {
     const s = this.symbols[id];
     console.log(Object.keys(this.symbols));
     if (s) {
-      if (s instanceof ElementAst) {
+      if (s instanceof TmplAstElement) {
         return getElementMetadata(s);
       } else if (s instanceof DirectiveSymbol) {
         return getDirectiveMetadata(s);
@@ -58,7 +58,7 @@ export class DirectiveState extends State {
   }
 
   nextState(id: string) {
-    if (id === TemplateId && this.directive.record === "Component") {
+    if (id === TemplateId && this.directive instanceof ComponentSymbol) {
       return new TemplateState(this.context, this.directive);
     }
     if (id === this.symbolId) {
@@ -88,7 +88,7 @@ export class DirectiveState extends State {
     ];
     const edges: Edge[] = [];
     if (this.showControl) {
-      if (this.directive.isComponent()) {
+      if (this.directive instanceof ComponentSymbol) {
         nodes.push({
           id: TemplateId,
           label: "Template",
@@ -168,11 +168,14 @@ export class DirectiveState extends State {
     providers.forEach((p) => {
       const m = p.metadata
       const id = getProviderId(m);
+      if (id === null) {
+        return;
+      }
       existing[id] = (existing[id] || 0) + 1;
-      const node = {
+      const node: Node<any> = {
         id,
         data: p,
-        label: getProviderName(m),
+        label: getProviderName(m)!,
         type: {
           angular: isAngularSymbol(m),
           type: SymbolTypes.Provider,

@@ -6,7 +6,7 @@ import {
   WorkspaceSymbols,
 } from "ngast";
 import { State } from "./state";
-import { ElementAst, DirectiveAst } from "@angular/compiler";
+import { TmplAstElement, DirectiveAst } from "@angular/compiler";
 import {
   VisualizationConfig,
   Metadata,
@@ -21,7 +21,7 @@ import {
 import { DirectiveState } from "./directive.state";
 
 interface NodeMap {
-  [id: string]: ComponentSymbol | DirectiveSymbol | ElementAst;
+  [id: string]: ComponentSymbol | DirectiveSymbol | TmplAstElement;
 }
 
 const TemplateId = "template";
@@ -36,7 +36,7 @@ export class TemplateState extends State {
   getMetadata(id: string): Metadata | null {
     const s = this.symbols[id];
     if (s) {
-      if (s instanceof ElementAst) {
+      if (s instanceof TmplAstElement) {
         return getElementMetadata(s);
       } else if (s instanceof ComponentSymbol) {
         return getDirectiveMetadata(s);
@@ -84,7 +84,7 @@ export class TemplateState extends State {
   }
 
   private addTemplateNodes(
-    resNodes: Node<ComponentSymbol | ElementAst>[],
+    resNodes: Node<ComponentSymbol | TmplAstElement>[],
     edges: any[]
   ) {
     const rootNodes = this.directive.getTemplateAst();
@@ -97,7 +97,7 @@ export class TemplateState extends State {
         p[getId(s)] = s;
         return p;
       }, {} as any);
-    const addNodes = (nodes: ElementAst[], parentNodeId: string) => {
+    const addNodes = (nodes: TmplAstElement[], parentNodeId: string) => {
       nodes.forEach((n) => {
         currentNode += 1;
         const nodeId = "el-" + currentNode;
@@ -108,7 +108,7 @@ export class TemplateState extends State {
         const node = {
           id: nodeId,
           label: n.name,
-          data: n as ElementAst,
+          data: n as TmplAstElement,
           type: {
             angular: false,
             type: n.directives.length
@@ -124,14 +124,14 @@ export class TemplateState extends State {
         }
         resNodes.push(node);
         addNodes(
-          n.children.filter((c) => c instanceof ElementAst) as ElementAst[],
+          n.children.filter((c) => c instanceof TmplAstElement) as TmplAstElement[],
           nodeId
         );
       });
       addNodes(
         (rootNodes || []).filter(
-          (c) => c instanceof ElementAst
-        ) as ElementAst[],
+          (c) => c instanceof TmplAstElement
+        ) as TmplAstElement[],
         TemplateId
       );
     };
@@ -144,9 +144,10 @@ export class TemplateState extends State {
     return componentDirs
       .filter((d) => {
         const ref = d.directive.type.reference;
-        const symbol = dirMap[ref.filePath + "#" + ref.name];
+        const symbol = dirMap[ref.path + "#" + ref.name];
         const metadata = symbol.metadata;
-        if (symbol && metadata && metadata.isComponent) {
+        // TODO
+        if (symbol && metadata) {
           return true;
         }
         return false;
