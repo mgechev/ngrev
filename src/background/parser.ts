@@ -136,10 +136,7 @@ export class BackgroundApp {
         const map = SymbolIndex.getIndex(this.project.projectSymbols);
         map.forEach((data: SymbolData, id: string) => {
           if (data.symbol instanceof Symbol) {
-            res.push(Object.assign({}, data.symbol.symbol, { id }));
-          } else {
-            const staticSymbol = new StaticSymbol('', getProviderName(data.symbol.getMetadata()), []);
-            res.push(Object.assign({}, staticSymbol, { id }));
+            res.push(Object.assign({}, data.symbol, { id }));
           }
         });
       } catch (e) {
