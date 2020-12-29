@@ -1,10 +1,10 @@
 import { State } from './state';
 import { Metadata, VisualizationConfig, Graph, Layout } from '../../shared/data-format';
-import { ProjectSymbols } from 'ngast';
+import { WorkspaceSymbols } from 'ngast';
 import { ModuleTreeState } from './module-tree.state';
 import { AppModuleState } from './app-module.state';
 import { DirectiveState } from './directive.state';
-import { ProviderState } from './provider.state';
+import { InjectableState } from './injectable.state';
 import { PipeState } from './pipe.state';
 
 const CompositeStateID = '$$$composite-state$$$';
@@ -13,8 +13,8 @@ const Title = 'Application View';
 export class AppState extends State {
   private states: State[] = [];
 
-  constructor(context: ProjectSymbols, private _showLibs: boolean, private _showModules: boolean) {
-    super(CompositeStateID, context);
+  constructor(context: WorkspaceSymbols, private _showLibs: boolean, private _showModules: boolean) {
+    super(context, CompositeStateID);
     this.init();
   }
 
@@ -67,28 +67,29 @@ export class AppState extends State {
     return data;
   }
 
-  private showSymbol(id: string) {
+  private showSymbol(id: string|null) {
     if (this.showLibs) {
       return true;
     }
-    return id.indexOf('node_modules') < 0;
+    return !id ? false : id.indexOf('node_modules') < 0;
   }
 
   private init() {
-    this.context.getModules().forEach(m => {
+    // TODO: As for me it looks weird.
+    this.context.getAllModules().forEach(m => {
       this.states.push(new ModuleTreeState(this.context, m));
     });
     if (!this.showModules) {
-      this.context.getModules().forEach(m => {
+      this.context.getAllModules().forEach(m => {
         this.states.push(new AppModuleState(this.context, m));
       });
-      this.context.getDirectives().forEach(d => {
+      this.context.getAllDirectives().forEach(d => {
         this.states.push(new DirectiveState(this.context, d, false));
       });
-      this.context.getProviders().forEach(p => {
-        this.states.push(new ProviderState(this.context, p));
+      this.context.getAllInjectable().forEach(p => {
+        this.states.push(new InjectableState(this.context, p));
       });
-      this.context.getPipes().forEach(p => {
+      this.context.getAllPipes().forEach(p => {
         this.states.push(new PipeState(this.context, p));
       });
     }

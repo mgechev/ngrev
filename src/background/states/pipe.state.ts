@@ -14,7 +14,7 @@ import {
 import { ProjectSymbols, ProviderSymbol, PipeSymbol } from 'ngast';
 import { State } from './state';
 import { getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
-import { ProviderState } from './provider.state';
+import { InjectableState } from './injectable.state';
 
 interface NodeMap {
   [id: string]: ProviderSymbol | PipeSymbol;
@@ -24,7 +24,7 @@ export class PipeState extends State {
   private symbols: NodeMap = {};
 
   constructor(context: ProjectSymbols, protected pipe: PipeSymbol) {
-    super(getId(pipe.symbol), context);
+    super(context, getId(pipe.symbol));
   }
 
   getMetadata(id: string): Metadata {
@@ -45,7 +45,7 @@ export class PipeState extends State {
       if (!symbol) {
         return null;
       }
-      return new ProviderState(this.context, symbol);
+      return new InjectableState(this.context, symbol);
     }
     return null;
   }
@@ -71,7 +71,7 @@ export class PipeState extends State {
         label: getProviderName(m),
         type: {
           angular: isAngularSymbol(m),
-          type: SymbolTypes.Provider
+          type: SymbolTypes.Injectable
         }
       });
     });

@@ -8,7 +8,7 @@ export interface Graph<T> {
 }
 
 export enum SymbolTypes {
-  Provider = 'provider',
+  Injectable = 'injectable',
   HtmlElement = 'html-element',
   HtmlElementWithDirective = 'html-element-with-directive',
   ComponentWithDirective = 'component-with-directive',
@@ -27,8 +27,8 @@ export interface SymbolType {
 }
 
 export interface Node<T> {
-  id: string;
-  label: string;
+  id: string|null;
+  label: string|null
   data?: T;
   type?: SymbolType;
 }
@@ -40,7 +40,7 @@ export enum Direction {
 }
 
 export interface Edge {
-  from: string;
+  from: string|null;
   to: string;
   direction?: Direction;
   data?: any;
@@ -62,7 +62,7 @@ export interface Config {
 
 export interface VisualizationConfig<T> {
   layout?: Layout;
-  title: string;
+  title: string|null;
   graph: Graph<T>;
 }
 
@@ -77,10 +77,11 @@ export const getId = (symbol: { name: string; path: string }) => {
   return `${symbol.path}#${symbol.name}`;
 };
 
-export const getProviderId = (provider: R3InjectableMetadata) => {
+export const getProviderId = (provider: R3InjectableMetadata): string | null => {
   if (provider.type.value) {
     return provider.name;
   }
+  // TODO: same here
   return null;
 };
 
@@ -88,6 +89,8 @@ export const getProviderName = (provider: R3InjectableMetadata) => {
   if (provider.type.value) {
     return provider.name;
   }
+  // TODO: How is it possible that providerId is null? Lot of code is related to this value.
+  //  Maybe we need to add some placeholder in case of null or something.
   return null;
 };
 

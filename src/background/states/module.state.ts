@@ -22,7 +22,7 @@ import {
   getProviderMetadata,
   getPipeMetadata
 } from '../formatters/model-formatter';
-import { ProviderState } from './provider.state';
+import { InjectableState } from './injectable.state';
 import { PipeState } from './pipe.state';
 
 interface DataType {
@@ -43,7 +43,7 @@ export class ModuleState extends State {
   private symbols: NodeMap;
 
   constructor(context: ProjectSymbols, protected module: ModuleSymbol) {
-    super(getId(module.symbol), context);
+    super(context, getId(module.symbol));
   }
 
   getMetadata(id: string): Metadata | null {
@@ -72,7 +72,7 @@ export class ModuleState extends State {
     if (data.symbol instanceof DirectiveSymbol) {
       return new DirectiveState(this.context, data.symbol);
     } else if (data.symbol instanceof ProviderSymbol) {
-      return new ProviderState(this.context, data.symbol);
+      return new InjectableState(this.context, data.symbol);
     } else if (data.symbol instanceof PipeSymbol) {
       return new PipeState(this.context, data.symbol);
     }
@@ -192,7 +192,7 @@ export class ModuleState extends State {
       };
     }
     Object.keys(providers).forEach(key => {
-      this._appendSet(ProvidersId, providers[key], nodes, SymbolTypes.Provider, edges);
+      this._appendSet(ProvidersId, providers[key], nodes, SymbolTypes.Injectable, edges);
     });
     this.symbols = nodes;
     return {

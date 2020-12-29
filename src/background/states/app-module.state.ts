@@ -13,7 +13,7 @@ import {
 } from '../../shared/data-format';
 import { DirectiveSymbol, ModuleSymbol, ProjectSymbols, Symbol, ProviderSymbol, PipeSymbol } from 'ngast';
 import { getDirectiveMetadata, getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
-import { ProviderState } from './provider.state';
+import { InjectableState } from './injectable.state';
 import { PipeState } from './pipe.state';
 
 interface DataType {
@@ -29,7 +29,7 @@ export class AppModuleState extends State {
   private symbols: NodeMap;
 
   constructor(context: ProjectSymbols, protected module: ModuleSymbol) {
-    super(getId(module.symbol), context);
+    super(context, getId(module.symbol));
   }
 
   getMetadata(id: string): Metadata | null {
@@ -58,7 +58,7 @@ export class AppModuleState extends State {
     if (data.symbol instanceof DirectiveSymbol) {
       return new DirectiveState(this.context, data.symbol);
     } else if (data.symbol instanceof ProviderSymbol) {
-      return new ProviderState(this.context, data.symbol);
+      return new InjectableState(this.context, data.symbol);
     } else if (data.symbol instanceof PipeSymbol) {
       return new PipeState(this.context, data.symbol);
     }
@@ -120,7 +120,7 @@ export class AppModuleState extends State {
       return prev;
     }, {});
     Object.keys(providers).forEach(key => {
-      this._appendSet(currentModuleId, providers[key], nodes, SymbolTypes.Provider, edges);
+      this._appendSet(currentModuleId, providers[key], nodes, SymbolTypes.Injectable, edges);
     });
     this.symbols = nodes;
     return {

@@ -44,7 +44,7 @@ export class ModuleTreeState extends State {
   // Based on the content of the `loadChildren` property and the path for the current module
   // find the symbols corresponding to the lazy-loaded modules and add them to the graph.
   constructor(private rootContext: ProjectSymbols, private module: ModuleSymbol) {
-    super(getId(module.symbol), rootContext);
+    super(rootContext, getId(module.symbol));
 
     if (!ModuleIndex.size) {
       rootContext.getModules().forEach(m => ModuleIndex.insert(getId(m.symbol), m));

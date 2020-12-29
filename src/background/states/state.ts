@@ -2,7 +2,7 @@ import { VisualizationConfig, Metadata } from '../../shared/data-format';
 import { WorkspaceSymbols } from 'ngast';
 
 export abstract class State {
-  constructor(protected symbolId: string, protected context: WorkspaceSymbols) {}
+  constructor(protected context: WorkspaceSymbols, protected symbolId: string|null) {}
 
   abstract getMetadata(id: string): Metadata | null;
 

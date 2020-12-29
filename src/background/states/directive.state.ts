@@ -41,7 +41,7 @@ export class DirectiveState extends State {
     protected directive: DirectiveSymbol | ComponentSymbol,
     private showControl = true
   ) {
-    super(getId(directive), context);
+    super(context, getId(directive));
   }
 
   getMetadata(id: string): Metadata | null {
@@ -178,7 +178,7 @@ export class DirectiveState extends State {
         label: getProviderName(m)!,
         type: {
           angular: isAngularSymbol(m),
-          type: SymbolTypes.Provider,
+          type: SymbolTypes.Injectable,
         },
       };
       // Handle circular references

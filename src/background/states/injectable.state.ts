@@ -1,7 +1,6 @@
 import {
   Node,
   Metadata,
-  getId,
   VisualizationConfig,
   Layout,
   Direction,
@@ -11,20 +10,19 @@ import {
   getProviderName,
   Edge
 } from '../../shared/data-format';
-import { StaticSymbol } from '@angular/compiler';
-import { ProjectSymbols, ProviderSymbol } from 'ngast';
+import { WorkspaceSymbols, InjectableSymbol } from 'ngast';
 import { State } from './state';
 import { getProviderMetadata } from '../formatters/model-formatter';
 
 interface NodeMap {
-  [id: string]: ProviderSymbol;
+  [id: string]: InjectableSymbol;
 }
 
-export class ProviderState extends State {
+export class InjectableState extends State {
   private symbols: NodeMap = {};
 
-  constructor(context: ProjectSymbols, protected provider: ProviderSymbol) {
-    super(getProviderId(provider.getMetadata()), context);
+  constructor(context: WorkspaceSymbols, protected injectable: InjectableSymbol) {
+    super(context, getProviderId(injectable.metadata));
   }
 
   getMetadata(id: string): Metadata {
@@ -39,44 +37,50 @@ export class ProviderState extends State {
     if (!symbol) {
       return null;
     }
-    return new ProviderState(this.context, symbol);
+    return new InjectableState(this.context, symbol);
   }
 
-  getData(): VisualizationConfig<ProviderSymbol> {
-    const metadata = this.provider.getMetadata();
+  getData(): VisualizationConfig<InjectableSymbol> {
+    const metadata = this.injectable.metadata;
     const existing: { [key: string]: number } = {};
     const currentId = getProviderId(metadata);
-    const nodes: Node<ProviderSymbol>[] = [
+    const nodes: Node<InjectableSymbol>[] = [
       {
         id: currentId,
-        data: this.provider,
+        data: this.injectable,
         label: getProviderName(metadata),
         type: {
           angular: isAngularSymbol(metadata),
-          type: SymbolTypes.Provider
+          type: SymbolTypes.Injectable
         }
       }
     ];
-    existing[currentId] = 1;
-    (this.provider.getDependencies() || []).forEach(p => {
-      const dependencyMetadata = p.getMetadata();
+    if (currentId) {
+      existing[currentId] = 1;
+    }
+    (this.injectable.getDependencies() || []).forEach((injectable: InjectableSymbol) => {
+      const dependencyMetadata = injectable.metadata;
       // Handle @SkipSelf()
       const id = getProviderId(dependencyMetadata);
-      if (!existing[id]) {
+      if (!id || !existing[id]) {
         nodes.push({
           id,
-          data: p,
+          data: injectable,
           label: getProviderName(dependencyMetadata),
           type: {
-            angular: isAngularSymbol(p.getMetadata()),
-            type: SymbolTypes.Provider
+            angular: isAngularSymbol(injectable.metadata),
+            type: SymbolTypes.Injectable
           }
         });
       }
-      existing[id] = (existing[id] || 0) + 1;
+      if (id) {
+        existing[id] = (existing[id] || 0) + 1;
+      }
     });
-    existing[currentId] -= 1;
-    nodes.forEach(n => n.data && (this.symbols[n.id] = n.data));
+    if (currentId) {
+      existing[currentId] -= 1;
+    }
+    nodes.forEach((node: Node<InjectableSymbol>) => node.data && node.id && (this.symbols[node.id] = node.data));
     const resultEdges: Edge[] = [];
 
     // Show only a single arrow
@@ -90,7 +94,7 @@ export class ProviderState extends State {
       }
     });
     return {
-      title: getProviderName(this.provider.getMetadata()),
+      title: getProviderName(this.injectable.metadata),
       layout: Layout.Regular,
       graph: {
         edges: resultEdges,

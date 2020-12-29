@@ -30,7 +30,7 @@ export class TemplateState extends State {
   private symbols: NodeMap = {};
 
   constructor(context: WorkspaceSymbols, protected directive: ComponentSymbol) {
-    super(getId(directive), context);
+    super(context, getId(directive));
   }
 
   getMetadata(id: string): Metadata | null {
