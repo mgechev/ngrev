@@ -71,7 +71,7 @@ export class AppState extends State {
     if (this.showLibs) {
       return true;
     }
-    return !id ? false : id.indexOf('node_modules') < 0;
+    return id && id.indexOf('node_modules') < 0;
   }
 
   private init() {
