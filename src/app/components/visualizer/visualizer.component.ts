@@ -94,6 +94,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
 
   private updateData(data: VisualizationConfig<any>) {
     const graph = data.graph;
+    console.log(data);
     this.usedColors = [];
     const colors = new Map<SymbolTypes, Color>();
     const nodes = new DataSet(

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, NgZone, ViewChild, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
 import { ProjectProxy } from './model/project-proxy';
-import { Config } from '../shared/data-format';
+import { Config, Metadata } from '../shared/data-format';
 import { SymbolWithId, formatError } from './shared/utils';
 import { StateManager, Memento } from './model/state-manager';
 import { Theme } from '../shared/themes/color-map';
@@ -32,7 +32,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild(QuickAccessComponent) quickAccess: QuickAccessComponent;
 
-  resolveMetadata = (nodeId: string) => {
+  resolveMetadata = (nodeId: string): Promise<Metadata | boolean> => {
     this.loading = true;
     return this.manager
       .getMetadata(nodeId)
