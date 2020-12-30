@@ -47,7 +47,7 @@ export const getDirectiveMetadata = (dir: DirectiveSymbol | ComponentSymbol): Me
     filePath: dir.path,
     properties: [
       { key: 'Selector', value: meta.selector },
-      { key: 'Component', value: dir.isSymbol('Component').toString() },
+      { key: 'Component', value: (dir.annotation === 'Component').toString() },
       { key: 'Change Detection', value: _changeDetectionToString(getChangeDetection()) },
       { key: 'Export', value: (meta.exportAs || []).join(', ') }
     ]

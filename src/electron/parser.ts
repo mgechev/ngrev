@@ -131,7 +131,7 @@ export class BackgroundApp {
         const map = SymbolIndex.getIndex(this.project.projectSymbols);
         map.forEach((data: SymbolData, id: string) => {
           if (data.symbol instanceof Symbol) {
-            res.push({ id, name: data.symbol.name, annotation: data.symbol.name, path: data.symbol.path });
+            res.push({ id, name: data.symbol.name, annotation: data.symbol.annotation, path: data.symbol.path });
           }
         });
       } catch (e) {
