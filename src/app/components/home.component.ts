@@ -51,19 +51,19 @@ export class HomeComponent {
   }
 
   loadProject() {
-    const filePaths = ['/Users/mgechev/Projects/angular-devtools/projects/ng-devtools/tsconfig.lib.json'];
-    // window.require('electron').remote.dialog
-    //   .showOpenDialog({ properties: ["openFile", "multiSelections"] })
-    //   .then(({filePaths}) => {
-    let config: Config;
-    this.configProvider.getConfig().then((conf: Config) => {
-      config = conf;
-      this.config = config;
+    // const filePaths = ['/Users/mgechev/Projects/angular-devtools/projects/ng-devtools/tsconfig.lib.json'];
+    window.require('electron').remote.dialog
+      .showOpenDialog({ properties: ["openFile", "multiSelections"] })
+      .then(({filePaths}) => {
+        let config: Config;
+        this.configProvider.getConfig().then((conf: Config) => {
+          config = conf;
+          this.config = config;
 
-      if (filePaths && filePaths[0]) {
-        this.project.emit({ tsconfig: filePaths[0], config: this.config });
-      }
-    });
-  // });
+          if (filePaths && filePaths[0]) {
+            this.project.emit({ tsconfig: filePaths[0], config: this.config });
+          }
+        });
+      });
   }
 }
