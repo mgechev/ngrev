@@ -1,6 +1,6 @@
+import { WorkspaceSymbols } from 'ngast';
 import { State } from './state';
 import { Metadata, VisualizationConfig, Layout } from '../../shared/data-format';
-import { WorkspaceSymbols } from 'ngast';
 import { ModuleTreeState } from './module-tree.state';
 import { AppModuleState } from './app-module.state';
 import { DirectiveState } from './directive.state';
