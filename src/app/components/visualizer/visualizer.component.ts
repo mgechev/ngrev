@@ -204,7 +204,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
   }
 
   private showContextMenu(id: string, metadata: Metadata) {
-    const { Menu, MenuItem } = window.require('electron');
+    const { Menu, MenuItem } = window.require('electron').remote;
     const menu = new Menu();
     const self = this;
     if (metadata && metadata.filePath) {
