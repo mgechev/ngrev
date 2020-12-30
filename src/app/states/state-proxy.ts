@@ -1,7 +1,6 @@
 import { IPCBus } from '../model/ipc-bus';
 import { Message } from '../../shared/ipc-constants';
 import { Metadata, VisualizationConfig } from '../../shared/data-format';
-import { Injectable } from '@angular/core';
 
 export class StateProxy {
   private ipcBus: IPCBus = new IPCBus();
