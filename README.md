@@ -1,124 +1,71 @@
-[![Angular Logo](https://www.vectorlogo.zone/logos/angular/angular-icon.svg)](https://angular.io/) [![Electron Logo](https://www.vectorlogo.zone/logos/electronjs/electronjs-icon.svg)](https://electronjs.org/)
+# ngrev
 
-![Maintained][maintained-badge]
-[![Travis Build Status][build-badge]][build]
-[![Make a pull request][prs-badge]][prs]
-[![License](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](LICENSE.md)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mgechev/ngrev/master/build/ngrev-512.png" alt="ngrev" width="250">
+</p>
 
-[![Watch on GitHub][github-watch-badge]][github-watch]
-[![Star on GitHub][github-star-badge]][github-star]
-[![Tweet][twitter-badge]][twitter]
+Graphical tool for reverse engineering of Angular projects. It allows you to navigate in the structure of your application and observe the relationship between the different modules, providers, and directives. The tool performs **static code analysis** which means that you **don't have to run your application** in order to use it.
 
-# Introduction
+# How to use?
 
-Bootstrap and package your project with Angular 10 and Electron 9 (Typescript + SASS + Hot Reload) for creating Desktop applications.
+## macOS
 
-Currently runs with:
+1.  Go to the [releases page](https://github.com/mgechev/ngrev/releases).
+2.  Download the latest `*.dmg` file.
+3.  Install the application.
 
-- Angular v11.0.3
-- Electron v11.0.3
-- Electron Builder v22.9.1
+## Linux
 
-With this sample, you can :
+1.  Go to the [releases page](https://github.com/mgechev/ngrev/releases).
+2.  Download the latest `*.AppImage` file.
+3.  Run the `*.AppImage` file (you may need to `chmod +x *.AppImage`).
 
-- Run your app in a local development environment with Electron & Hot reload
-- Run your app in a production environment
-- Package your app into an executable file for Linux, Windows & Mac
+## Windows
 
-/!\ Hot reload only pertains to the renderer process. The main electron process is not able to be hot reloaded, only restarted.
+1.  Go to the [releases page](https://github.com/mgechev/ngrev/releases).
+2.  Download the latest `*.exe` file.
+3.  Install the application.
 
-/!\ Angular 11.x CLI needs Node 10.13 or later to work correctly.
+# Creating a custom theme
 
-## Getting Started
+You can add your own theme by creating a `[theme-name].theme.json` file in Electron `[userData]/themes`. For a sample theme see [Dark](https://github.com/mgechev/ngrev/blob/master/app/dark.theme.json).
 
-Clone this repository locally :
+## Application Requirements
 
-``` bash
-git clone https://github.com/maximegris/angular-electron.git
-```
+Your application needs to be compatible with the Angular's AoT compiler (i.e. you should be able to compile it with `ngc`).
 
-Install dependencies with npm :
+## Using with Angular CLI
 
-``` bash
-npm install
-```
+1.  Open the Angular's application directory.
+2.  Make sure the dependencies are installed.
+3.  Open `ngrev`.
+4.  Click on `Select Project` and select `[YOUR_CLI_APP]/src/tsconfig.app.json`.
 
-There is an issue with `yarn` and `node_modules` when the application is built by the packager. Please use `npm` as dependencies manager.
+## Using with Angular Seed
 
+1.  Open the Angular's application directory.
+2.  Make sure the dependencies are installed.
+3.  Open `ngrev`.
+4.  Click on `Select Project` and select `[YOUR_CLI_APP]/src/client/tsconfig.json`.
 
-If you want to generate Angular components with Angular-cli , you **MUST** install `@angular/cli` in npm global context.
-Please follow [Angular-cli documentation](https://github.com/angular/angular-cli) if you had installed a previous version of `angular-cli`.
+# Demo
 
-``` bash
-npm install -g @angular/cli
-```
+Demo [here](https://www.youtube.com/watch?v=sKdsxdeLWjM).
 
-## To build for development
+<a href="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/1.png" target="_blank"><img src="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/1.png" alt="Component template"/></a>
 
-- **in a terminal window** -> npm start
+<a href="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/2.png" target="_blank"><img src="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/2.png" alt="Themes"></a>
 
-Voila! You can use your Angular + Electron app in a local development environment with hot reload !
+<a href="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/3.png" target="_blank"><img src="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/3.png" alt="Command + P"></a>
 
-The application code is managed by `main.ts`. In this sample, the app runs with a simple Angular App (http://localhost:4200) and an Electron window.
-The Angular component contains an example of Electron and NodeJS native lib import.
-You can disable "Developer Tools" by commenting `win.webContents.openDevTools();` in `main.ts`.
+<a href="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/4.png" target="_blank"><img src="https://raw.githubusercontent.com/mgechev/ngrev/master/assets/4.png" alt="Module Dependencies"></a>
 
-## Use Electron / NodeJS / 3rd party libraries
+# Contributors
 
-As see in previous chapter, this sample project runs on both mode (web and electron). To make this happens, **you have to import your dependencies the right way**. Please check `providers/electron.service.ts` to watch how conditional import of libraries has to be done when using electron / NodeJS / 3rd party librairies in renderer context (ie. Angular).
+[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="MichalMaM" src="https://avatars0.githubusercontent.com/u/417576?v=4&s=117" width="117">](https://github.com/MichalMaM) |
+:---: |:---: |
+[mgechev](https://github.com/mgechev) |[MichalMaM](https://github.com/MichalMaM) |
 
-## Browser mode
+# License
 
-Maybe you only want to execute the application in the browser with hot reload ? Just run `npm run ng:serve:web`.
-
-## Included Commands
-
-|Command|Description|
-|--|--|
-|`npm run ng:serve`| Execute the app in the browser |
-|`npm run build`| Build the app. Your built files are in the /dist folder. |
-|`npm run build:prod`| Build the app with Angular aot. Your built files are in the /dist folder. |
-|`npm run electron:local`| Builds your application and start electron
-|`npm run electron:build`| Builds your application and creates an app consumable based on your operating system |
-
-**Your application is optimised. Only /dist folder and node dependencies are included in the executable.**
-
-## You want to use a specific lib (like rxjs) in electron main thread ?
-
-YES! You can do it! Just by importing your library in npm dependencies section (not **devDependencies**) with `npm install --save`. It will be loaded by electron during build phase and added to your final package. Then use your library by importing it in `main.ts` file. Quite simple, isn't it ?
-
-## E2E Testing
-
-E2E Test scripts can be found in `e2e` folder.
-
-|Command|Description|
-|--|--|
-|`npm run e2e`| Execute end to end tests |
-
-Note: To make it work behind a proxy, you can add this proxy exception in your terminal  
-`export {no_proxy,NO_PROXY}="127.0.0.1,localhost"`
-
-## Branch & Packages version
-
-- Angular 4 & Electron 1 : Branch [angular4](https://github.com/maximegris/angular-electron/tree/angular4)
-- Angular 5 & Electron 1 : Branch [angular5](https://github.com/maximegris/angular-electron/tree/angular5)
-- Angular 6 & Electron 3 : Branch [angular6](https://github.com/maximegris/angular-electron/tree/angular6)
-- Angular 7 & Electron 3 : Branch [angular7](https://github.com/maximegris/angular-electron/tree/angular7)
-- Angular 8 & Electron 7 : Branch [angular8](https://github.com/maximegris/angular-electron/tree/angular8)
-- Angular 9 & Electron 7 : Branch [angular9](https://github.com/maximegris/angular-electron/tree/angular9)
-- Angular 10 & Electron 9 : Branch [angular10](https://github.com/maximegris/angular-electron/tree/angular9)
-- Angular 11 & Electron 10 : (master)
-
-[build-badge]: https://travis-ci.org/maximegris/angular-electron.svg?branch=master&style=style=flat-square
-[build]: https://travis-ci.org/maximegris/angular-electron
-[license-badge]: https://img.shields.io/badge/license-Apache2-blue.svg?style=style=flat-square
-[license]: https://github.com/maximegris/angular-electron/blob/master/LICENSE.md
-[prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
-[prs]: http://makeapullrequest.com
-[github-watch-badge]: https://img.shields.io/github/watchers/maximegris/angular-electron.svg?style=social
-[github-watch]: https://github.com/maximegris/angular-electron/watchers
-[github-star-badge]: https://img.shields.io/github/stars/maximegris/angular-electron.svg?style=social
-[github-star]: https://github.com/maximegris/angular-electron/stargazers
-[twitter]: https://twitter.com/intent/tweet?text=Check%20out%20angular-electron!%20https://github.com/maximegris/angular-electron%20%F0%9F%91%8D
-[twitter-badge]: https://img.shields.io/twitter/url/https/github.com/maximegris/angular-electron.svg?style=social
-[maintained-badge]: https://img.shields.io/badge/maintained-yes-brightgreen
+MIT
