@@ -63,6 +63,14 @@ class SymbolIndexImpl {
         }
       })
     );
+    context.getAllComponents().forEach(symbol =>
+      this.symbolsIndex.set(getId(symbol), {
+        symbol,
+        stateFactory() {
+          return new DirectiveState(context, symbol);
+        }
+      })
+    );
     return this.symbolsIndex;
   }
 
