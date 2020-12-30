@@ -46,9 +46,9 @@ export class HomeComponent {
 
   constructor(private configProvider: Configuration) {}
 
-  ngAfterViewInit() {
-    this.loadProject();
-  }
+  // ngAfterViewInit() {
+  //   this.loadProject();
+  // }
 
   loadProject() {
     // const filePaths = ['/Users/mgechev/Projects/angular-devtools/projects/ng-devtools/tsconfig.lib.json'];
