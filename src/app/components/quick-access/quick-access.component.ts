@@ -11,85 +11,23 @@ import {
   ChangeDetectorRef
 } from '@angular/core';
 import { Theme } from '../../../shared/themes/color-map';
+import { KeyValuePair, QueryObject } from './quick-access';
+import { CONTROL, META, P, ESCAPE, UP_ARROW, DOWN_ARROW } from '@angular/cdk/keycodes';
 
 declare const require: any;
-
 const Fuse = require('fuse.js');
 
-const MetaKeyCodes = [91, 17];
-const PKeyCode = 80;
-const ESCKeyCode = 27;
-const UpArrowKeyCode = 38;
-const DownArrowKeyCode = 40;
-
-export interface KeyValuePair<T> {
-  key: string;
-  value: T;
-}
-
-export interface QueryObject {
-  [index: number]: string[];
-}
+const MetaKeyCodes = [META, CONTROL];
 
 @Component({
   selector: 'ngrev-quick-access',
-  template: `
-    <div class="fuzzy-box"
-      [style.boxShadow]="boxShadow"
-      [style.color]="theme.fuzzySearch.font"
-      [style.background]="theme.fuzzySearch.background"
-      *ngIf="fuzzyBoxVisible" (click)="$event.stopImmediatePropagation()">
-      <input [style.background]="theme.fuzzySearch.background"
-        [style.color]="theme.fuzzySearch.font"
-        [style.border]="theme.fuzzySearch.border"
-        autofocus #input type="text" (keydown)="updateKeyword($event)">
-      <ngrev-quick-access-list
-        *ngIf="search() as results"
-        [theme]="theme"
-        [style.display]="results.length ? 'block' : 'none'"
-        [data]="results"
-        [highlight]="symbolName"
-        (select)="select.next($event); hide()"
-      >
-      </ngrev-quick-access-list>
-    </div>
-  `,
+  templateUrl: './quick-access.component.html',
   host: {
     '(document:keydown)': 'onKeyDown($event)',
     '(document:keyup)': 'onKeyUp($event)',
     '(document:click)': 'onDocumentClick($event)'
   },
-  styles: [
-    `
-      :host {
-        margin: auto;
-        margin-top: 45px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        width: 70%;
-        max-width: 600px;
-        height: calc(100% - 45px);
-        z-index: 15;
-      }
-      .fuzzy-box {
-        padding: 5px;
-        width: 100%;
-        max-height: 80%;
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-      }
-      .fuzzy-box input {
-        max-height: 60px;
-        font-size: 35px;
-        outline: none;
-        padding: 7px;
-      }
-    `
-  ]
+  styleUrls: ['./quick-access.component.scss']
 })
 export class QuickAccessComponent implements AfterViewInit {
   private metaKeyDown = 0;
@@ -99,8 +37,7 @@ export class QuickAccessComponent implements AfterViewInit {
 
   constructor(private element: ElementRef, private renderer: Renderer2, private cd: ChangeDetectorRef) {}
 
-  @Input()
-  theme: Theme;
+  @Input() theme: Theme;
 
   @Input()
   set queryObject(query: QueryObject) {
@@ -116,22 +53,21 @@ export class QuickAccessComponent implements AfterViewInit {
     this.fuse.set(symbols);
   }
 
-  @Output()
-  select = new EventEmitter<string>();
-  @ViewChildren('input')
-  input: QueryList<ElementRef>;
+  @Output() select: EventEmitter<string> = new EventEmitter<string>();
+
+  @ViewChildren('input') input: QueryList<ElementRef>;
 
   onKeyDown(e) {
     if (MetaKeyCodes.indexOf(e.keyCode) >= 0) {
       this.metaKeyDown = e.keyCode;
     }
-    if (e.keyCode === PKeyCode && this.metaKeyDown) {
+    if (e.keyCode === P && this.metaKeyDown) {
       this.show();
     }
-    if (e.keyCode === ESCKeyCode) {
+    if (e.keyCode === ESCAPE) {
       this.hide();
     }
-    if (e.keyCode === DownArrowKeyCode || e.keyCode === UpArrowKeyCode) {
+    if (e.keyCode === DOWN_ARROW || e.keyCode === UP_ARROW) {
       e.preventDefault();
     }
   }

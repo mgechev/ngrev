@@ -1,0 +1,19 @@
+<h2 *ngIf="states.length" [style.color]="theme.historyLabel">History</h2>
+<ul *ngIf="states.length">
+  <li
+    [class.state]="!isMetaState(memento)"
+    [class.meta]="isMetaState(memento)"
+    [style.backgroundColor]="getBackgroundColor(memento)"
+    [style.borderColor]="theme.background"
+    (click)="changeState(memento)"
+    (mouseenter)="showTooltip(index)"
+    (mouseleave)="hideTooltip(index)"
+    *ngFor="let memento of getRenderableItems(); let index = index">
+    <span class="next-arrow" [style.borderLeftColor]="getBackgroundColor(memento)"></span>
+    <span [class.visible]="visibleTooltip === index || isMetaState(memento)"
+          [class.tooltip]="!isMetaState(memento)"
+          [class.label]="isMetaState(memento)">
+          {{ memento.state.title }}
+        </span>
+  </li>
+</ul>

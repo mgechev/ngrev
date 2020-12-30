@@ -1,12 +1,18 @@
 import { Message, Status } from "../../shared/ipc-constants";
+import { Injectable } from '@angular/core';
 
 const NonBlocking = {
   [Message.EnableExport]: true,
   [Message.DisableExport]: true,
 };
 
+@Injectable({
+  providedIn: 'root'
+})
 export class IPCBus {
   private blocked = false;
+
+  constructor() {}
 
   send(method: Message, data?: any): Promise<any> {
     if (this.pending && !NonBlocking[method]) {

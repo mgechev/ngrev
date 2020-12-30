@@ -2,7 +2,9 @@ import { IPCBus } from './ipc-bus';
 import { Message } from '../../shared/ipc-constants';
 import { Injectable } from '@angular/core';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ProjectProxy {
   constructor(private ipcBus: IPCBus) {}
 

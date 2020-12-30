@@ -1,0 +1,35 @@
+:host {
+  &.type-regular {
+    width: 185px;
+    display: block;
+    margin: auto;
+    cursor: pointer;
+    background: #2196f3;
+    padding: 13px;
+    color: #fff;
+    font-size: 18px;
+    border: 2px solid #1976d2;
+    border-radius: 25px;
+    outline: none;
+
+    &:active {
+      background: #1976d2;
+    }
+  }
+
+  &.type-back {
+    z-index: 1;
+    width: 60px;
+    height: 30px;
+    border: none;
+    outline: none;
+    border-bottom-right-radius: 7px;
+    background: #eee;
+    transition: 0.2s opacity;
+
+    &:active {
+      background: #ccc;
+    }
+  }
+}
+

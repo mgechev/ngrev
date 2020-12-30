@@ -1,0 +1,11 @@
+<ul *ngIf="bindData.length">
+  <li #items *ngFor="let element of bindData; let i=index"
+      [style.borderTopColor]="theme.fuzzySearch.border"
+      [style.borderLeftColor]="theme.fuzzySearch.border"
+      [style.borderRightColor]="theme.fuzzySearch.border"
+      [style.backgroundColor]="i === selection ? theme.fuzzySearch.selected : theme.fuzzySearch.background"
+      [class.selected]="i === selection"
+      (click)="selectItem($event, element)"
+      [innerHtml]="formatText(element.key)">
+  </li>
+</ul>
