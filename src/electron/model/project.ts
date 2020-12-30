@@ -3,7 +3,7 @@ import { WorkspaceSymbols } from 'ngast';
 export class Project {
   projectSymbols: WorkspaceSymbols;
 
-  load(tsconfig: string) {
+  load(tsconfig: string): Promise<WorkspaceSymbols> {
     this.projectSymbols = new WorkspaceSymbols(
       tsconfig,
     );

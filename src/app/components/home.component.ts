@@ -51,7 +51,7 @@ export class HomeComponent {
   }
 
   loadProject() {
-    const filePaths = ['/Users/mgechev/Projects/angular-devtools/tsconfig.app.json'];
+    const filePaths = ['/Users/mgechev/Projects/angular-devtools/projects/ng-devtools/tsconfig.lib.json'];
     // window.require('electron').remote.dialog
     //   .showOpenDialog({ properties: ["openFile", "multiSelections"] })
     //   .then(({filePaths}) => {

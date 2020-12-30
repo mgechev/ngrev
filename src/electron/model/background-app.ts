@@ -50,7 +50,7 @@ export class BackgroundApp {
   private slaveProcess: SlaveProcess;
   private taskQueue: TaskQueue;
 
-  init(config: Partial<Config>) {
+  init(config: Partial<Config>): void {
     this.slaveProcess = SlaveProcess.create(join(__dirname, '..', 'parser.js'));
     this.taskQueue = new TaskQueue();
 

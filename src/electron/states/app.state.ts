@@ -79,9 +79,6 @@ export class AppState extends State {
       this.states.push(new ModuleTreeState(this.context, m));
     });
     if (!this.showModules) {
-      this.context.getAllModules().forEach(m => {
-        this.states.push(new AppModuleState(this.context, m));
-      });
       this.context.getAllDirectives().forEach(d => {
         this.states.push(new DirectiveState(this.context, d, false));
       });
@@ -89,6 +86,7 @@ export class AppState extends State {
         this.states.push(new DirectiveState(this.context, d, false));
       });
       this.context.getAllInjectable().forEach(p => {
+        console.log('###', p.name);
         this.states.push(new ProviderState(this.context, p));
       });
       this.context.getAllPipes().forEach(p => {
