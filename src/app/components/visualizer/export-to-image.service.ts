@@ -1,12 +1,11 @@
 import { Message } from "../../../shared/ipc-constants";
 import { IPCBus } from "../../model/ipc-bus";
-import { remote } from "electron";
-// import { writeFileSync } from "fs";
 import { Injectable } from "@angular/core";
+declare const require: any;
 const sanitizeFilename = require("sanitize-filename");
 
 function arrayBufferToBuffer(ab) {
-  const buffer = new Buffer(ab.byteLength);
+  const buffer = new window.Buffer(ab.byteLength);
   const view = new Uint8Array(ab);
   for (let i = 0; i < buffer.length; ++i) {
     buffer[i] = view[i];
@@ -54,14 +53,14 @@ export class ExportToImage {
             image: r.result,
             format: "png",
           };
-          remote.dialog
-            .showSaveDialog(remote.BrowserWindow.getAllWindows()[0], {
+          window.require('electron').remote.dialog
+            .showSaveDialog(window.require('electron').remote.BrowserWindow.getAllWindows()[0], {
               title: "Export to Image",
               defaultPath: sanitizeFilename(data.name + "." + data.format),
             })
             .then(result => {
-              // TODO(mgechev) enable
-              // writeFileSync(result.filePath, arrayBufferToBuffer(data.image));
+              const fs = window.require('fs');
+              fs.writeFileSync(result.filePath, arrayBufferToBuffer(data.image));
             });
         };
         r.readAsArrayBuffer(b);

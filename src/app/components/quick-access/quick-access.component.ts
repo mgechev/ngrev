@@ -12,6 +12,8 @@ import {
 } from '@angular/core';
 import { Theme } from '../../../shared/themes/color-map';
 
+declare const require: any;
+
 const Fuse = require('fuse.js');
 
 const MetaKeyCodes = [91, 17];

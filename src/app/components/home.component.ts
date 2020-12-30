@@ -1,10 +1,10 @@
 import { Component, Output, EventEmitter, Input } from "@angular/core";
 
 import { Network } from "vis";
-import { remote } from "electron";
 import { Configuration } from "../model/configuration";
 import { Config } from "../../shared/data-format";
 
+declare const require: any;
 @Component({
   selector: "ngrev-home",
   template: ` <button (click)="loadProject()">Select Project</button> `,
@@ -47,7 +47,7 @@ export class HomeComponent {
   constructor(private configProvider: Configuration) {}
 
   loadProject() {
-    remote.dialog
+    window.require('electron').remote.dialog
       .showOpenDialog({ properties: ["openFile", "multiSelections"] })
       .then((files) => {
         let config: Config;

@@ -1,9 +1,8 @@
-import { ipcRenderer } from 'electron';
-import { Message, Status } from '../../shared/ipc-constants';
+import { Message, Status } from "../../shared/ipc-constants";
 
 const NonBlocking = {
   [Message.EnableExport]: true,
-  [Message.DisableExport]: true
+  [Message.DisableExport]: true,
 };
 
 export class IPCBus {
@@ -11,14 +10,15 @@ export class IPCBus {
 
   send(method: Message, data?: any): Promise<any> {
     if (this.pending && !NonBlocking[method]) {
-      console.log('Trying to send request', method);
-      return Promise.reject('Pending requests');
+      console.log("Trying to send request", method);
+      return Promise.reject("Pending requests");
     }
     this.blocked = true;
-    console.log('Sending method call', method);
+    console.log("Sending method call", method);
     return new Promise((resolve, reject) => {
+      const { ipcRenderer } = window.require("electron");
       ipcRenderer.once(method, (e, code, payload) => {
-        console.log('Got response of type', method);
+        console.log("Got response of type", method);
         if (code === Status.Success) {
           resolve(payload);
         } else {
@@ -35,6 +35,7 @@ export class IPCBus {
   }
 
   on(event: string, cb: any): () => void {
+    const { ipcRenderer } = window.require("electron");
     ipcRenderer.addListener(event, cb);
     return () => ipcRenderer.removeListener(event, cb);
   }

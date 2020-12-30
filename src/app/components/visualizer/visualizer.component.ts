@@ -11,7 +11,6 @@ import {
   ChangeDetectorRef
 } from '@angular/core';
 import { Network, DataSet } from 'vis';
-import { remote, shell } from 'electron';
 
 import { VisualizationConfig, Layout, Metadata, Direction, SymbolTypes } from '../../../shared/data-format';
 import { DefaultColor, Theme } from '../../../shared/themes/color-map';
@@ -198,7 +197,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
   }
 
   private showContextMenu(id: string, metadata: Metadata) {
-    const { Menu, MenuItem } = remote;
+    const { Menu, MenuItem } = window.require('electron');
     const menu = new Menu();
     const self = this;
     if (metadata && metadata.filePath) {
@@ -207,7 +206,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
           label: 'Open File',
           click() {
             if (metadata && metadata.filePath) {
-              shell.openPath(metadata.filePath);
+              window.require('electron').shell.openPath(metadata.filePath);
             }
           }
         })
@@ -236,7 +235,7 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
         })
       );
     }
-    menu.popup({ window: remote.getCurrentWindow() });
+    menu.popup({ window: window.require('electron').remote.getCurrentWindow() });
   }
 
   private stateChanged(changes: SimpleChanges) {

@@ -1,5 +1,4 @@
 import { Component, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
-import { remote } from 'electron';
 import { ProjectProxy } from '../model/project-proxy';
 import { Config } from '../../shared/data-format';
 import { KeyValuePair, QuickAccessComponent } from './quick-access/quick-access.component';
@@ -177,7 +176,7 @@ export class AppComponent {
         .then(symbols => (this.queryList = symbols.map(s => ({ key: s.name, value: s }))))
         .then(this._stopLoading)
         .catch(error => {
-          remote.dialog.showErrorBox(
+          window.require('electron').remote.dialog.showErrorBox(
             'Error while parsing project',
             "Cannot parse your project. Make sure it's " +
               "compatible with the Angular's AoT compiler. Error during parsing:\n\n" +
