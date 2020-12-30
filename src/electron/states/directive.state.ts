@@ -3,9 +3,9 @@ import {
   WorkspaceSymbols,
   ComponentSymbol,
   InjectableSymbol,
-} from "ngast";
-import { State } from "./state";
-import { TmplAstElement } from "@angular/compiler";
+} from 'ngast';
+import { State } from './state';
+import { TmplAstElement } from '@angular/compiler';
 import {
   VisualizationConfig,
   Metadata,
@@ -15,21 +15,20 @@ import {
   SymbolTypes,
   Direction,
   Edge,
-} from "../../shared/data-format";
+} from '../../shared/data-format';
 import {
   getDirectiveMetadata,
   getElementMetadata,
-} from "../formatters/model-formatter";
-import { TemplateState } from "./template.state";
+} from '../formatters/model-formatter';
+import { TemplateState } from './template.state';
 
 interface NodeMap {
   [id: string]: DirectiveSymbol | TmplAstElement;
 }
 
-const TemplateId = "template";
-const DependenciesId = "dependencies";
-const ViewProvidersId = "view-providers";
-const ProvidersId = "providers";
+const TemplateId = 'template';
+const DependenciesId = 'dependencies';
+const ProvidersId = 'providers';
 
 export class DirectiveState extends State {
   private symbols: NodeMap = {};
@@ -44,7 +43,6 @@ export class DirectiveState extends State {
 
   getMetadata(id: string): Metadata | null {
     const s = this.symbols[id];
-    console.log(Object.keys(this.symbols));
     if (s) {
       if (s instanceof TmplAstElement) {
         return getElementMetadata(s);
@@ -55,7 +53,7 @@ export class DirectiveState extends State {
     return null;
   }
 
-  nextState(id: string) {
+  nextState(id: string): State | null {
     if (id === TemplateId && this.directive instanceof ComponentSymbol) {
       return new TemplateState(this.context, this.directive);
     }
@@ -89,7 +87,7 @@ export class DirectiveState extends State {
       if (this.directive instanceof ComponentSymbol) {
         nodes.push({
           id: TemplateId,
-          label: "Template",
+          label: 'Template',
           type: {
             type: SymbolTypes.Meta,
             angular: false,
@@ -105,24 +103,17 @@ export class DirectiveState extends State {
         nodes,
         edges,
         addedSymbols,
-        "Dependencies",
+        'Dependencies',
         DependenciesId,
         this.directive.getDependencies() as InjectableSymbol[]
       );
+      console.log('Dependencies of the directive', this.directive.getDependencies());
       this.addProviderNodes(
         nodes,
         edges,
         addedSymbols,
-        "Providers",
+        'Providers',
         ProvidersId,
-        this.directive.getProviders() as InjectableSymbol[]
-      );
-      this.addProviderNodes(
-        nodes,
-        edges,
-        addedSymbols,
-        "View Providers",
-        ViewProvidersId,
         this.directive.getProviders() as InjectableSymbol[]
       );
     }
@@ -168,7 +159,7 @@ export class DirectiveState extends State {
       if (id === null) {
         return;
       }
-      existing[id] = (existing[id] || 0) + 1;
+      existing[id] = parseInt((existing[id] || 0)) + 1;
       const node: Node<any> = {
         id,
         data: p,

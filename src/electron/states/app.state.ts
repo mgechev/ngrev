@@ -18,11 +18,11 @@ export class AppState extends State {
     this.init();
   }
 
-  get showLibs() {
+  get showLibs(): boolean {
     return this._showLibs;
   }
 
-  get showModules() {
+  get showModules(): boolean {
     return this._showModules;
   }
 
@@ -33,7 +33,7 @@ export class AppState extends State {
     }, null);
   }
 
-  nextState(id: string) {
+  nextState(): null {
     return null;
   }
 

@@ -4,7 +4,7 @@ import { SymbolIndex, SymbolData } from './model/symbol-index';
 import { Message } from '../shared/ipc-constants';
 import { State } from './states/state';
 import { Project } from './model/project';
-import { Symbol } from 'ngast';
+import { AnnotationNames, Symbol } from 'ngast';
 import {
   ParentProcess,
   LoadProjectRequest,
@@ -15,14 +15,13 @@ import {
   GetMetadataRequest,
   GetDataRequest
 } from './helpers/process';
-import { StaticSymbol } from '@angular/compiler';
 
 export class BackgroundApp {
   private project: Project;
   private states: State[] = [];
   private parentProcess = new ParentProcess();
 
-  init() {
+  init(): void {
     this.parentProcess.on(Message.LoadProject, (data: LoadProjectRequest, responder: Responder) => {
       this.states.forEach(s => s.destroy());
       SymbolIndex.clear();
@@ -34,8 +33,11 @@ export class BackgroundApp {
       try {
         this.project.load(data.tsconfig);
         const allModules = this.project.projectSymbols.getAllModules();
+        const bootstrapModule = allModules.filter(m => {
+          return m.getBootstap().length > 0;
+        }).pop();
         if (!parseError) {
-          const module = allModules[0]
+          const module = bootstrapModule ?? allModules[0];
           if (module) {
             console.log('Project loaded');
             this.states.push(new AppState(this.project.projectSymbols, data.showLibs, data.showModules));
@@ -129,7 +131,7 @@ export class BackgroundApp {
       const res: any[] = [];
       try {
         const map = SymbolIndex.getIndex(this.project.projectSymbols);
-        map.forEach((data: SymbolData, id: string) => {
+        map.forEach((data: SymbolData<AnnotationNames>, id: string) => {
           if (data.symbol instanceof Symbol) {
             res.push({ id, name: data.symbol.name, annotation: data.symbol.annotation, path: data.symbol.path });
           }

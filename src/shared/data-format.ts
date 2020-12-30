@@ -1,5 +1,4 @@
-import { StaticSymbol, R3InjectableMetadata } from '@angular/compiler';
-import { AnnotationNames, InjectableSymbol, Symbol } from 'ngast';
+import { R3InjectableMetadata } from '@angular/compiler';
 import { Theme } from './themes/color-map';
 
 export interface Graph<T> {
@@ -73,19 +72,17 @@ export interface Metadata {
   filePath?: string | null;
 }
 
-export const getId = (symbol: { name: string; path: string }) => {
+export const getId = (symbol: { name: string; path: string }): string => {
   return `${symbol.path}#${symbol.name}`;
 };
 
-export const getProviderName = (provider: R3InjectableMetadata) => {
+export const getProviderName = (provider: R3InjectableMetadata): string | null => {
   if (provider.type.value) {
     return provider.name;
   }
   return null;
 };
 
-export const isAngularSymbol = (symbol: any) => {
-  // TODO
-  return false;
-  // return /node_modules\/@angular/.test(s);
+export const isAngularSymbol = (symbol: { path: string }): boolean => {
+  return /node_modules\/@angular/.test(symbol.path);
 };

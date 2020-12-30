@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy } from '@angular/core';
 import { ComponentSymbol, DirectiveSymbol, InjectableSymbol, NgModuleSymbol, PipeSymbol } from 'ngast';
 import { Metadata } from '../../shared/data-format';
-import { StaticSymbol, TmplAstElement } from '@angular/compiler';
+import { TmplAstElement } from '@angular/compiler';
 
 const _changeDetectionToString = (cd: ChangeDetectionStrategy | undefined): string | null => {
   switch (cd) {

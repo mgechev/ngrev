@@ -4,19 +4,19 @@ import { getId } from '../../shared/data-format';
 import { PipeState } from '../states/pipe.state';
 import { DirectiveState } from '../states/directive.state';
 import { ModuleTreeState } from '../states/module-tree.state';
-import { textSpanContainsTextSpan } from 'typescript';
 import { ProviderState } from '../states/provider.state';
 
 export interface StateFactory {
   (): State;
 }
 
-export interface SymbolData {
+export interface SymbolData<T extends AnnotationNames> {
   stateFactory: StateFactory;
-  symbol: Symbol<AnnotationNames>;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  symbol: Symbol<T>;
 }
 
-export type Index = Map<string, SymbolData>;
+export type Index = Map<string, SymbolData<AnnotationNames>>;
 
 export interface ISymbolIndex {
   getIndex(context: WorkspaceSymbols): Index;
@@ -30,7 +30,7 @@ class SymbolIndexImpl {
     if (this.symbolsIndex && this.symbolsIndex.size) {
       return this.symbolsIndex;
     }
-    this.symbolsIndex = new Map<string, SymbolData>();
+    this.symbolsIndex = new Map<string, SymbolData<AnnotationNames>>();
     context.getAllInjectable().forEach(symbol => {
       this.symbolsIndex.set(getId(symbol), {
         symbol,
@@ -63,11 +63,19 @@ class SymbolIndexImpl {
         }
       })
     );
+    context.getAllComponents().forEach(symbol =>
+      this.symbolsIndex.set(getId(symbol), {
+        symbol,
+        stateFactory() {
+          return new DirectiveState(context, symbol);
+        }
+      })
+    );
     return this.symbolsIndex;
   }
 
   clear() {
-    this.symbolsIndex = new Map<string, SymbolData>();
+    this.symbolsIndex = new Map<string, SymbolData<AnnotationNames>>();
   }
 }
 

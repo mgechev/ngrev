@@ -35,7 +35,7 @@ export class AppModuleState extends State {
     if (!data) {
       return null;
     }
-    if (data.symbol instanceof DirectiveSymbol) {
+    if (data.symbol instanceof DirectiveSymbol || data.symbol instanceof ComponentSymbol) {
       return getDirectiveMetadata(data.symbol);
     } else if (data.symbol instanceof InjectableSymbol) {
       return getProviderMetadata(data.symbol);
@@ -45,7 +45,7 @@ export class AppModuleState extends State {
     return null;
   }
 
-  nextState(nodeId: string) {
+  nextState(nodeId: string): State | null {
     if (nodeId === this.symbolId) {
       return null;
     }
@@ -53,7 +53,7 @@ export class AppModuleState extends State {
     if (!data) {
       return null;
     }
-    if (data.symbol instanceof DirectiveSymbol) {
+    if (data.symbol instanceof DirectiveSymbol || data.symbol instanceof ComponentSymbol) {
       return new DirectiveState(this.context, data.symbol);
     } else if (data.symbol instanceof InjectableSymbol) {
       return new ProviderState(this.context, data.symbol);
@@ -80,47 +80,38 @@ export class AppModuleState extends State {
       }
     };
     const edges: Edge[] = [];
-    const declarations = this.module.getDeclarations();
-    if (declarations.length) {
-      declarations.forEach(node => {
-        if (node instanceof PipeSymbol) {
-          this._appendSet(currentModuleId, node, nodes, SymbolTypes.Pipe, edges);
-        } else {
-          this._appendSet(currentModuleId, node, nodes, SymbolTypes.ComponentOrDirective, edges);
-        }
-      });
-    }
 
-    const exports = this.module.getExports();
-    if (exports.length) {
-      exports.forEach(node => {
-        if (node instanceof PipeSymbol) {
-          this._appendSet(currentModuleId, node, nodes, SymbolTypes.Pipe, edges);
-        } else if (node instanceof DirectiveSymbol || node instanceof ComponentSymbol) {
-          this._appendSet(currentModuleId, node, nodes, SymbolTypes.ComponentOrDirective, edges);
-        }
-      });
-    }
-    const providers = this.module.getProviders().reduce((prev: any, p) => {
-      if (!(p instanceof InjectableSymbol)) {
-        return prev;
+    this.module.getDeclarations().forEach(node => {
+      if (node instanceof PipeSymbol) {
+        this._appendSet(currentModuleId, node, nodes, SymbolTypes.Pipe, edges);
+      } else {
+        this._appendSet(currentModuleId, node, nodes, SymbolTypes.ComponentOrDirective, edges);
       }
-      const id = getId(p);
-      prev[id] = p;
-      return prev;
-    }, {});
-    Object.keys(providers).forEach(key => {
-      this._appendSet(currentModuleId, providers[key], nodes, SymbolTypes.Provider, edges);
     });
+
+    this.module.getExports().forEach(node => {
+      if (node instanceof PipeSymbol) {
+        this._appendSet(currentModuleId, node, nodes, SymbolTypes.Pipe, edges);
+      } else if (node instanceof DirectiveSymbol || node instanceof ComponentSymbol) {
+        this._appendSet(currentModuleId, node, nodes, SymbolTypes.ComponentOrDirective, edges);
+      }
+    });
+
+    this.module.getProviders().forEach(provider => {
+      if (!(provider instanceof InjectableSymbol)) {
+        return;
+      }
+      this._appendSet(currentModuleId, provider, nodes, SymbolTypes.Provider, edges);
+    });
+
     this.symbols = nodes;
     return {
       title: this.module.name,
       graph: {
-        nodes: Object.keys(nodes).map((key: string) => {
-          const node: any = Object.assign({}, nodes[key]);
-          node.id = key;
+        nodes: Object.keys(nodes).map((id: string) => {
+          const node = nodes[id];
           return {
-            id: node.id,
+            id,
             type: node.type,
             label: node.label
           };
