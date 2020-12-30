@@ -118,9 +118,9 @@ export class ModuleState extends State {
     if (exports.length) {
       exports.forEach(node => {
         if (node instanceof PipeSymbol) {
-          this._appendSet(DeclarationsId, node, nodes, SymbolTypes.Pipe, edges);
+          this._appendSet(ExportsId, node, nodes, SymbolTypes.Pipe, edges);
         } else if (node instanceof DirectiveSymbol || node instanceof ComponentSymbol) {
-          this._appendSet(DeclarationsId, node, nodes, SymbolTypes.ComponentOrDirective, edges);
+          this._appendSet(ExportsId, node, nodes, SymbolTypes.ComponentOrDirective, edges);
         }
       });
       nodes[ExportsId] = {
