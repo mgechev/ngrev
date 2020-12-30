@@ -54,7 +54,7 @@ export class ModuleState extends State {
     return null;
   }
 
-  nextState(nodeId: string) {
+  nextState(nodeId: string): State | null {
     if (nodeId === this.symbolId) {
       return null;
     }
@@ -62,7 +62,7 @@ export class ModuleState extends State {
     if (!data) {
       return null;
     }
-    if (data.symbol instanceof DirectiveSymbol) {
+    if (data.symbol instanceof DirectiveSymbol || data.symbol instanceof ComponentSymbol) {
       return new DirectiveState(this.context, data.symbol);
     } else if (data.symbol instanceof InjectableSymbol) {
       return new ProviderState(this.context, data.symbol);
@@ -114,6 +114,26 @@ export class ModuleState extends State {
       edges.push({ from: currentModuleId, to: DeclarationsId });
     }
 
+    const bootstrap = this.module.getBootstap();
+    if (bootstrap.length) {
+      bootstrap.forEach(s => {
+        this._appendSet(BootstrapId, s, nodes, SymbolTypes.ComponentOrDirective, edges);
+      });
+      nodes[BootstrapId] = {
+        id: BootstrapId,
+        label: 'Bootstrap',
+        data: {
+          symbol: null,
+          metadata: null
+        },
+        type: {
+          angular: false,
+          type: SymbolTypes.Meta
+        }
+      };
+      edges.push({ from: currentModuleId, to: BootstrapId });
+    }
+
     const exports = this.module.getExports();
     if (exports.length) {
       exports.forEach(node => {
@@ -137,15 +157,13 @@ export class ModuleState extends State {
       };
       edges.push({ from: currentModuleId, to: ExportsId });
     }
-    const providers = this.module.getProviders().reduce((prev: any, p) => {
-      if (!(p instanceof InjectableSymbol)) {
-        return prev;
+    const providers = this.module.getProviders().filter(provider => {
+      if (!(provider instanceof InjectableSymbol)) {
+        return false;
       }
-      const id = getId(p);
-      prev[id] = p;
-      return prev;
-    }, {});
-    if (Object.keys(providers).length) {
+      return true;
+    }) as InjectableSymbol[];
+    if (providers.length) {
       edges.push({ from: currentModuleId, to: ProvidersId });
       nodes[ProvidersId] = {
         id: ProvidersId,
@@ -159,19 +177,18 @@ export class ModuleState extends State {
           type: SymbolTypes.Meta
         }
       };
+      providers.forEach(provider => {
+        this._appendSet(ProvidersId, provider, nodes, SymbolTypes.Provider, edges);
+      });
     }
-    Object.keys(providers).forEach(key => {
-      this._appendSet(ProvidersId, providers[key], nodes, SymbolTypes.Provider, edges);
-    });
     this.symbols = nodes;
     return {
       title: this.module.name,
       graph: {
-        nodes: Object.keys(nodes).map((key: string) => {
-          const node: any = Object.assign({}, nodes[key]);
-          node.id = key;
+        nodes: Object.keys(nodes).map((id: string) => {
+          const node = nodes[id];
           return {
-            id: node.id,
+            id,
             type: node.type,
             label: node.label
           };

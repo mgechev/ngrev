@@ -46,19 +46,24 @@ export class HomeComponent {
 
   constructor(private configProvider: Configuration) {}
 
-  loadProject() {
-    window.require('electron').remote.dialog
-      .showOpenDialog({ properties: ["openFile", "multiSelections"] })
-      .then(({filePaths}) => {
-        let config: Config;
-        this.configProvider.getConfig().then((conf: Config) => {
-          config = conf;
-          this.config = config;
+  ngAfterViewInit() {
+    this.loadProject();
+  }
 
-          if (filePaths && filePaths[0]) {
-            this.project.emit({ tsconfig: filePaths[0], config: this.config });
-          }
-        });
-      });
+  loadProject() {
+    const filePaths = ['/Users/mgechev/Projects/angular-devtools/tsconfig.app.json'];
+    // window.require('electron').remote.dialog
+    //   .showOpenDialog({ properties: ["openFile", "multiSelections"] })
+    //   .then(({filePaths}) => {
+    let config: Config;
+    this.configProvider.getConfig().then((conf: Config) => {
+      config = conf;
+      this.config = config;
+
+      if (filePaths && filePaths[0]) {
+        this.project.emit({ tsconfig: filePaths[0], config: this.config });
+      }
+    });
+  // });
   }
 }
