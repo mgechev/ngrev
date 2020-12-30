@@ -65,20 +65,27 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
   @Output()
   highlight = new EventEmitter<string>();
 
-  @ViewChild('container')
-  container: ElementRef;
+  @ViewChild('container') container: ElementRef;
 
   usedColors: ColorLegend;
   metadata: Metadata | null;
 
   private network: Network | null;
+  private initialized = false;
 
   private clickTimeout = 0;
 
   constructor(private exportToImage: ExportToImage, private cd: ChangeDetectorRef) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (this.stateChanged(changes)) {
+    if (this.stateChanged(changes) && this.initialized) {
+      this.updateData(this.data);
+    }
+  }
+
+  ngAfterViewInit() {
+    this.initialized = true;
+    if (this.data) {
       this.updateData(this.data);
     }
   }

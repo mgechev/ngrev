@@ -49,14 +49,14 @@ export class HomeComponent {
   loadProject() {
     window.require('electron').remote.dialog
       .showOpenDialog({ properties: ["openFile", "multiSelections"] })
-      .then((files) => {
+      .then(({filePaths}) => {
         let config: Config;
         this.configProvider.getConfig().then((conf: Config) => {
           config = conf;
           this.config = config;
 
-          if (files && files[0]) {
-            this.project.emit({ tsconfig: files[0], config: this.config });
+          if (filePaths && filePaths[0]) {
+            this.project.emit({ tsconfig: filePaths[0], config: this.config });
           }
         });
       });

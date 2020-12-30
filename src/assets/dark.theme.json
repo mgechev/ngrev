@@ -1,0 +1,162 @@
+{
+  "name": "Dark",
+  "background": "#2E3440",
+  "historyLabel": "#D8DEE9",
+  "fuzzySearch": {
+    "font": "#D8DEE9",
+    "background": "#2E3440",
+    "border": "1px solid #999",
+    "shadowColor": "#D8DEE9",
+    "selected": "#4C5669"
+  },
+  "legend": {
+    "background": "#3D4455",
+    "font": "#7EB7BB",
+    "title": "#7EB7BB",
+    "border": "1px solid #999"
+  },
+  "backButton": {
+    "border": "none",
+    "background": "#4C5669",
+    "font": "#D8DEE9"
+  },
+  "arrow": {
+    "color": "#D8DEE9",
+    "highlight": "#E5E9F0"
+  },
+  "component": {
+    "margin": 10,
+    "color": {
+      "background": "#BE616B",
+      "border": "#914A52",
+      "highlight": {
+        "background": "#BE616B",
+        "border": "#914A52"
+      }
+    },
+    "labelHighlightBold": false,
+    "font": {
+      "color": "#FFFFFF"
+    }
+  },
+  "component-or-directive": {
+    "margin": 10,
+    "color": {
+      "background": "#CF8772",
+      "border": "#A16959",
+      "highlight": {
+        "background": "#CF8772",
+        "border": "#A16959"
+      }
+    },
+    "labelHighlightBold": false,
+    "font": {
+      "color": "#FFFFFF"
+    }
+  },
+  "component-with-directive": {
+    "margin": 10,
+    "color": {
+      "background": "#EACA8F",
+      "border": "#B89F70",
+      "highlight": {
+        "background": "#EACA8F",
+        "border": "#B89F70"
+      }
+    },
+    "labelHighlightBold": false,
+    "font": {
+      "color": "#FFFFFF"
+    }
+  },
+  "html-element": {
+    "margin": 10,
+    "color": {
+      "background": "#A4BD8E",
+      "border": "#849872",
+      "highlight": {
+        "background": "#A4BD8E",
+        "border": "#849872"
+      }
+    },
+    "labelHighlightBold": false,
+    "font": {
+      "color": "#FFFFFF"
+    }
+  },
+  "html-element-with-directive": {
+    "margin": 10,
+    "color": {
+      "background": "#B38FAC",
+      "border": "#8B6F86",
+      "highlight": {
+        "background": "#B38FAC",
+        "border": "#8B6F86"
+      }
+    },
+    "labelHighlightBold": false,
+    "font": {
+      "color": "#FFFFFF"
+    }
+  },
+  "module": {
+    "margin": 10,
+    "color": {
+      "background": "#5F82AA",
+      "border": "#496483",
+      "highlight": {
+        "background": "#5F82AA",
+        "border": "#496483"
+      }
+    },
+    "labelHighlightBold": false,
+    "font": {
+      "color": "#FFFFFF"
+    }
+  },
+  "lazy-module": {
+    "margin": 10,
+    "color": {
+      "background": "#90BCBB",
+      "border": "#749897",
+      "highlight": {
+        "background": "#90BCBB",
+        "border": "#749897"
+      }
+    },
+    "labelHighlightBold": false,
+    "font": {
+      "color": "#FFFFFF"
+    }
+  },
+  "provider": {
+    "margin": 10,
+    "color": {
+      "background": "#8AC0CF",
+      "border": "#6B95A1",
+      "highlight": {
+        "background": "#8AC0CF",
+        "border": "#6B95A1"
+      }
+    },
+    "labelHighlightBold": false,
+    "font": {
+      "color": "#FFFFFF"
+    }
+  },
+  "pipe": {
+    "margin": 10,
+    "color": {
+      "background": "#82A1C0",
+      "border": "#637B92",
+      "highlight": {
+        "background": "#82A1C0",
+        "border": "#637B92"
+      }
+    },
+    "labelHighlightBold": false,
+    "font": {
+      "color": "#FFFFFF"
+    }
+  }
+}

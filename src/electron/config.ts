@@ -4,9 +4,11 @@ import { readFileSync, readdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { app } from 'electron';
 
-const builtInThemesMap = readdirSync(__dirname)
+
+// Handle the case when the theme is not there
+const builtInThemesMap = readdirSync(join(__dirname, '..', 'assets'))
   .filter(f => f.endsWith('.theme.json'))
-  .map(f => JSON.parse(readFileSync(join(__dirname, f)).toString()))
+  .map(f => JSON.parse(readFileSync(join(__dirname, '..', 'assets', f)).toString()))
   .reduce((a, theme) => {
     a[theme.name] = theme;
     return a;

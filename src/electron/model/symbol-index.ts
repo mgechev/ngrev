@@ -4,6 +4,8 @@ import { getId } from '../../shared/data-format';
 import { PipeState } from '../states/pipe.state';
 import { DirectiveState } from '../states/directive.state';
 import { ModuleTreeState } from '../states/module-tree.state';
+import { textSpanContainsTextSpan } from 'typescript';
+import { ProviderState } from '../states/provider.state';
 
 export interface StateFactory {
   (): State;
@@ -29,6 +31,14 @@ class SymbolIndexImpl {
       return this.symbolsIndex;
     }
     this.symbolsIndex = new Map<string, SymbolData>();
+    context.getAllInjectable().forEach(symbol => {
+      this.symbolsIndex.set(getId(symbol), {
+        symbol,
+        stateFactory() {
+          return new ProviderState(context, symbol);
+        }
+      });
+    });
     context.getAllPipes().forEach(symbol =>
       this.symbolsIndex.set(getId(symbol), {
         symbol,

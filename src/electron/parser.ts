@@ -126,12 +126,12 @@ export class BackgroundApp {
 
     this.parentProcess.on(Message.GetSymbols, (data: GetSymbolsRequest, responder: Responder) => {
       console.log('Get symbols');
-      let res: any[] = [];
+      const res: any[] = [];
       try {
         const map = SymbolIndex.getIndex(this.project.projectSymbols);
         map.forEach((data: SymbolData, id: string) => {
           if (data.symbol instanceof Symbol) {
-            res.push(Object.assign({}, data.symbol, { id }));
+            res.push({ id, name: data.symbol.name, annotation: data.symbol.annotation, path: data.symbol.path });
           }
         });
       } catch (e) {
