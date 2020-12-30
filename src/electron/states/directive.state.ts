@@ -138,6 +138,7 @@ export class DirectiveState extends State {
     rootId: string,
     providers: InjectableSymbol[]
   ) {
+    console.log('Total provider for directive', this.directive.name, providers.length);
     if (providers.length > 0) {
       nodes.push({
         id: rootId,
