@@ -31,7 +31,11 @@ export class AppModuleState extends State {
   }
 
   getMetadata(id: string): Metadata | null {
-    const data = this.symbols[id].data;
+    const symbol = this.symbols[id];
+    if (!symbol) {
+      return null;
+    }
+    const data = symbol.data;
     if (!data) {
       return null;
     }

@@ -53,17 +53,12 @@ export const TypeToNameMap = {
   ]
 })
 export class VisualizerComponent implements OnChanges, OnDestroy {
-  @Input()
-  data: VisualizationConfig<any>;
-  @Input()
-  metadataResolver: (id: string) => Promise<Metadata>;
-  @Input()
-  theme: Theme;
+  @Input() data: VisualizationConfig<any>;
+  @Input() metadataResolver: (id: string) => Promise<Metadata>;
+  @Input() theme: Theme;
 
-  @Output()
-  select = new EventEmitter<string>();
-  @Output()
-  highlight = new EventEmitter<string>();
+  @Output() select = new EventEmitter<string>();
+  @Output() highlight = new EventEmitter<string>();
 
   @ViewChild('container') container: ElementRef;
 
@@ -72,25 +67,24 @@ export class VisualizerComponent implements OnChanges, OnDestroy {
 
   private network: Network | null;
   private initialized = false;
-
   private clickTimeout = 0;
 
   constructor(private exportToImage: ExportToImage, private cd: ChangeDetectorRef) {}
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (this.stateChanged(changes) && this.initialized) {
       this.updateData(this.data);
     }
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.initialized = true;
     if (this.data) {
       this.updateData(this.data);
     }
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.network) {
       this.network.destroy();
       this.network = null;

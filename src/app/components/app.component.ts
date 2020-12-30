@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, NgZone, ViewChild } from '@angular/core';
 import { ProjectProxy } from '../model/project-proxy';
-import { Config } from '../../shared/data-format';
+import { Config, Metadata } from '../../shared/data-format';
 import { KeyValuePair, QuickAccessComponent } from './quick-access/quick-access.component';
 import { SymbolWithId, formatError } from '../shared/utils';
 import { StateManager, Memento } from '../model/state-manager';
@@ -107,7 +107,7 @@ export class AppComponent {
   @ViewChild(QuickAccessComponent)
   quickAccess: QuickAccessComponent;
 
-  resolveMetadata = (nodeId: string) => {
+  resolveMetadata = (nodeId: string): Promise<Metadata | boolean> => {
     this.loading = true;
     return this.manager
       .getMetadata(nodeId)
