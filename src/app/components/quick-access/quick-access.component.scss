@@ -1,0 +1,27 @@
+:host {
+  margin: auto;
+  margin-top: 45px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 70%;
+  max-width: 600px;
+  height: calc(100% - 45px);
+  z-index: 15;
+}
+.fuzzy-box {
+  padding: 5px;
+  width: 100%;
+  max-height: 80%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.fuzzy-box input {
+  max-height: 60px;
+  font-size: 35px;
+  outline: none;
+  padding: 7px;
+}

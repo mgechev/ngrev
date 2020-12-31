@@ -10,13 +10,16 @@ export class Memento {
   constructor(public state: VisualizationConfig<any>, public dirty = false) {}
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class StateManager {
+  private state?: StateProxy;
   private history: Memento[] = [];
   private transitionInProgress: string | null = null;
   private transitionResolveQueue: { resolve: (value?: unknown) => void; reject: (value?: unknown) => void }[] = [];
 
-  constructor(private project: ProjectProxy, private state: StateProxy, private bus: IPCBus) {}
+  constructor(private project: ProjectProxy, private bus: IPCBus) {}
 
   getHistory() {
     return this.history;
@@ -25,6 +28,8 @@ export class StateManager {
   loadProject(tsconfig: string, showLibs: boolean, showModules: boolean) {
     return this.project
       .load(tsconfig, showLibs, showModules)
+      // TODO: StateProxy is gonna be created everytime the same as IPCBus. Maybe it would be great to use only one,
+      //  provided by angular service, just reset the state after loading new project.
       .then(() => (this.state = new StateProxy()))
       .then((proxy: StateProxy) => proxy.getData())
       .then(data => this.history.push(new Memento(data)));

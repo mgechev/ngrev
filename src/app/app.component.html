@@ -1,0 +1,34 @@
+<button ngrev-button buttonType="back" [style.color]="theme.backButton.font"
+        [style.background]="theme.backButton.background"
+        [style.border]="theme.backButton.border"
+        (click)="prevState()"
+        *ngIf="initialized && !loading && manager.getHistory().length > 1">Back</button>
+
+<ngrev-state-navigation
+  [maxWidth]="maxWidth$ | async"
+  [states]="manager.getHistory()"
+  [theme]="theme"
+  (select)="restoreMemento($event)">
+</ngrev-state-navigation>
+
+<!--TODO: Create separated route?-->
+<ngrev-home *ngIf="!projectSet" (project)="onProject($event)"></ngrev-home>
+
+<ngrev-visualizer
+  *ngIf="initialized"
+  [data]="initialized"
+  [theme]="theme"
+  [metadataResolver]="resolveMetadata"
+  (select)="tryChangeState($event)">
+</ngrev-visualizer>
+
+<ngrev-quick-access
+  *ngIf="initialized"
+  (select)="selectSymbol($event)"
+  [theme]="theme"
+  [queryList]="queryList"
+  [queryObject]="queryObject"
+>
+</ngrev-quick-access>
+
+<ngrev-spinner *ngIf="projectSet && loading"></ngrev-spinner>

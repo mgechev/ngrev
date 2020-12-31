@@ -41,6 +41,7 @@
     "lint": "ng lint"
   },
   "dependencies": {
+    "@angular/cdk": "11.0.3",
     "@types/vis": "^4.17.3",
     "fs-jetpack": "^0.10.2",
     "fuse.js": "^2.6.2",

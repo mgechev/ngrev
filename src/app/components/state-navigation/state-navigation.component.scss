@@ -1,0 +1,69 @@
+:host {
+  position: absolute;
+  top: 30px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+h2 {
+  text-align: center;
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 13px;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+ul {
+  list-style: none;
+  margin: auto;
+  padding: 0;
+  display: block;
+}
+
+li.state {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 2px;
+  position: relative;
+  cursor: pointer;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.tooltip {
+  display: none;
+  position: absolute;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px;
+  border-radius: 3px;
+  top: 24px;
+}
+
+.visible {
+  display: block;
+  font-size: 10px;
+}
+
+li.meta {
+  width: 30px;
+  height: 20px;
+  display: inline-block;
+  position: relative;
+}
+
+.label {
+  position: absolute;
+  top: -2px;
+  left: 13px;
+  font-size: 16px;
+  display: block;
+}
