@@ -6,12 +6,14 @@ import { StateManager, Memento } from './model/state-manager';
 import { Theme } from '../shared/themes/color-map';
 import { IPCBus } from './model/ipc-bus';
 import { Message } from '../shared/ipc-constants';
-import { fromEvent, Observable, Subscription } from 'rxjs';
-import { debounceTime, filter, map, startWith, tap } from 'rxjs/operators';
+import { fromEvent, merge, Observable, Subscription } from 'rxjs';
+import { debounceTime, filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 import { Configuration } from './model/configuration';
 import { ProjectLoadEvent } from './home';
 import { BACKSPACE } from '@angular/cdk/keycodes';
 import { KeyValuePair, QuickAccessComponent } from './components/quick-access';
+import { ipcOn, ipcSend } from './common/ipc';
+import { IpcService } from './common/ipc.service';
 
 @Component({
   selector: 'ngrev-app',
@@ -60,7 +62,8 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     private _project: ProjectProxy,
     private _changeDetectorRef: ChangeDetectorRef,
     private _ipcBus: IPCBus,
-    private _configuration: Configuration
+    private _configuration: Configuration,
+    private _ipcService: IpcService
   ) {
     this._configuration.getConfig().then((config: Config) => {
       this.themes = config.themes;
@@ -87,22 +90,32 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this._ipcBus.on(Message.ChangeTheme, (_: any, theme: string) => {
-      this.theme = this.themes[theme];
-      this._changeDetectorRef.detectChanges();
-    });
-    this._ipcBus.on(Message.ToggleLibsMenuAction, (_: any) => {
-      this.manager.toggleLibs().then(() => {
-        this.manager.reloadAppState();
+    // TODO: unsubscribe it;
+    merge(
+      this._ipcService.on<string>(Message.ChangeTheme).pipe(
+        tap((payload: string) => {
+          console.log('Message.ChangeTheme', NgZone.isInAngularZone());
+          this.theme = this.themes[payload];
+        })
+      ),
+      ipcOn<string>(Message.ToggleLibsMenuAction).pipe(
+        switchMap(() => ipcSend(Message.ToggleLibs)),
+        tap(() => {
+          console.log('Message.ToggleLibsMenuAction', NgZone.isInAngularZone());
+          this.manager.reloadAppState();
+        })
+      ),
+      ipcOn<string>(Message.ToggleModulesMenuAction).pipe(
+        switchMap(() => ipcSend(Message.ToggleModules)),
+        tap(() => {
+          this.manager.reloadAppState();
+        })
+      )
+    ).pipe(
+      tap(() => {
         this._changeDetectorRef.detectChanges();
-      });
-    });
-    this._ipcBus.on(Message.ToggleModulesMenuAction, (_: any) => {
-      this.manager.toggleModules().then(() => {
-        this.manager.reloadAppState();
-        this._changeDetectorRef.detectChanges();
-      });
-    });
+      })
+    ).subscribe();
   }
 
   ngOnDestroy(): void {
