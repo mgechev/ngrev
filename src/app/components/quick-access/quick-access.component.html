@@ -2,17 +2,19 @@
      [style.boxShadow]="boxShadow"
      [style.color]="theme.fuzzySearch.font"
      [style.background]="theme.fuzzySearch.background"
-     *ngIf="fuzzyBoxVisible" (click)="$event.stopImmediatePropagation()">
+     *ngIf="!hidden"
+     (click)="$event.stopImmediatePropagation()">
   <input [style.background]="theme.fuzzySearch.background"
          [style.color]="theme.fuzzySearch.font"
          [style.border]="theme.fuzzySearch.border"
-         autofocus #input type="text" (keydown)="updateKeyword($event)">
+         autofocus #input type="text" name="search"
+         [ngModel] (ngModelChange)="updateKeyword($event)">
   <ngrev-quick-access-list
-    *ngIf="search() as results"
+    *ngIf="searchResult$ | async as results"
     [theme]="theme"
     [style.display]="results.length ? 'block' : 'none'"
     [data]="results"
-    [highlight]="symbolName"
+    [highlight]="searchQuery$ | async"
     (select)="select.next($event); hide()"
   >
   </ngrev-quick-access-list>

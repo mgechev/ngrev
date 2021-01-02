@@ -32,24 +32,13 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild(QuickAccessComponent) quickAccess: QuickAccessComponent;
 
-  resolveMetadata = (nodeId: string): Promise<Metadata | boolean> => {
-    this.loading = true;
-    return this.manager
-      .getMetadata(nodeId)
-      .then(metadata => {
-        this.loading = false;
-        return metadata;
-      })
-      .catch(() => (this.loading = false));
-  };
-
   private _stopLoading = () => {
     this.loading = false;
-    this._changeDetectorRef.detectChanges();
+    // this._changeDetectorRef.detectChanges();
   };
   private _startLoading = () => {
     this.loading = true;
-    this._changeDetectorRef.detectChanges();
+    // this._changeDetectorRef.detectChanges();
   };
 
   private _keyDownSubscription: Subscription;
@@ -67,7 +56,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       this.theme = config.themes[config.theme];
       this.showLibs = config.showLibs;
       this.showModules = config.showModules;
-      this._changeDetectorRef.detectChanges();
+      // this._changeDetectorRef.detectChanges();
     });
 
     this.maxWidth$ = fromEvent(window, 'resize').pipe(
@@ -77,7 +66,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     );
 
     this._keyDownSubscription = fromEvent(document, 'keydown').pipe(
-      filter((event: KeyboardEvent) => event.keyCode === BACKSPACE && this.quickAccess && !this.quickAccess.visible()),
+      filter((event: KeyboardEvent) => event.keyCode === BACKSPACE && this.quickAccess?.hidden),
       tap({
         next: () => {
           this.prevState()
@@ -89,18 +78,18 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this._ipcBus.on(Message.ChangeTheme, (_: any, theme: string) => {
       this.theme = this.themes[theme];
-      this._changeDetectorRef.detectChanges();
+      // this._changeDetectorRef.detectChanges();
     });
     this._ipcBus.on(Message.ToggleLibsMenuAction, (_: any) => {
       this.manager.toggleLibs().then(() => {
         this.manager.reloadAppState();
-        this._changeDetectorRef.detectChanges();
+        // this._changeDetectorRef.detectChanges();
       });
     });
     this._ipcBus.on(Message.ToggleModulesMenuAction, (_: any) => {
       this.manager.toggleModules().then(() => {
         this.manager.reloadAppState();
-        this._changeDetectorRef.detectChanges();
+        // this._changeDetectorRef.detectChanges();
       });
     });
   }
@@ -110,14 +99,15 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   onProject({ tsconfig }: ProjectLoadEvent) {
-    this._changeDetectorRef.detach();
     this.projectSet = true;
-    this._ngZone.run(() => {
+    // this._ngZone.run(() => {
       this._startLoading();
       this.manager
         .loadProject(tsconfig, this.showLibs, this.showModules)
         .then(() => this._project.getSymbols())
-        .then(symbols => (this.queryList = symbols.map(s => ({ key: s.name, value: s }))))
+        .then(symbols => {
+          return this.queryList = symbols.map(s => ({ key: s.name, value: s }));
+        })
         .then(this._stopLoading)
         .catch(error => {
           window.require('electron').remote.dialog.showErrorBox(
@@ -128,14 +118,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
           );
           this._stopLoading();
         });
-    });
-  }
-
-  @HostListener('keydown', ['$event'])
-  keyDown(event: KeyboardEvent) {
-    if (event.keyCode === BACKSPACE && this.quickAccess && !this.quickAccess.visible()) {
-      this.prevState();
-    }
+    // });
   }
 
   tryChangeState(id: string) {
@@ -143,8 +126,12 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       this._startLoading();
       this.manager
         .tryChangeState(id)
-        .then(this._stopLoading)
-        .catch(this._stopLoading);
+        .then(() => {
+          this._stopLoading();
+        })
+        .catch(() => {
+          this._stopLoading();
+        });
     });
   }
 
@@ -162,7 +149,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   get initialized() {
-    return this.manager.getCurrentState(() => this._changeDetectorRef.detectChanges());
+    return this.manager.getCurrentState(() => {});
   }
 
   prevState() {

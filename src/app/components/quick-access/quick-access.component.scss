@@ -10,6 +10,10 @@
   max-width: 600px;
   height: calc(100% - 45px);
   z-index: 15;
+
+  &.hidden {
+    display: none;
+  }
 }
 .fuzzy-box {
   padding: 5px;

@@ -1,0 +1,13 @@
+<section
+  [class.hidden]="!colors.length"
+  [style.height]="(colors.length * 12 + 20) + 'px'"
+  [style.background]="theme.legend.background"
+  [style.color]="theme.legend.font"
+  [style.border]="theme.legend.border"
+>
+  <h1 [style.color]="theme.legend.title">Legend</h1>
+  <div *ngFor="let color of colors" class="colors-wrapper">
+    <div class="color" [style.backgroundColor]="color.color"></div>
+    <div class="color-label" [style.font]="theme.legend.font">{{ color.label }}</div>
+  </div>
+</section>
