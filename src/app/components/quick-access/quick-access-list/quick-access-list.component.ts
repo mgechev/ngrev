@@ -14,10 +14,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { KeyValuePair } from '../quick-access';
 import { Theme } from '../../../../shared/themes/color-map';
-
-const EnterKeyCode = 13;
-const UpArrowKeyCode = 38;
-const DownArrowKeyCode = 40;
+import { DOWN_ARROW, ENTER, UP_ARROW } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'ngrev-quick-access-list',
@@ -45,7 +42,7 @@ export class QuickAccessListComponent {
 
   selection = 0;
 
-  constructor(private renderer: Renderer2, private sanitizer: DomSanitizer) {}
+  constructor(private _renderer: Renderer2, private _sanitizer: DomSanitizer) {}
 
   selectItem(e, element: KeyValuePair<any>) {
     this.select.emit(element);
@@ -54,16 +51,16 @@ export class QuickAccessListComponent {
 
   onKeyDown(e) {
     let nextIdx = this.selection;
-    if (e.keyCode === UpArrowKeyCode) {
+    if (e.keyCode === UP_ARROW) {
       nextIdx = this.selection - 1;
       if (nextIdx < 0) {
         nextIdx = this.bindData.length - 1;
       }
     }
-    if (e.keyCode === DownArrowKeyCode) {
+    if (e.keyCode === DOWN_ARROW) {
       nextIdx = (this.selection + 1) % this.bindData.length;
     }
-    if (e.keyCode === EnterKeyCode && this.bindData[this.selection]) {
+    if (e.keyCode === ENTER && this.bindData[this.selection]) {
       this.select.emit(this.bindData[this.selection]);
     }
     this.highlightItem(nextIdx);
@@ -73,7 +70,7 @@ export class QuickAccessListComponent {
     const map = {};
     (this.highlight || '').split('').forEach(c => (map[c.toLowerCase()] = true));
     const textChars = text.split('');
-    return this.sanitizer.bypassSecurityTrustHtml(
+    return this._sanitizer.bypassSecurityTrustHtml(
       textChars.reduce((a, c) => {
         return a + (map[c.toLowerCase()] ? `<b>${c}</b>` : c);
       }, '')
@@ -86,7 +83,7 @@ export class QuickAccessListComponent {
     const elements = this.items.toArray();
     const item = elements[idx];
     if (item) {
-      this.renderer.addClass(item.nativeElement, 'selected');
+      this._renderer.addClass(item.nativeElement, 'selected');
       this.ensureVisible(item);
     }
     this.selection = idx;
@@ -97,7 +94,7 @@ export class QuickAccessListComponent {
     const elements = this.items.toArray();
     const item = elements[idx];
     if (item) {
-      this.renderer.removeClass(item.nativeElement, 'selected');
+      this._renderer.removeClass(item.nativeElement, 'selected');
     }
   }
 

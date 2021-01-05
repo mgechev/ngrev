@@ -1,0 +1,12 @@
+<table [class.hidden]="!metadata" [style.background]="theme.legend.background">
+  <thead [style.color]="theme.legend.title">
+  <th [style.border]="theme.legend.border">Name</th>
+  <th [style.border]="theme.legend.border">Value</th>
+  </thead>
+  <tbody [style.color]="theme.legend.font">
+  <tr *ngFor="let pair of metadata">
+    <td [style.border]="theme.legend.border" *ngIf="pair.value">{{pair.key}}</td>
+    <td [style.border]="theme.legend.border" *ngIf="pair.value">{{pair.value}}</td>
+  </tr>
+  </tbody>
+</table>

@@ -1,18 +1,18 @@
 import {
-  Component,
-  Output,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component, ElementRef,
   EventEmitter,
-  ViewChildren,
-  ElementRef,
-  Renderer2,
-  QueryList,
-  AfterViewInit,
-  Input,
-  ChangeDetectorRef
+  HostBinding,
+  Input, OnDestroy,
+  Output,
+  ViewChild
 } from '@angular/core';
 import { Theme } from '../../../shared/themes/color-map';
 import { KeyValuePair, QueryObject } from './quick-access';
-import { CONTROL, META, P, ESCAPE, UP_ARROW, DOWN_ARROW } from '@angular/cdk/keycodes';
+import { CONTROL, DOWN_ARROW, ESCAPE, META, P, UP_ARROW } from '@angular/cdk/keycodes';
+import { fromEvent, Observable, Subject } from 'rxjs';
+import { map, takeUntil, tap } from 'rxjs/operators';
 
 declare const require: any;
 const Fuse = require('fuse.js');
@@ -23,20 +23,12 @@ const MetaKeyCodes = [META, CONTROL];
   selector: 'ngrev-quick-access',
   templateUrl: './quick-access.component.html',
   host: {
-    '(document:keydown)': 'onKeyDown($event)',
-    '(document:keyup)': 'onKeyUp($event)',
     '(document:click)': 'onDocumentClick($event)'
   },
-  styleUrls: ['./quick-access.component.scss']
+  styleUrls: ['./quick-access.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class QuickAccessComponent implements AfterViewInit {
-  private metaKeyDown = 0;
-  private fuzzyBoxVisible = false;
-  private symbolName = '';
-  private fuse = new Fuse([], { keys: ['name', 'filePath'] });
-
-  constructor(private element: ElementRef, private renderer: Renderer2, private cd: ChangeDetectorRef) {}
-
+export class QuickAccessComponent implements OnDestroy {
   @Input() theme: Theme;
 
   @Input()
@@ -55,72 +47,79 @@ export class QuickAccessComponent implements AfterViewInit {
 
   @Output() select: EventEmitter<string> = new EventEmitter<string>();
 
-  @ViewChildren('input') input: QueryList<ElementRef>;
+  @HostBinding('class.hidden') hidden: boolean = true;
 
-  onKeyDown(e) {
-    if (MetaKeyCodes.indexOf(e.keyCode) >= 0) {
-      this.metaKeyDown = e.keyCode;
-    }
-    if (e.keyCode === P && this.metaKeyDown) {
-      this.show();
-    }
-    if (e.keyCode === ESCAPE) {
-      this.hide();
-    }
-    if (e.keyCode === DOWN_ARROW || e.keyCode === UP_ARROW) {
-      e.preventDefault();
-    }
+  @ViewChild('input', {static: false})
+  set input(value: ElementRef) {
+    value?.nativeElement.focus();
   }
 
-  onKeyUp(e) {
-    if (MetaKeyCodes.indexOf(e.keyCode) >= 0 && this.metaKeyDown === e.keyCode) {
-      this.metaKeyDown = 0;
-    }
+  searchQuery$: Subject<string> = new Subject<string>();
+  searchResult$: Observable<any>;
+
+  private metaKeyDown = 0;
+  private fuse = new Fuse([], { keys: ['name', 'filePath'] });
+  private _unsubscribe: Subject<void> = new Subject<void>();
+
+  constructor(private _changeDetectorRef: ChangeDetectorRef) {
+    fromEvent(document, 'keydown').pipe(
+      tap((event: KeyboardEvent) => {
+        if (MetaKeyCodes.indexOf(event.keyCode) >= 0) {
+          this.metaKeyDown = event.keyCode;
+        }
+        if (event.keyCode === P && this.metaKeyDown) {
+          this.show();
+        }
+        if (event.keyCode === ESCAPE) {
+          this.hide();
+        }
+        if (event.keyCode === DOWN_ARROW || event.keyCode === UP_ARROW) {
+          event.preventDefault();
+        }
+      }),
+      takeUntil(this._unsubscribe)
+    ).subscribe();
+
+    fromEvent(document, 'keyup').pipe(
+      tap((event: KeyboardEvent) => {
+        if (MetaKeyCodes.indexOf(event.keyCode) >= 0 && this.metaKeyDown === event.keyCode) {
+          this.metaKeyDown = 0;
+        }
+      }),
+      takeUntil(this._unsubscribe)
+    ).subscribe();
+
+    this.searchResult$ = this.searchQuery$.pipe(
+      map((searchQuery: string) => {
+        return this.fuse.search(searchQuery);
+      })
+    );
   }
 
-  ngAfterViewInit() {
-    // In most cases (always) fuzzyBoxVisible will be false
-    // when this life-cycle hook is invoked.
-    // We want to hide the access bar by default in order to
-    // not prevent capturing clicks in the visualizer.
-    if (!this.fuzzyBoxVisible) {
-      this.hide();
-    }
-    this.input.changes.subscribe(e => (e.first ? e.first.nativeElement.focus() : void 0));
-  }
-
-  search() {
-    setTimeout(() => this.cd.detectChanges());
-    return this.fuse.search(this.symbolName);
+  ngOnDestroy(): void {
+    this._unsubscribe.next();
+    this._unsubscribe.complete();
   }
 
   onDocumentClick() {
     this.hide();
   }
 
-  updateKeyword(event) {
-    this.symbolName = event.target.value;
-    this.cd.detectChanges();
-  }
-
-  visible() {
-    return this.fuzzyBoxVisible;
+  updateKeyword(searchText: string) {
+    this.searchQuery$.next(searchText);
   }
 
   get boxShadow() {
     return `0 0 11px 3px ${this.theme.fuzzySearch.shadowColor}`;
   }
 
-  private show() {
-    this.fuzzyBoxVisible = true;
-    this.renderer.setStyle(this.element.nativeElement, 'display', 'block');
-    this.cd.detectChanges();
+  hide() {
+    this.hidden = true;
+    this._changeDetectorRef.markForCheck();
   }
 
-  private hide() {
-    this.fuzzyBoxVisible = false;
-    this.symbolName = '';
-    this.renderer.setStyle(this.element.nativeElement, 'display', 'none');
-    this.cd.detectChanges();
+  private show() {
+    this.hidden = false;
+    this._changeDetectorRef.markForCheck();
   }
 }
