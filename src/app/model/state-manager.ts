@@ -82,14 +82,14 @@ export class StateManager {
     this.history[0].dirty = true;
   }
 
-  getCurrentState(refreshOnReady: () => void) {
+  getCurrentState(refreshOnReady?: () => void) {
     const last = this.history[this.history.length - 1];
     if (last) {
       if (last.dirty) {
         last.dirty = false;
         this.state.reload().then(state => {
           this.history[this.history.length - 1] = new Memento(state);
-          refreshOnReady();
+          refreshOnReady && refreshOnReady();
           return state;
         });
       }
