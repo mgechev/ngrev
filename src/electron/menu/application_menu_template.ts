@@ -5,7 +5,7 @@ import { getConfig } from "../config";
 export const applicationMenuTemplate = (
   onThemeChange: (name: string) => void,
   onLibraryToggle: () => void,
-  onModulesToggle: () => void
+  onModulesToggle: () => void,
 ) => {
   return {
     label: "ngrev",
@@ -48,6 +48,14 @@ export const applicationMenuTemplate = (
           const window = BrowserWindow.getAllWindows()[0];
           onModulesToggle();
           window.webContents.send(Message.ToggleModulesMenuAction);
+        },
+      },
+      {
+        label: "Fit view",
+        accelerator: "CmdOrCtrl+F",
+        click() {
+          const window = BrowserWindow.getAllWindows()[0];
+          window.webContents.send(Message.FitView);
         },
       },
       {

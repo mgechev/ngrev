@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, On
 import { NetworkConfig } from './network';
 import { Network } from 'vis';
 import { ExportToImage } from '../export-to-image.service';
+import { IPCBus } from '../../../model/ipc-bus';
+import { Message } from '../../../../shared/ipc-constants';
 
 @Component({
   selector: 'ngrev-network',
@@ -13,26 +15,28 @@ export class NetworkComponent implements OnDestroy {
   @Input()
   get network() { return this._network; }
   set network(value: NetworkConfig) {
-    this._network = value;
+    const scale: number = this._instance.getScale();
+    const position: {x: number, y: number} = this._instance.getViewPosition();
 
-    if (this._instance) {
-      this._instance.destroy();
+    this._instance.setData({
+      nodes: value.nodes, edges: value.edges
+    });
+
+    this._instance.setOptions(value.options);
+
+    if (this._network?.title === value.title) {
+      this._instance.moveTo({
+        scale,
+        position
+      });
     }
-
-    this._instance = new Network(
-      this._elementRef.nativeElement,
-      {nodes: value.nodes, edges: value.edges},
-      value.options
-    );
-
-    this._instance.on('doubleClick', this.selectNode.bind(this));
-    this._instance.on('click', this.highlightNode.bind(this));
-    this._instance.on('oncontext', this.nodeContext.bind(this));
 
     this._exportToImage.enable({
       title: value.title,
       canvas: this._elementRef.nativeElement.querySelector('canvas')
     });
+
+    this._network = value;
   }
 
   @Output() select: EventEmitter<string> = new EventEmitter<string>();
@@ -42,14 +46,26 @@ export class NetworkComponent implements OnDestroy {
   private _network: NetworkConfig;
   private _instance?: Network;
   private _clickTimeout: any;
+  private _fitViewListener: any;
 
-  constructor(private _elementRef: ElementRef, private _exportToImage: ExportToImage) {}
+  constructor(private _elementRef: ElementRef, private _exportToImage: ExportToImage, private _ipcBus: IPCBus) {
+    this._instance = new Network(this._elementRef.nativeElement, {});
+
+    this._instance.on('doubleClick', this.selectNode.bind(this));
+    this._instance.on('click', this.highlightNode.bind(this));
+    this._instance.on('oncontext', this.nodeContext.bind(this));
+
+    this._fitViewListener = this._ipcBus.on(Message.FitView, () => {
+      this._instance.fit();
+    });
+  }
 
   ngOnDestroy(): void {
     if (this._instance) {
       this._instance.destroy();
       this._instance = null;
       this._exportToImage.disable();
+      this._fitViewListener();
     }
   }
 
