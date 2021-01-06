@@ -46,7 +46,7 @@ export class NetworkComponent implements OnDestroy {
   private _network: NetworkConfig;
   private _instance?: Network;
   private _clickTimeout: any;
-  private _fitViewListener: any;
+  private _fitViewListener: () => void;
 
   constructor(private _elementRef: ElementRef, private _exportToImage: ExportToImage, private _ipcBus: IPCBus) {
     this._instance = new Network(this._elementRef.nativeElement, {});
