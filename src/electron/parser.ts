@@ -181,7 +181,7 @@ export class BackgroundApp {
     this.parentProcess.on(Message.ToggleLibs, (_: any, responder: Responder) => {
       console.log('Toggle libraries');
       const state = this.states.shift() as AppState;
-      const newState = new AppState(this.project.projectSymbols, !state.showLibs, !state.showModules);
+      const newState = new AppState(this.project.projectSymbols, !state.showLibs, state.showModules);
       this.states.unshift(newState);
       responder({
         topic: Message.ToggleLibs

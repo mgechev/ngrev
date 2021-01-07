@@ -1,14 +1,5 @@
-import {
-  SlaveProcess,
-  LoadProjectResponse,
-  PrevStateResponse,
-  DirectStateTransitionResponse,
-  GetSymbolsResponse,
-  GetMetadataResponse,
-  GetDataResponse,
-  ToggleLibsResponse
-} from '../helpers/process';
-import { ipcMain } from 'electron';
+import { SlaveProcess } from '../helpers/process';
+import { ipcMain, MenuItem } from 'electron';
 import { Message, Status } from '../../shared/ipc-constants';
 import { State } from '../states/state';
 import { Config } from '../../shared/data-format';
@@ -210,12 +201,12 @@ export class BackgroundApp {
     });
 
     ipcMain.on(Message.DisableExport, e => {
-      (menus.items[0] as any).submenu.items[1].enabled = false;
+      (menus.items[0] as MenuItem).submenu.items[4].enabled = false;
       success(e.sender, Message.DisableExport, true);
     });
 
     ipcMain.on(Message.EnableExport, e => {
-      (menus.items[0] as any).submenu.items[1].enabled = true;
+      (menus.items[0] as MenuItem).submenu.items[4].enabled = true;
       console.log('Enable!');
       success(e.sender, Message.EnableExport, true);
     });

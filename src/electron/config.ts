@@ -14,7 +14,7 @@ const builtInThemesMap = readdirSync(join(__dirname, '..', 'assets'))
     return a;
   }, {});
 
-export const getConfig = () => {
+export const getConfig = (): Config => {
   const path = app.getPath('userData');
   console.log('Looking for config file in', path);
   let config = null;
@@ -24,7 +24,7 @@ export const getConfig = () => {
     console.log('Found config file');
   } catch (_) {
     console.log('Config file not found');
-    return { showLibs: false, showModules: false, theme: DefaultTheme, themes: builtInThemesMap } as Partial<Config>;
+    return { showLibs: false, showModules: false, theme: DefaultTheme, themes: builtInThemesMap };
   }
   try {
     themes = readdirSync(join(path, 'themes'))
@@ -33,9 +33,12 @@ export const getConfig = () => {
     console.log('Found themes');
   } catch (_) {
     console.log('Themes not found', _);
-    return { showLibs: !!(config as any).showLibs, showModules: !!(config as any).showModules, theme: (config as any).theme, themes: builtInThemesMap } as Partial<
-      Config
-    >;
+    return {
+      showLibs: !!(config as any).showLibs,
+      showModules: !!(config as any).showModules,
+      theme: (config as any).theme,
+      themes: builtInThemesMap
+    };
   }
   return {
     showLibs: !!(config as any).showLibs,
@@ -48,7 +51,7 @@ export const getConfig = () => {
       }, {}),
       builtInThemesMap
     )
-  } as Partial<Config>;
+  };
 };
 
 export const setConfigProps = (config: Partial<Config>) => {
