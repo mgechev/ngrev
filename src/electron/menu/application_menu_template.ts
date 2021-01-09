@@ -1,12 +1,12 @@
-import { app, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, dialog, MenuItem, MenuItemConstructorOptions } from "electron";
 import { Message } from "../../shared/ipc-constants";
 import { getConfig } from "../config";
 
 export const applicationMenuTemplate = (
-  onThemeChange: (name: string) => void,
-  onLibraryToggle: () => void,
-  onModulesToggle: () => void
-) => {
+  themeChange: (name: string) => void,
+  libsToggle: () => void,
+  modulesOnlyToggle: () => void
+): MenuItemConstructorOptions | MenuItem => {
   return {
     label: "ngrev",
     submenu: [
@@ -15,13 +15,40 @@ export const applicationMenuTemplate = (
         submenu: Object.keys(getConfig().themes || []).map((label) => {
           return {
             label,
+            type: "radio",
+            checked: label === getConfig().theme,
             click() {
               const window = BrowserWindow.getAllWindows()[0];
-              onThemeChange(label);
+              themeChange(label);
               window.webContents.send(Message.ChangeTheme, label);
             },
           };
         }),
+      },
+      {
+        label: "Show libs",
+        type: "checkbox",
+        checked: getConfig().showLibs,
+        accelerator: "CmdOrCtrl+L",
+        click() {
+          const window = BrowserWindow.getAllWindows()[0];
+          libsToggle();
+          window.webContents.send(Message.ToggleLibsMenuAction);
+        },
+      },
+      {
+        label: "Show modules only",
+        type: "checkbox",
+        checked: getConfig().showModules,
+        accelerator: "CmdOrCtrl+M",
+        click() {
+          const window = BrowserWindow.getAllWindows()[0];
+          modulesOnlyToggle();
+          window.webContents.send(Message.ToggleModulesMenuAction);
+        },
+      },
+      {
+        type: "separator"
       },
       {
         label: "Export",
@@ -33,22 +60,7 @@ export const applicationMenuTemplate = (
         },
       },
       {
-        label: "Show libs",
-        accelerator: "CmdOrCtrl+L",
-        click() {
-          const window = BrowserWindow.getAllWindows()[0];
-          onLibraryToggle();
-          window.webContents.send(Message.ToggleLibsMenuAction);
-        },
-      },
-      {
-        label: "Show modules only",
-        accelerator: "CmdOrCtrl+M",
-        click() {
-          const window = BrowserWindow.getAllWindows()[0];
-          onModulesToggle();
-          window.webContents.send(Message.ToggleModulesMenuAction);
-        },
+        type: "separator"
       },
       {
         label: "Reset",

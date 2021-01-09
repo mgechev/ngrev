@@ -19,27 +19,32 @@ if (serve) {
   app.setPath('userData', userDataPath + ' (development)');
 }
 
-const onThemeChange = (theme: string) => setConfigProps({ theme });
+const themeChange = (theme: string) => setConfigProps({ theme });
 
-const onAngularToggle = () => {
+const libsToggle = () => {
   const config = getConfig();
   const showLibs = !config.showLibs;
   setConfigProps({ showLibs });
 };
 
-const onModulesToggle = () => {
+const modulesOnlyToggle = () => {
   const config = getConfig();
   const showModules = !config.showModules;
   setConfigProps({ showModules });
 };
 
-const menuItems = [applicationMenuTemplate(onThemeChange, onAngularToggle, onModulesToggle)];
+const menuItems = [
+  applicationMenuTemplate(
+    themeChange,
+    libsToggle,
+    modulesOnlyToggle
+  )
+];
 if (serve) {
   menuItems.push(devMenuTemplate());
 }
 
 export const menus = Menu.buildFromTemplate(menuItems);
-
 
 function createWindow(): BrowserWindow {
   Menu.setApplicationMenu(menus);
