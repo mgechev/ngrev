@@ -15,7 +15,8 @@ export enum Message {
   ImageData = 'image-data',
   DisableExport = 'disable-export',
   EnableExport = 'enable-export',
-  Config = 'config'
+  Config = 'config',
+  FitView = 'fit-view'
 }
 
 export enum Status {

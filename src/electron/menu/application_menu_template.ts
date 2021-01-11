@@ -63,6 +63,14 @@ export const applicationMenuTemplate = (
         type: "separator"
       },
       {
+        label: "Fit view",
+        accelerator: "CmdOrCtrl+F",
+        click() {
+          const window = BrowserWindow.getAllWindows()[0];
+          window.webContents.send(Message.FitView);
+        },
+      },
+      {
         label: "Reset",
         accelerator: "CmdOrCtrl+R",
         click() {
