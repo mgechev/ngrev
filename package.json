@@ -45,7 +45,7 @@
     "@types/vis": "^4.17.3",
     "fs-jetpack": "^0.10.2",
     "fuse.js": "^2.6.2",
-    "ngast": "../ngast/dist/",
+    "ngast": "0.6.1",
     "sanitize-filename": "^1.6.1",
     "vis": "^4.18.1"
   },
