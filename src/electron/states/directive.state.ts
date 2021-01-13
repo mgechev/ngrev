@@ -15,6 +15,7 @@ import {
   SymbolTypes,
   Direction,
   Edge,
+  isThirdParty,
 } from '../../shared/data-format';
 import {
   getDirectiveMetadata,
@@ -62,6 +63,12 @@ export class DirectiveState extends State {
       return null;
     }
     const symbol = this.symbols[id];
+    // ngtsc does not allow us to resolve many of the properties
+    // we need for third-party symbols so we don't allow the navigation.
+    if ((symbol instanceof ComponentSymbol || symbol instanceof DirectiveSymbol) &&
+        isThirdParty(symbol)) {
+      return null;
+    }
     if (symbol instanceof DirectiveSymbol) {
       return new DirectiveState(this.context, symbol);
     } else {

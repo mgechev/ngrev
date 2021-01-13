@@ -7,7 +7,8 @@ import {
   Direction,
   isAngularSymbol,
   SymbolTypes,
-  Edge
+  Edge,
+  isThirdParty
 } from '../../shared/data-format';
 import { State } from './state';
 import { getProviderMetadata } from '../formatters/model-formatter';
@@ -28,12 +29,17 @@ export class ProviderState extends State {
     return getProviderMetadata(this.symbols[id]);
   }
 
-  nextState(nodeId: string) {
+  nextState(nodeId: string): State {
     if (nodeId === this.symbolId) {
       return null;
     }
     const symbol = this.symbols[nodeId];
     if (!symbol) {
+      return null;
+    }
+    // ngtsc does not allow us to resolve many of the properties
+    // we need for third-party symbols so we don't allow the navigation.
+    if (isThirdParty(symbol)) {
       return null;
     }
     return new ProviderState(this.context, symbol);

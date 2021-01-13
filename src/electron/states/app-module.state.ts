@@ -7,7 +7,8 @@ import {
   getId,
   SymbolTypes,
   isAngularSymbol,
-  VisualizationConfig
+  VisualizationConfig,
+  isThirdParty
 } from '../../shared/data-format';
 import { ComponentSymbol, DirectiveSymbol, InjectableSymbol, NgModuleSymbol, PipeSymbol, WorkspaceSymbols } from 'ngast';
 import { getDirectiveMetadata, getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
@@ -56,6 +57,11 @@ export class AppModuleState extends State {
     const data = this.symbols[nodeId].data;
     if (!data) {
       return null;
+    }
+    // ngtsc does not allow us to resolve many of the properties
+    // we need for third-party symbols so we don't allow the navigation.
+    if (isThirdParty(data.symbol)) {
+      return;
     }
     if (data.symbol instanceof DirectiveSymbol || data.symbol instanceof ComponentSymbol) {
       return new DirectiveState(this.context, data.symbol);

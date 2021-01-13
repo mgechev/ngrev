@@ -7,7 +7,8 @@ import {
   Direction,
   isAngularSymbol,
   SymbolTypes,
-  Edge
+  Edge,
+  isThirdParty
 } from '../../shared/data-format';
 import { InjectableSymbol, PipeSymbol, WorkspaceSymbols } from 'ngast';
 import { State } from './state';
@@ -34,13 +35,15 @@ export class PipeState extends State {
     }
   }
 
-  nextState(nodeId: string) {
+  nextState(nodeId: string): State {
     if (nodeId === this.symbolId) {
       return null;
     }
     const symbol = this.symbols[nodeId];
     if (symbol instanceof InjectableSymbol) {
-      if (!symbol) {
+      // ngtsc does not allow us to resolve many of the properties
+      // we need for third-party symbols so we don't allow the navigation.
+      if (!symbol || isThirdParty(symbol)) {
         return null;
       }
       return new ProviderState(this.context, symbol);

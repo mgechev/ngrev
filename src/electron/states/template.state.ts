@@ -11,6 +11,8 @@ import {
   getId,
   Node,
   SymbolTypes,
+  isAngularSymbol,
+  isThirdParty
 } from '../../shared/data-format';
 import {
   getDirectiveMetadata,
@@ -35,7 +37,8 @@ export class TemplateState extends State {
     const s = this.symbols[id];
     if (s) {
       if (s instanceof ComponentSymbol || s instanceof DirectiveSymbol) {
-        return getDirectiveMetadata(s);
+        // We can't analyze well symbols coming from node modules.
+        return isThirdParty(s) ? null : getDirectiveMetadata(s);
       } else {
         return getElementMetadata(s);
       }
@@ -49,6 +52,12 @@ export class TemplateState extends State {
     }
     const symbol = this.symbols[id];
     if (!symbol) {
+      return null;
+    }
+    // ngtsc does not allow us to resolve many of the properties
+    // we need for third-party symbols so we don't allow the navigation.
+    if ((symbol instanceof ComponentSymbol || symbol instanceof DirectiveSymbol) &&
+        isThirdParty(symbol)) {
       return null;
     }
     if (symbol instanceof ComponentSymbol) {
