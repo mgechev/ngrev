@@ -1,9 +1,17 @@
 import { ChangeDetectionStrategy } from '@angular/core';
-import { ComponentSymbol, DirectiveSymbol, InjectableSymbol, NgModuleSymbol, PipeSymbol } from 'ngast';
+import {
+  ComponentSymbol,
+  DirectiveSymbol,
+  InjectableSymbol,
+  NgModuleSymbol,
+  PipeSymbol,
+  TemplateNode,
+} from 'ngast';
 import { Metadata } from '../../shared/data-format';
-import { TmplAstElement } from '@angular/compiler';
 
-const _changeDetectionToString = (cd: ChangeDetectionStrategy | undefined): string | null => {
+const _changeDetectionToString = (
+  cd: ChangeDetectionStrategy | undefined
+): string | null => {
   switch (cd) {
     case ChangeDetectionStrategy.Default:
       return 'Default';
@@ -20,8 +28,8 @@ export const getProviderMetadata = (provider: InjectableSymbol): Metadata => {
     properties: [
       { key: 'Name', value: provider.name },
       // { key: 'Multiprovider', value: (meta.multi === true).toString() },
-      { key: 'Dependencies', value: deps.map(dep => dep.name).join(', ') }
-    ]
+      { key: 'Dependencies', value: deps.map((dep) => dep.name).join(', ') },
+    ],
   };
 };
 
@@ -31,11 +39,13 @@ export const getPipeMetadata = (pipe: PipeSymbol): Metadata => {
     properties: [
       { key: 'Name', value: pipe.name },
       // { key: 'Pure', value: ((meta || { pure: true }).pure === true).toString() }
-    ]
+    ],
   };
 };
 
-export const getDirectiveMetadata = (dir: DirectiveSymbol | ComponentSymbol): Metadata => {
+export const getDirectiveMetadata = (
+  dir: DirectiveSymbol | ComponentSymbol
+): Metadata => {
   const meta = dir.metadata;
   const getChangeDetection = () => {
     if (dir instanceof ComponentSymbol) {
@@ -48,25 +58,29 @@ export const getDirectiveMetadata = (dir: DirectiveSymbol | ComponentSymbol): Me
     properties: [
       { key: 'Selector', value: meta.selector },
       { key: 'Component', value: (dir.annotation === 'Component').toString() },
-      { key: 'Change Detection', value: _changeDetectionToString(getChangeDetection()) },
-      { key: 'Export', value: (meta.exportAs || []).join(', ') }
-    ]
+      {
+        key: 'Change Detection',
+        value: _changeDetectionToString(getChangeDetection()),
+      },
+      { key: 'Export', value: (meta.exportAs || []).join(', ') },
+    ],
   };
 };
 
-export const getElementMetadata = (el: TmplAstElement): Metadata => {
+export const getElementMetadata = (el: TemplateNode): Metadata => {
   return {
     properties: [
       { key: 'Name', value: el.name },
-      // { key: 'Directives', value: el.directives.map(d => d.directive.type.reference.name).join(', ') },
-      // { key: 'Attributes', value: el.attrs.map(a => `[${a.name}=${a.value}]`).join(', ') }
-    ]
+      { key: 'Directives', value: el.directives.map(d => d.name).join(', ') },
+      { key: 'Attributes', value: el.attributes.map(a => `[${a}]`).join(', ') },
+      { key: 'References', value: el.references.map(r => `[${r}]`).join(', ') },
+    ],
   };
 };
 
 export const getModuleMetadata = (node: NgModuleSymbol): Metadata => {
   return {
     filePath: node.path,
-    properties: [{ key: 'Name', value: node.name }]
+    properties: [{ key: 'Name', value: node.name }],
   };
 };

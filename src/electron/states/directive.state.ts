@@ -2,10 +2,10 @@ import {
   DirectiveSymbol,
   WorkspaceSymbols,
   ComponentSymbol,
-  InjectableSymbol
+  InjectableSymbol,
+  TemplateNode
 } from 'ngast';
 import { State } from './state';
-import { TmplAstElement } from '@angular/compiler';
 import {
   VisualizationConfig,
   Metadata,
@@ -23,7 +23,7 @@ import {
 import { TemplateState } from './template.state';
 
 interface NodeMap {
-  [id: string]: DirectiveSymbol | ComponentSymbol | TmplAstElement;
+  [id: string]: DirectiveSymbol | ComponentSymbol | TemplateNode;
 }
 
 const TemplateId = 'template';
@@ -44,16 +44,17 @@ export class DirectiveState extends State {
   getMetadata(id: string): Metadata | null {
     const s = this.symbols[id];
     if (s) {
-      if (s instanceof TmplAstElement) {
-        return getElementMetadata(s);
-      } else if (s instanceof DirectiveSymbol || s instanceof ComponentSymbol) {
+      if (s instanceof DirectiveSymbol || s instanceof ComponentSymbol) {
         return getDirectiveMetadata(s);
+      } else {
+        return getElementMetadata(s);
       }
     }
     return null;
   }
 
   nextState(id: string): State | null {
+    console.log('State', id, this.directive instanceof ComponentSymbol);
     if (id === TemplateId && this.directive instanceof ComponentSymbol) {
       return new TemplateState(this.context, this.directive);
     }

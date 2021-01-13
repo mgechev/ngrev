@@ -1,30 +1,28 @@
 import {
-  AnnotationNames,
   ComponentSymbol,
   DirectiveSymbol,
-  Symbol,
   WorkspaceSymbols,
-} from "ngast";
-import { State } from "./state";
-import { TmplAstElement, DirectiveAst } from "@angular/compiler";
+  TemplateNode,
+} from 'ngast';
+import { State } from './state';
 import {
   VisualizationConfig,
   Metadata,
   getId,
   Node,
   SymbolTypes,
-} from "../../shared/data-format";
+} from '../../shared/data-format';
 import {
   getDirectiveMetadata,
   getElementMetadata,
-} from "../formatters/model-formatter";
-import { DirectiveState } from "./directive.state";
+} from '../formatters/model-formatter';
+import { DirectiveState } from './directive.state';
 
 interface NodeMap {
-  [id: string]: ComponentSymbol | DirectiveSymbol | TmplAstElement;
+  [id: string]: ComponentSymbol | DirectiveSymbol | TemplateNode;
 }
 
-const TemplateId = "template";
+const TemplateId = 'template';
 
 export class TemplateState extends State {
   private symbols: NodeMap = {};
@@ -36,16 +34,16 @@ export class TemplateState extends State {
   getMetadata(id: string): Metadata | null {
     const s = this.symbols[id];
     if (s) {
-      if (s instanceof TmplAstElement) {
-        return getElementMetadata(s);
-      } else if (s instanceof ComponentSymbol) {
+      if (s instanceof ComponentSymbol || s instanceof DirectiveSymbol) {
         return getDirectiveMetadata(s);
+      } else {
+        return getElementMetadata(s);
       }
     }
     return null;
   }
 
-  nextState(id: string) {
+  nextState(id: string): State {
     if (id === this.symbolId) {
       return null;
     }
@@ -77,30 +75,31 @@ export class TemplateState extends State {
     return {
       title: label,
       graph: {
-        nodes,
+        nodes: nodes.map(node => ({
+          id: node.id,
+          label: node.label,
+          type: node.type
+        })),
         edges,
       },
     };
   }
 
   private addTemplateNodes(
-    resNodes: Node<ComponentSymbol | TmplAstElement>[],
+    resNodes: Node<ComponentSymbol | TemplateNode>[],
     edges: any[]
   ) {
     const rootNodes = this.directive.getTemplateAst();
+    if (rootNodes === 'error') {
+      return;
+    }
     let currentNode = 0;
-    const dirMap = (this.context.getAllDirectives() as Symbol<
-      AnnotationNames
-    >[])
-      .concat(this.context.getAllComponents())
-      .reduce((p, s) => {
-        p[getId(s)] = s;
-        return p;
-      }, {} as any);
-    const addNodes = (nodes: TmplAstElement[], parentNodeId: string) => {
+    const addNodes = (nodes: TemplateNode[], parentNodeId: string) => {
       nodes.forEach((n) => {
+        if (!n) return;
+
         currentNode += 1;
-        const nodeId = "el-" + currentNode;
+        const nodeId = 'el-' + currentNode.toString();
         edges.push({
           from: parentNodeId,
           to: nodeId,
@@ -108,51 +107,29 @@ export class TemplateState extends State {
         const node = {
           id: nodeId,
           label: n.name,
-          data: n as TmplAstElement,
+          data: n,
           type: {
             angular: false,
-            type: n.inputs.length
+            type: n.directives.length
               ? SymbolTypes.HtmlElementWithDirective
               : SymbolTypes.HtmlElement,
           },
         };
-        const component = this.tryGetMatchingComponent(dirMap, []);
         this.symbols[nodeId] = n;
-        if (component) {
-          this.symbols[nodeId] = component;
+        if (n.component) {
+          this.symbols[nodeId] = n.component;
           node.type.type = SymbolTypes.Component;
         }
         resNodes.push(node);
         addNodes(
-          n.children.filter((c) => c instanceof TmplAstElement) as TmplAstElement[],
+          n.children,
           nodeId
         );
       });
-      addNodes(
-        (rootNodes || []).filter(
-          (c) => c instanceof TmplAstElement
-        ) as any[],
-        TemplateId
-      );
     };
-  }
-
-  private tryGetMatchingComponent(
-    dirMap: { [id: string]: ComponentSymbol | DirectiveSymbol },
-    componentDirs: DirectiveAst[]
-  ) {
-    return componentDirs
-      .filter((d) => {
-        const ref = d.directive.type.reference;
-        const symbol = dirMap[ref.path + "#" + ref.name];
-        const metadata = symbol.metadata;
-        // TODO
-        if (symbol && metadata) {
-          return true;
-        }
-        return false;
-      })
-      .map((d) => dirMap[getId(d.directive.type.reference)])
-      .pop();
+    addNodes(
+      rootNodes,
+      TemplateId
+    );
   }
 }
