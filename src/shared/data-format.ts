@@ -86,3 +86,7 @@ export const getProviderName = (provider: R3InjectableMetadata): string | null =
 export const isAngularSymbol = (symbol: { path: string }): boolean => {
   return /node_modules\/@angular/.test(symbol.path);
 };
+
+export const isThirdParty = (symbol: { path: string }): boolean => {
+  return /node_modules/.test(symbol.path);
+};

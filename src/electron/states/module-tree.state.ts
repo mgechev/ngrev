@@ -1,5 +1,3 @@
-import { isAbsolute, normalize, join, sep } from 'path';
-
 import { State } from './state';
 import { ModuleState } from './module.state';
 import {
@@ -11,7 +9,8 @@ import {
   getId,
   Direction,
   isAngularSymbol,
-  SymbolTypes
+  SymbolTypes,
+  isThirdParty
 } from '../../shared/data-format';
 import { getModuleMetadata } from '../formatters/model-formatter';
 import { Trie } from '../utils/trie';
@@ -73,6 +72,11 @@ export class ModuleTreeState extends State {
   // Switch to binary search if gets too slow.
   nextState(id: string): State {
     const module = this.symbols[id];
+    // ngtsc does not allow us to resolve many of the properties
+    // we need for third-party symbols so we don't allow the navigation.
+    if (isThirdParty(module)) {
+      return null;
+    }
     if (module === this.module) {
       return new ModuleState(this.context, module);
     } else {
