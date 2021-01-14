@@ -94,16 +94,20 @@ export class AppModuleState extends State {
     this.module.getDeclarations().forEach(node => {
       if (node instanceof PipeSymbol) {
         this._appendSet(currentModuleId, node, nodes, SymbolTypes.Pipe, edges);
+      } else if (node instanceof DirectiveSymbol) {
+        this._appendSet(currentModuleId, node, nodes, SymbolTypes.Directive, edges);
       } else {
-        this._appendSet(currentModuleId, node, nodes, SymbolTypes.ComponentOrDirective, edges);
+        this._appendSet(currentModuleId, node, nodes, SymbolTypes.Component, edges);
       }
     });
 
     this.module.getExports().forEach(node => {
       if (node instanceof PipeSymbol) {
         this._appendSet(currentModuleId, node, nodes, SymbolTypes.Pipe, edges);
-      } else if (node instanceof DirectiveSymbol || node instanceof ComponentSymbol) {
-        this._appendSet(currentModuleId, node, nodes, SymbolTypes.ComponentOrDirective, edges);
+      } else if (node instanceof DirectiveSymbol) {
+        this._appendSet(currentModuleId, node, nodes, SymbolTypes.Directive, edges);
+      } else if (node instanceof ComponentSymbol) {
+        this._appendSet(currentModuleId, node, nodes, SymbolTypes.Component, edges);
       }
     });
 
@@ -137,7 +141,7 @@ export class AppModuleState extends State {
     nodes: NodeMap,
     symbolType: SymbolTypes,
     edges: Edge[]
-  ) {
+  ): void {
     const id = getId(node);
     const name = node.name;
     nodes[id] = {

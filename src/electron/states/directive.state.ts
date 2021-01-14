@@ -1,26 +1,17 @@
-import {
-  DirectiveSymbol,
-  WorkspaceSymbols,
-  ComponentSymbol,
-  InjectableSymbol,
-  TemplateNode
-} from 'ngast';
+import { ComponentSymbol, DirectiveSymbol, InjectableSymbol, TemplateNode, WorkspaceSymbols } from 'ngast';
 import { State } from './state';
 import {
-  VisualizationConfig,
-  Metadata,
-  getId,
-  Node,
-  isAngularSymbol,
-  SymbolTypes,
   Direction,
   Edge,
+  getId,
+  isAngularSymbol,
   isThirdParty,
+  Metadata,
+  Node,
+  SymbolTypes,
+  VisualizationConfig,
 } from '../../shared/data-format';
-import {
-  getDirectiveMetadata,
-  getElementMetadata,
-} from '../formatters/model-formatter';
+import { getDirectiveMetadata, getElementMetadata, } from '../formatters/model-formatter';
 import { TemplateState } from './template.state';
 
 interface NodeMap {
@@ -77,16 +68,15 @@ export class DirectiveState extends State {
   }
 
   getData(): VisualizationConfig<any> {
-    const s = this.directive;
-    const nodeId = getId(s);
+    const nodeId = getId(this.directive);
     const nodes: Node<DirectiveSymbol | ComponentSymbol>[] = [
       {
         id: nodeId,
-        label: s.name,
+        label: this.directive.name,
         data: this.directive,
         type: {
-          type: SymbolTypes.Component,
-          angular: isAngularSymbol(s),
+          type: (this.directive instanceof DirectiveSymbol) ? SymbolTypes.Directive : SymbolTypes.Component,
+          angular: isAngularSymbol(this.directive),
         },
       },
     ];
@@ -145,7 +135,7 @@ export class DirectiveState extends State {
     rootLabel: string,
     rootId: string,
     providers: InjectableSymbol[]
-  ) {
+  ): void {
     console.log('Total provider for directive', this.directive.name, providers.length);
     if (providers.length > 0) {
       nodes.push({

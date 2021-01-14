@@ -11,6 +11,7 @@ import { NetworkConfig } from './network/network';
 
 export const TypeToNameMap = {
   [SymbolTypes.Component]: 'Component',
+  [SymbolTypes.Directive]: 'Directive',
   [SymbolTypes.ComponentWithDirective]: 'Component with Directive',
   [SymbolTypes.HtmlElement]: 'HTML element',
   [SymbolTypes.HtmlElementWithDirective]: 'HTML element with Directive',
