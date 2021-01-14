@@ -15,6 +15,9 @@ export class NetworkComponent implements OnDestroy {
   @Input()
   get network() { return this._network; }
   set network(value: NetworkConfig) {
+    if (!value) {
+      return;
+    }
     const scale: number = this._instance.getScale();
     const position: {x: number, y: number} = this._instance.getViewPosition();
 

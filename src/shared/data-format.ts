@@ -12,6 +12,7 @@ export enum SymbolTypes {
   HtmlElementWithDirective = 'html-element-with-directive',
   ComponentWithDirective = 'component-with-directive',
   Component = 'component',
+  Directive = 'directive',
   ComponentOrDirective = 'component-or-directive',
   Pipe = 'pipe',
   Module = 'module',

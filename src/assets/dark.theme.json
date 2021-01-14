@@ -39,6 +39,21 @@
       "color": "#FFFFFF"
     }
   },
+  "directive": {
+    "margin": 10,
+    "color": {
+      "background": "#CF8772",
+      "border": "#A16959",
+      "highlight": {
+        "background": "#CF8772",
+        "border": "#A16959"
+      }
+    },
+    "labelHighlightBold": false,
+    "font": {
+      "color": "#FFFFFF"
+    }
+  },
   "component-or-directive": {
     "margin": 10,
     "color": {

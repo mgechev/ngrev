@@ -1,6 +1,13 @@
-import { WorkspaceSymbols } from 'ngast';
+import {
+  ComponentSymbol,
+  DirectiveSymbol,
+  InjectableSymbol,
+  NgModuleSymbol,
+  PipeSymbol,
+  WorkspaceSymbols
+} from 'ngast';
 import { State } from './state';
-import { Metadata, VisualizationConfig, Layout } from '../../shared/data-format';
+import { Metadata, VisualizationConfig, Layout, Node, Edge } from '../../shared/data-format';
 import { ModuleTreeState } from './module-tree.state';
 import { AppModuleState } from './app-module.state';
 import { DirectiveState } from './directive.state';
@@ -48,51 +55,51 @@ export class AppState extends State {
     };
     const existingNodes = new Set();
     const existingEdges = new Set();
-    this.states.forEach(s => {
-      const { graph } = s.getData();
-      graph.nodes.forEach(n => {
-        if (!existingNodes.has(n.id) && this.showSymbol(n.id)) {
-          data.graph.nodes.push(n);
-          existingNodes.add(n.id);
+    this.states.forEach((state: State) => {
+      const { graph } = state.getData();
+      graph.nodes.forEach((node: Node<any>) => {
+        if (!existingNodes.has(node.id) && this.showSymbol(node.id)) {
+          data.graph.nodes.push(node);
+          existingNodes.add(node.id);
         }
       });
-      graph.edges.forEach(e => {
-        const edge = `${e.from}->${e.to}`;
-        if (!existingEdges.has(edge) && this.showSymbol(edge)) {
-          data.graph.edges.push(e);
-          existingEdges.add(edge);
+      graph.edges.forEach((edge: Edge) => {
+        const edgeKey = `${edge.from}->${edge.to}`;
+        if (!existingEdges.has(edgeKey) && this.showSymbol(edgeKey)) {
+          data.graph.edges.push(edge);
+          existingEdges.add(edgeKey);
         }
       });
     });
     return data;
   }
 
-  private showSymbol(id: string) {
+  private showSymbol(id: string): boolean {
     if (this.showLibs) {
       return true;
     }
     return id.indexOf('node_modules') < 0;
   }
 
-  private init() {
-    this.context.getAllModules().forEach(m => {
-      this.states.push(new ModuleTreeState(this.context, m));
+  private init(): void {
+    this.context.getAllModules().forEach((module: NgModuleSymbol) => {
+      this.states.push(new ModuleTreeState(this.context, module));
     });
     if (!this.showModules) {
-      this.context.getAllModules().forEach(m => {
-        this.states.push(new AppModuleState(this.context, m));
+      this.context.getAllModules().forEach((module: NgModuleSymbol) => {
+        this.states.push(new AppModuleState(this.context, module));
       });
-      this.context.getAllDirectives().forEach(d => {
-        this.states.push(new DirectiveState(this.context, d, false));
+      this.context.getAllDirectives().forEach((directive: DirectiveSymbol) => {
+        this.states.push(new DirectiveState(this.context, directive, false));
       });
-      this.context.getAllComponents().forEach(d => {
-        this.states.push(new DirectiveState(this.context, d, false));
+      this.context.getAllComponents().forEach((component: ComponentSymbol) => {
+        this.states.push(new DirectiveState(this.context, component, false));
       });
-      this.context.getAllInjectable().forEach(p => {
-        this.states.push(new ProviderState(this.context, p));
+      this.context.getAllInjectable().forEach((injectable: InjectableSymbol) => {
+        this.states.push(new ProviderState(this.context, injectable));
       });
-      this.context.getAllPipes().forEach(p => {
-        this.states.push(new PipeState(this.context, p));
+      this.context.getAllPipes().forEach((pipe: PipeSymbol) => {
+        this.states.push(new PipeState(this.context, pipe));
       });
     }
   }
