@@ -1,5 +1,6 @@
 {
   "productName": "ngrev",
+  "asar": false,
   "directories": {
     "output": "release/"
   },
