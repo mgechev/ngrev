@@ -136,7 +136,7 @@ export class ParentProcess {
     });
   }
 
-  on(topic: Message, cb: RequestHandler) {
+  on(topic: Message, cb: RequestHandler): void {
     this.emitter.on(topic, (request: IPCRequest, responder: Responder) => {
       try {
         cb(request, responder);
@@ -164,16 +164,16 @@ export class SlaveProcess {
     return result;
   }
 
-  get connected() {
+  get connected(): boolean {
     return this.process.connected;
   }
 
-  onReady(cb: () => void) {
+  onReady(cb: () => void): void {
     this.emitter.on('ready', cb);
   }
 
-  send(request: IPCRequest) {
-    return new Promise((resolve, reject) => {
+  send(request: IPCRequest): Promise<IPCResponse> {
+    return new Promise((resolve) => {
       this.process.once('message', (data: IPCResponse) => {
         console.log('Got message with topic', data.topic);
         resolve(data);

@@ -1,4 +1,3 @@
-import { getProviderName } from '../shared/data-format';
 import { AppState } from './states/app.state';
 import { SymbolIndex, SymbolData } from './model/symbol-index';
 import { Message } from '../shared/ipc-constants';
