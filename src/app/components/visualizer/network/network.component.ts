@@ -13,8 +13,8 @@ import { Message } from '../../../../shared/ipc-constants';
 })
 export class NetworkComponent implements OnDestroy {
   @Input()
-  get network() { return this._network; }
-  set network(value: NetworkConfig) {
+  get network(): NetworkConfig | undefined { return this._network; }
+  set network(value: NetworkConfig | undefined) {
     if (!value) {
       return;
     }
@@ -46,8 +46,8 @@ export class NetworkComponent implements OnDestroy {
   @Output() highlight: EventEmitter<string> = new EventEmitter<string>();
   @Output() contextMenu: EventEmitter<string> = new EventEmitter<string>();
 
-  private _network: NetworkConfig;
-  private _instance?: Network;
+  private _network?: NetworkConfig;
+  private _instance: Network;
   private _clickTimeout: any;
   private _fitViewListener: () => void;
 
@@ -66,7 +66,6 @@ export class NetworkComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (this._instance) {
       this._instance.destroy();
-      this._instance = null;
       this._exportToImage.disable();
       this._fitViewListener();
     }

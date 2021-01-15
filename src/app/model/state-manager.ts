@@ -52,9 +52,12 @@ export class StateManager {
     if (!this.transitionInProgress) {
       this.transitionInProgress = id;
     }
-    return this.state
+    if (!this.state) {
+      return Promise.reject(new Error('Project is not loaded yet.'));
+    }
+    return this.state!
       .directStateTransfer(id)
-      .then(() => this.state.getData())
+      .then(() => this.state!.getData())
       .then(data => {
         this.pushState(data);
         while (this.transitionResolveQueue.length) {
@@ -87,7 +90,7 @@ export class StateManager {
     if (last) {
       if (last.dirty) {
         last.dirty = false;
-        this.state.reload().then(state => {
+        this.state!.reload().then(state => {
           this.history[this.history.length - 1] = new Memento(state);
           refreshOnReady && refreshOnReady();
           return state;
@@ -100,7 +103,7 @@ export class StateManager {
   }
 
   getMetadata(nodeId: string) {
-    return this.state.getMetadata(nodeId);
+    return this.state!.getMetadata(nodeId);
   }
 
   async restoreMemento(memento: Memento) {
@@ -129,6 +132,6 @@ export class StateManager {
   }
 
   private popState() {
-    return this.state.prevState().then(() => this.history.pop());
+    return this.state!.prevState().then(() => this.history.pop());
   }
 }

@@ -29,7 +29,7 @@ const MetaKeyCodes = [META, CONTROL];
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuickAccessComponent implements OnDestroy {
-  @Input() theme: Theme;
+  @Input() theme!: Theme;
 
   @Input()
   set queryObject(query: QueryObject) {
@@ -62,7 +62,7 @@ export class QuickAccessComponent implements OnDestroy {
   private _unsubscribe: Subject<void> = new Subject<void>();
 
   constructor(private _changeDetectorRef: ChangeDetectorRef) {
-    fromEvent(document, 'keydown').pipe(
+    fromEvent<KeyboardEvent>(document, 'keydown').pipe(
       tap((event: KeyboardEvent) => {
         if (MetaKeyCodes.indexOf(event.keyCode) >= 0) {
           this.metaKeyDown = event.keyCode;
@@ -80,7 +80,7 @@ export class QuickAccessComponent implements OnDestroy {
       takeUntil(this._unsubscribe)
     ).subscribe();
 
-    fromEvent(document, 'keyup').pipe(
+    fromEvent<KeyboardEvent>(document, 'keyup').pipe(
       tap((event: KeyboardEvent) => {
         if (MetaKeyCodes.indexOf(event.keyCode) >= 0 && this.metaKeyDown === event.keyCode) {
           this.metaKeyDown = 0;

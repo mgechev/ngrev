@@ -9,6 +9,6 @@ import { Theme } from '../../../../shared/themes/color-map';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MetadataComponent {
-  @Input() theme: Theme;
-  @Input() metadata: Metadata;
+  @Input() theme!: Theme;
+  @Input() metadata?: Metadata;
 }

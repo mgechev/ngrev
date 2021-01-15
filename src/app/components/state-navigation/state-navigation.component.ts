@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { SymbolTypes, VisualizationConfig } from '../../../shared/data-format';
-import { Theme, DefaultColor } from '../../../shared/themes/color-map';
+import { Theme, DefaultColor, BoxTheme } from '../../../shared/themes/color-map';
 import { Memento } from '../../model/state-manager';
 import { coerceNumberProperty } from '@angular/cdk/coercion';
 
@@ -29,9 +29,9 @@ export class StateNavigationComponent {
   set maxWidth(value: number) {
     this._maxWidth = coerceNumberProperty(value);
   }
-  private _maxWidth: number;
+  private _maxWidth!: number;
 
-  @Input() theme: Theme;
+  @Input() theme!: Theme;
 
   @Output() select: EventEmitter<Memento> = new EventEmitter<Memento>();
 
@@ -64,7 +64,7 @@ export class StateNavigationComponent {
       const nodes = memento.state.graph.nodes;
       const first = nodes[0];
       if (first && first.type) {
-        const config = this.theme[first.type.type];
+        const config: BoxTheme = this.theme[(first.type.type as keyof Theme)] as BoxTheme;
         if (config) {
           return config.color.background;
         }

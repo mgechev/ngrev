@@ -4,6 +4,7 @@
     "module": "es2020",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
+    "strict": true,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
@@ -29,5 +30,10 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "angularCompilerOptions": {
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": false
+  }
 }

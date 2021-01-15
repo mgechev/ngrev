@@ -11,7 +11,7 @@ export class Configuration {
   constructor(private ipcBus: IPCBus) {}
 
   getConfig(): Promise<Config> {
-    return this.ipcBus.send(Message.Config).then(config => {
+    return this.ipcBus.send<Config>(Message.Config).then((config: Config) => {
       config.themes = Object.assign(config.themes || {});
       config.theme = config.theme || DefaultTheme;
       return config;
