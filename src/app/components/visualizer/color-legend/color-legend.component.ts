@@ -9,12 +9,12 @@ import { ColorLegend } from './color-legend';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ColorLegendComponent {
-  @Input() theme: Theme;
+  @Input() theme!: Theme;
 
   @Input()
   get colors() { return this._colors || []; }
-  set colors(val: ColorLegend) {
-    this._colors = val;
+  set colors(value: ColorLegend) {
+    this._colors = value;
   }
   private _colors: ColorLegend = [];
 }

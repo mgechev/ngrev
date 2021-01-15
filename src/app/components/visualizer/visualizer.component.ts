@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { DataSet } from 'vis';
 
-import { Direction, Layout, Metadata, SymbolTypes, VisualizationConfig } from '../../../shared/data-format';
-import { DefaultColor, Theme } from '../../../shared/themes/color-map';
+import { Direction, Layout, Metadata, SymbolTypes, VisualizationConfig, Node } from '../../../shared/data-format';
+import { BoxColor, BoxTheme, DefaultColor, Theme } from '../../../shared/themes/color-map';
 import { Color, ColorLegend } from './color-legend';
 import { StateManager } from '../../model/state-manager';
 import { combineLatest, ReplaySubject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { NetworkConfig } from './network/network';
 
-export const TypeToNameMap = {
+export const TypeToNameMap: { [key: string]: string } = {
   [SymbolTypes.Component]: 'Component',
   [SymbolTypes.Directive]: 'Directive',
   [SymbolTypes.ComponentWithDirective]: 'Component with Directive',
@@ -43,8 +43,8 @@ export class VisualizerComponent {
   @Output() select: EventEmitter<string> = new EventEmitter<string>();
   @Output() highlight: EventEmitter<string> = new EventEmitter<string>();
 
-  usedColors: ColorLegend;
-  metadata: Metadata | null;
+  usedColors?: ColorLegend;
+  metadata: Metadata | null = null;
   networkConfig?: NetworkConfig;
   theme$: ReplaySubject<Theme> = new ReplaySubject<Theme>(1);
 
@@ -59,13 +59,13 @@ export class VisualizerComponent {
         const graph = data.graph;
         const colors = new Map<SymbolTypes, Color>();
         const nodes = new DataSet(
-          graph.nodes.map(n => {
-            const type = (n.type || { type: SymbolTypes.Unknown }).type;
-            const styles = theme[type] || DefaultColor;
+          graph.nodes.map((node: Node<any>): Node<any> => {
+            const type = (node.type || { type: SymbolTypes.Unknown }).type;
+            const styles: BoxTheme = (theme[type as keyof Theme] as BoxTheme)|| DefaultColor;
             const color = styles.color.background;
-            const label = TypeToNameMap[type] || 'Unknown';
+            const label = TypeToNameMap[type as string] || 'Unknown';
             colors.set(type, { color, label });
-            return Object.assign({}, n, styles);
+            return Object.assign({}, node, styles);
           })
         );
 
@@ -121,7 +121,7 @@ export class VisualizerComponent {
       }),
       tap(({title, layout, nodes, edges, colors}) => {
         this.usedColors = [];
-        colors.forEach(val => this.usedColors.push(val));
+        colors.forEach(val => this.usedColors!.push(val));
 
         this.networkConfig = {
           title,

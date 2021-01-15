@@ -23,14 +23,14 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   loading = false;
   queryList: KeyValuePair<SymbolWithId>[] = [];
   queryObject = ['value.name', 'value.filePath'];
-  theme: Theme;
-  themes: { [name: string]: Theme };
-  showLibs: boolean;
-  showModules: boolean;
+  theme!: Theme;
+  themes!: { [name: string]: Theme };
+  showLibs = false;
+  showModules = true;
 
   maxWidth$: Observable<number>;
 
-  @ViewChild(QuickAccessComponent) quickAccess: QuickAccessComponent;
+  @ViewChild(QuickAccessComponent) quickAccess?: QuickAccessComponent;
 
   private _stopLoading = () => {
     this.loading = false;
@@ -62,8 +62,8 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       startWith(window.innerWidth)
     );
 
-    this._keyDownSubscription = fromEvent(document, 'keydown').pipe(
-      filter((event: KeyboardEvent) => event.keyCode === BACKSPACE && this.quickAccess?.hidden),
+    this._keyDownSubscription = fromEvent<KeyboardEvent>(document, 'keydown').pipe(
+      filter((event: KeyboardEvent): boolean => !!(event.keyCode === BACKSPACE && this.quickAccess?.hidden)),
       tap({
         next: () => {
           this.prevState()
@@ -98,11 +98,11 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     this.manager
       .loadProject(tsconfig, this.showLibs, this.showModules)
       .then(() => this._project.getSymbols())
-      .then(symbols => {
-        return this.queryList = symbols.map(s => ({ key: s.name, value: s }));
+      .then((symbols: any) => {
+        return this.queryList = symbols.map((symbol: any) => ({ key: symbol.name, value: symbol }));
       })
       .then(this._stopLoading)
-      .catch(error => {
+      .catch((error: any) => {
         window.require('electron').remote.dialog.showErrorBox(
           'Error while parsing project',
           "Cannot parse your project. Make sure it's " +

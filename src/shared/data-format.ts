@@ -1,5 +1,5 @@
 import { R3InjectableMetadata } from '@angular/compiler';
-import { Theme } from './themes/color-map';
+import { BoxTheme, Theme } from './themes/color-map';
 
 export interface Graph<T> {
   nodes: Node<T>[];
@@ -31,6 +31,7 @@ export interface Node<T> {
   label: string;
   data?: T;
   type?: SymbolType;
+  styles?: BoxTheme;
 }
 
 export enum Direction {

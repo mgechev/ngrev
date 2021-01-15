@@ -67,7 +67,7 @@ export interface Theme {
   pipe: BoxTheme;
 }
 
-export const DefaultColor = {
+export const DefaultColor: BoxTheme = {
   margin: 10,
   color: {
     background: '#90A4AE',
