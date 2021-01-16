@@ -13,7 +13,7 @@ import {
 import { ComponentSymbol, DirectiveSymbol, InjectableSymbol, NgModuleSymbol, PipeSymbol, WorkspaceSymbols } from 'ngast';
 import {
   getDirectiveMetadata,
-  getProviderMetadata,
+  getInjectableMetadata,
   getPipeMetadata, getModuleMetadata
 } from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';
@@ -48,7 +48,7 @@ export class ModuleState extends State {
     if (data.symbol instanceof DirectiveSymbol || data.symbol instanceof ComponentSymbol) {
       return getDirectiveMetadata(data.symbol);
     } else if (data.symbol instanceof InjectableSymbol) {
-      return getProviderMetadata(data.symbol);
+      return getInjectableMetadata(data.symbol);
     } else if (data.symbol instanceof PipeSymbol) {
       return getPipeMetadata(data.symbol);
     } else if (data.symbol instanceof NgModuleSymbol) {

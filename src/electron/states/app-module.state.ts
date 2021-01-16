@@ -11,7 +11,7 @@ import {
   isThirdParty
 } from '../../shared/data-format';
 import { ComponentSymbol, DirectiveSymbol, InjectableSymbol, NgModuleSymbol, PipeSymbol, WorkspaceSymbols } from 'ngast';
-import { getDirectiveMetadata, getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
+import { getDirectiveMetadata, getInjectableMetadata, getPipeMetadata } from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';
 import { PipeState } from './pipe.state';
 
@@ -43,7 +43,7 @@ export class AppModuleState extends State {
     if (data.symbol instanceof DirectiveSymbol || data.symbol instanceof ComponentSymbol) {
       return getDirectiveMetadata(data.symbol);
     } else if (data.symbol instanceof InjectableSymbol) {
-      return getProviderMetadata(data.symbol);
+      return getInjectableMetadata(data.symbol);
     } else if (data.symbol instanceof PipeSymbol) {
       return getPipeMetadata(data.symbol);
     }

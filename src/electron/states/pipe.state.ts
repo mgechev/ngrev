@@ -12,7 +12,7 @@ import {
 } from '../../shared/data-format';
 import { InjectableSymbol, PipeSymbol, WorkspaceSymbols } from 'ngast';
 import { State } from './state';
-import { getProviderMetadata, getPipeMetadata } from '../formatters/model-formatter';
+import { getInjectableMetadata, getPipeMetadata } from '../formatters/model-formatter';
 import { ProviderState } from './provider.state';
 
 interface NodeMap {
@@ -29,7 +29,7 @@ export class PipeState extends State {
   getMetadata(id: string): Metadata {
     const s = this.symbols[id];
     if (s instanceof InjectableSymbol) {
-      return getProviderMetadata(s);
+      return getInjectableMetadata(s);
     } else {
       return getPipeMetadata(s);
     }
