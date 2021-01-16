@@ -1,7 +1,7 @@
 import { Component, ChangeDetectorRef, NgZone, ViewChild, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
 import { ProjectProxy } from './model/project-proxy';
-import { Config, Metadata } from '../shared/data-format';
-import { SymbolWithId, formatError } from './shared/utils';
+import { Config, IdentifiedStaticSymbol } from '../shared/data-format';
+import { formatError } from './shared/utils';
 import { StateManager, Memento } from './model/state-manager';
 import { Theme } from '../shared/themes/color-map';
 import { IPCBus } from './model/ipc-bus';
@@ -11,7 +11,8 @@ import { debounceTime, filter, map, startWith, tap } from 'rxjs/operators';
 import { Configuration } from './model/configuration';
 import { ProjectLoadEvent } from './home';
 import { BACKSPACE } from '@angular/cdk/keycodes';
-import { KeyValuePair, QuickAccessComponent } from './components/quick-access';
+import { QuickAccessComponent } from './components/quick-access';
+import { KeyValue } from '@angular/common';
 
 @Component({
   selector: 'ngrev-app',
@@ -21,8 +22,8 @@ import { KeyValuePair, QuickAccessComponent } from './components/quick-access';
 export class AppComponent implements AfterViewInit, OnDestroy {
   projectSet = false;
   loading = false;
-  queryList: KeyValuePair<SymbolWithId>[] = [];
-  queryObject = ['value.name', 'value.filePath'];
+  queryList: KeyValue<string, IdentifiedStaticSymbol>[] = [];
+  queryObject: string[] = ['value.name', 'value.filePath'];
   theme!: Theme;
   themes!: { [name: string]: Theme };
   showLibs = false;
@@ -98,8 +99,8 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     this.manager
       .loadProject(tsconfig, this.showLibs, this.showModules)
       .then(() => this._project.getSymbols())
-      .then((symbols: any) => {
-        return this.queryList = symbols.map((symbol: any) => ({ key: symbol.name, value: symbol }));
+      .then((symbols: IdentifiedStaticSymbol[]): KeyValue<string, IdentifiedStaticSymbol>[] => {
+        return this.queryList = symbols.map((symbol: IdentifiedStaticSymbol) => ({ key: symbol.name, value: symbol }));
       })
       .then(this._stopLoading)
       .catch((error: any) => {
@@ -127,7 +128,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  selectSymbol(symbolPair: KeyValuePair<SymbolWithId>) {
+  selectSymbol(symbolPair: KeyValue<string, IdentifiedStaticSymbol>) {
     if (symbolPair && symbolPair.value) {
       this.tryChangeState(symbolPair.value.id);
     }
