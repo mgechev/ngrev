@@ -21,17 +21,29 @@ const _changeDetectionToString = (
   return null;
 };
 
-export const getProviderMetadata = (provider: InjectableSymbol): Metadata => {
-  const deps = provider.getDependencies();
+export const getInjectableMetadata = (injectable: InjectableSymbol): Metadata => {
+  const deps = injectable.getDependencies();
   return {
-    filePath: provider.path,
+    filePath: injectable.path,
     properties: [
-      { key: 'Name', value: provider.name },
+      { key: 'Name', value: injectable.name },
       // { key: 'Multiprovider', value: (meta.multi === true).toString() },
       { key: 'Dependencies', value: deps.map((dep) => dep.name).join(', ') },
     ],
   };
 };
+
+// TODO: Implement it, when Provider is gonna be provided by ngast
+// export const getProviderMetadata = (provider: Provider): Metadata => {
+//   return {
+//     filePath: `...`,
+//     properties: [
+//       { key: 'Name', value: provider.name },
+//       { key: 'UseKey', value: provider.metadata.useKey },
+//       { key: 'Value', value: provider.metadata.value },
+//     ],
+//   };
+// }
 
 export const getPipeMetadata = (pipe: PipeSymbol): Metadata => {
   return {

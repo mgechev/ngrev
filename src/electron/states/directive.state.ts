@@ -1,4 +1,10 @@
-import { ComponentSymbol, DirectiveSymbol, InjectableSymbol, TemplateNode, WorkspaceSymbols } from 'ngast';
+import {
+  ComponentSymbol,
+  DirectiveSymbol,
+  InjectableSymbol,
+  TemplateNode,
+  WorkspaceSymbols
+} from 'ngast';
 import { State } from './state';
 import {
   Direction,
@@ -11,7 +17,7 @@ import {
   SymbolTypes,
   VisualizationConfig,
 } from '../../shared/data-format';
-import { getDirectiveMetadata, getElementMetadata, } from '../formatters/model-formatter';
+import { getDirectiveMetadata, getElementMetadata, getInjectableMetadata } from '../formatters/model-formatter';
 import { TemplateState } from './template.state';
 
 interface NodeMap {
@@ -38,6 +44,11 @@ export class DirectiveState extends State {
     if (s) {
       if (s instanceof DirectiveSymbol || s instanceof ComponentSymbol) {
         return getDirectiveMetadata(s);
+      } else if (s instanceof InjectableSymbol) {
+        return getInjectableMetadata(s);
+      // TODO: Implement it, when Provider is gonna be provided by ngast
+      // } else if (s instanceof Provider) {
+      //   return getProviderMetadata(s);
       } else {
         return getElementMetadata(s);
       }

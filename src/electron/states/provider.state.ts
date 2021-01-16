@@ -11,7 +11,7 @@ import {
   isThirdParty
 } from '../../shared/data-format';
 import { State } from './state';
-import { getProviderMetadata } from '../formatters/model-formatter';
+import { getInjectableMetadata } from '../formatters/model-formatter';
 import { InjectableSymbol, WorkspaceSymbols } from 'ngast';
 
 interface NodeMap {
@@ -26,7 +26,7 @@ export class ProviderState extends State {
   }
 
   getMetadata(id: string): Metadata {
-    return getProviderMetadata(this.symbols[id]);
+    return getInjectableMetadata(this.symbols[id]);
   }
 
   nextState(nodeId: string): State {
