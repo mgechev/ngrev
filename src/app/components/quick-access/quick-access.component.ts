@@ -9,10 +9,11 @@ import {
   ViewChild
 } from '@angular/core';
 import { Theme } from '../../../shared/themes/color-map';
-import { KeyValuePair, QueryObject } from './quick-access';
 import { CONTROL, DOWN_ARROW, ESCAPE, META, P, UP_ARROW } from '@angular/cdk/keycodes';
 import { fromEvent, Observable, Subject } from 'rxjs';
-import { map, takeUntil, tap } from 'rxjs/operators';
+import { filter, map, takeUntil, tap } from 'rxjs/operators';
+import { KeyValue } from '@angular/common';
+import { IdentifiedStaticSymbol } from '../../../shared/data-format';
 
 declare const require: any;
 const Fuse = require('fuse.js');
@@ -22,9 +23,6 @@ const MetaKeyCodes = [META, CONTROL];
 @Component({
   selector: 'ngrev-quick-access',
   templateUrl: './quick-access.component.html',
-  host: {
-    '(document:click)': 'onDocumentClick($event)'
-  },
   styleUrls: ['./quick-access.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -32,7 +30,7 @@ export class QuickAccessComponent implements OnDestroy {
   @Input() theme!: Theme;
 
   @Input()
-  set queryObject(query: QueryObject) {
+  set queryObject(query: string[]) {
     let list = [];
     if (this.fuse) {
       list = this.fuse.list;
@@ -41,11 +39,11 @@ export class QuickAccessComponent implements OnDestroy {
   }
 
   @Input()
-  set queryList(symbols: KeyValuePair<any>[]) {
+  set queryList(symbols: KeyValue<string, IdentifiedStaticSymbol>[]) {
     this.fuse.set(symbols);
   }
 
-  @Output() select: EventEmitter<string> = new EventEmitter<string>();
+  @Output() select: EventEmitter<KeyValue<string, IdentifiedStaticSymbol>> = new EventEmitter<KeyValue<string, IdentifiedStaticSymbol>>();
 
   @HostBinding('class.hidden') hidden: boolean = true;
 
@@ -58,10 +56,20 @@ export class QuickAccessComponent implements OnDestroy {
   searchResult$: Observable<any>;
 
   private metaKeyDown = 0;
-  private fuse = new Fuse([], { keys: ['name', 'filePath'] });
+  private fuse: typeof Fuse = new Fuse([], { keys: ['name', 'filePath'] });
   private _unsubscribe: Subject<void> = new Subject<void>();
 
   constructor(private _changeDetectorRef: ChangeDetectorRef) {
+    fromEvent(document, 'click').pipe(
+      filter(() => !this.hidden),
+      tap({
+        next: () => {
+          this.hide();
+        }
+      }),
+      takeUntil(this._unsubscribe)
+    ).subscribe();
+
     fromEvent<KeyboardEvent>(document, 'keydown').pipe(
       tap((event: KeyboardEvent) => {
         if (MetaKeyCodes.indexOf(event.keyCode) >= 0) {
@@ -99,10 +107,6 @@ export class QuickAccessComponent implements OnDestroy {
   ngOnDestroy(): void {
     this._unsubscribe.next();
     this._unsubscribe.complete();
-  }
-
-  onDocumentClick() {
-    this.hide();
   }
 
   updateKeyword(searchText: string) {
