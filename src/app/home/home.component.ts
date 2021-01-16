@@ -11,8 +11,6 @@ import { ProjectLoadEvent } from './home';
 export class HomeComponent {
   @Output() project: EventEmitter<ProjectLoadEvent> = new EventEmitter<ProjectLoadEvent>();
 
-  constructor() {}
-
   loadProject(): void {
     window.require('electron').remote.dialog
       .showOpenDialog({ properties: ['openFile', 'multiSelections'] })
