@@ -11,10 +11,10 @@ import {
 } from '@angular/core';
 
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-
-import { KeyValuePair } from '../quick-access';
 import { Theme } from '../../../../shared/themes/color-map';
 import { DOWN_ARROW, ENTER, UP_ARROW } from '@angular/cdk/keycodes';
+import { KeyValue } from '@angular/common';
+import { IdentifiedStaticSymbol } from '../../../../shared/data-format';
 
 const ensureVisible = (item: ElementRef) => {
   const domNode = item.nativeElement as HTMLLIElement;
@@ -52,27 +52,29 @@ const formatText = (text: string, highlight: string): string => {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuickAccessListComponent {
-  bindData: KeyValuePair<any>[] = [];
 
   @Input() theme!: Theme;
   @Input() highlight!: string;
   @Input()
-  set data(val: KeyValuePair<any>[]) {
-    this.bindData = val;
-    if (this.selection >= val.length) {
+  get data(): KeyValue<string, IdentifiedStaticSymbol>[] { return this._data; }
+  set data(value: KeyValue<string, IdentifiedStaticSymbol>[]) {
+    this._data = value;
+    if (this.selection >= value.length) {
       this.highlightItem(0);
     }
   }
-  @Output() select = new EventEmitter<KeyValuePair<any>>();
+  private _data: KeyValue<string, IdentifiedStaticSymbol>[] = [];
+
+  @Output() select: EventEmitter<KeyValue<string, IdentifiedStaticSymbol>> = new EventEmitter<KeyValue<string, IdentifiedStaticSymbol>>();
   @ViewChildren('items') items?: QueryList<ElementRef>;
 
   selection = 0;
 
   constructor(private _renderer: Renderer2, private _sanitizer: DomSanitizer) {}
 
-  selectItem(e: Event, element: KeyValuePair<any>) {
+  selectItem(event: Event, element: KeyValue<string, IdentifiedStaticSymbol>) {
     this.select.emit(element);
-    e.stopImmediatePropagation();
+    event.stopImmediatePropagation();
   }
 
   onKeyDown(event: KeyboardEvent) {
@@ -80,14 +82,14 @@ export class QuickAccessListComponent {
     if (event.keyCode === UP_ARROW) {
       nextIdx = this.selection - 1;
       if (nextIdx < 0) {
-        nextIdx = this.bindData.length - 1;
+        nextIdx = this.data.length - 1;
       }
     }
     if (event.keyCode === DOWN_ARROW) {
-      nextIdx = (this.selection + 1) % this.bindData.length;
+      nextIdx = (this.selection + 1) % this.data.length;
     }
-    if (event.keyCode === ENTER && this.bindData[this.selection]) {
-      this.select.emit(this.bindData[this.selection]);
+    if (event.keyCode === ENTER && this.data[this.selection]) {
+      this.select.emit(this.data[this.selection]);
     }
     this.highlightItem(nextIdx);
   }
