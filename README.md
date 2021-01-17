@@ -61,7 +61,7 @@ To release:
 
 1. Update version in `package.json`.
 2. `git commit -am vX.Y.Z && git tag vX.Y.Z`
-3. `git push origin --follow-tags`
+3. `git push && git push --tags`
 
 ## Contributors
 
