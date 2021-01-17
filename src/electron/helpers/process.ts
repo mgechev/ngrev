@@ -1,7 +1,12 @@
-import { Metadata, VisualizationConfig, Config, IdentifiedStaticSymbol } from '../../shared/data-format';
+import { Metadata, VisualizationConfig, Config } from '../../shared/data-format';
 import { fork, ChildProcess } from 'child_process';
 import { EventEmitter } from 'events';
 import { Message } from '../../shared/ipc-constants';
+import { StaticSymbol } from '@angular/compiler';
+
+export interface IdentifiedStaticSymbol extends StaticSymbol {
+  id: string;
+}
 
 export interface LoadProjectRequest {
   showLibs: boolean;

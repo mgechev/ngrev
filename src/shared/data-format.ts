@@ -1,6 +1,5 @@
 import { R3InjectableMetadata } from '@angular/compiler';
 import { BoxTheme, Theme } from './themes/color-map';
-import { AnnotationNames } from 'ngast';
 
 export interface Graph<T> {
   nodes: Node<T>[];
@@ -20,13 +19,6 @@ export enum SymbolTypes {
   LazyModule = 'lazy-module',
   Meta = 'meta',
   Unknown = 'unknown'
-}
-
-export interface IdentifiedStaticSymbol {
-  id: string;
-  name: string;
-  annotation: AnnotationNames;
-  path: string;
 }
 
 export interface SymbolType {

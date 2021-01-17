@@ -1,5 +1,8 @@
 import { StaticSymbol } from '@angular/compiler';
-import { AnnotationNames } from 'ngast';
+
+export interface SymbolWithId extends StaticSymbol {
+  id: string;
+}
 
 export const formatError = (error: any) => {
   if (typeof error === 'string') {

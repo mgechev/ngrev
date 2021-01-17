@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import { VisualizationConfig } from '../../../shared/data-format';
+import { SymbolTypes, VisualizationConfig } from '../../../shared/data-format';
 import { Theme, DefaultColor, BoxTheme } from '../../../shared/themes/color-map';
 import { Memento } from '../../model/state-manager';
 import { coerceNumberProperty } from '@angular/cdk/coercion';

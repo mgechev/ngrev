@@ -32,8 +32,6 @@ export class NetworkComponent implements OnDestroy {
         scale,
         position
       });
-    } else {
-      this._instance.fit();
     }
 
     this._exportToImage.enable({

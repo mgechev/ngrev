@@ -14,7 +14,6 @@ import {
   GetMetadataRequest,
   GetDataRequest
 } from './helpers/process';
-import { IdentifiedStaticSymbol } from '../shared/data-format';
 
 export class BackgroundApp {
   private project: Project;
@@ -128,7 +127,7 @@ export class BackgroundApp {
 
     this.parentProcess.on(Message.GetSymbols, (data: GetSymbolsRequest, responder: Responder) => {
       console.log('Get symbols');
-      const res: IdentifiedStaticSymbol[] = [];
+      const res: any[] = [];
       try {
         const map = SymbolIndex.getIndex(this.project.projectSymbols);
         map.forEach((data: SymbolData<AnnotationNames>, id: string) => {

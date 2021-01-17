@@ -1,5 +1,5 @@
-<ul *ngIf="data.length">
-  <li #items *ngFor="let element of data; let i=index"
+<ul *ngIf="bindData.length">
+  <li #items *ngFor="let element of bindData; let i=index"
       [style.borderTopColor]="theme.fuzzySearch.border"
       [style.borderLeftColor]="theme.fuzzySearch.border"
       [style.borderRightColor]="theme.fuzzySearch.border"
