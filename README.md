@@ -14,6 +14,8 @@ Graphical tool for reverse engineering of Angular projects. It allows you to nav
 2.  Download the latest `*.dmg` file.
 3.  Install the application.
 
+The application is not signed, so you may have to explicitly allow your mac to run it in `System Preferences -> Security & Privacy -> General`.
+
 ### Linux
 
 1.  Go to the [releases page](https://github.com/mgechev/ngrev/releases).
@@ -32,7 +34,7 @@ You can add your own theme by creating a `[theme-name].theme.json` file in Elect
 
 ### Application Requirements
 
-Your application needs to be compatible with the Angular's AoT compiler (i.e. you should be able to compile it with `ngc`).
+Your application needs to be compatible with Angular Ivy compiler. `ngrev` is not tested with versions older than v11. To stay up to date check the [update guide](https://angular.io/guide/updating) on angular.io.
 
 ### Using with Angular CLI
 
@@ -40,13 +42,6 @@ Your application needs to be compatible with the Angular's AoT compiler (i.e. yo
 2.  Make sure the dependencies are installed.
 3.  Open `ngrev`.
 4.  Click on `Select Project` and select `[YOUR_CLI_APP]/src/tsconfig.app.json`.
-
-### Using with Angular Seed
-
-1.  Open the Angular's application directory.
-2.  Make sure the dependencies are installed.
-3.  Open `ngrev`.
-4.  Click on `Select Project` and select `[YOUR_CLI_APP]/src/client/tsconfig.json`.
 
 ## Demo
 
