@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, MenuItem, MenuItemConstructorOptions } from "electron";
+import { app, BrowserWindow, dialog, MenuItem, MenuItemConstructorOptions, MessageBoxReturnValue } from "electron";
 import { Message } from "../../shared/ipc-constants";
 import { getConfig } from "../config";
 
@@ -82,9 +82,9 @@ export const applicationMenuTemplate = (
               message:
                 "Your progress will be lost. Are you sure you want to refresh and select a new project?",
             })
-            .then((response) => {
-              if (!response) {
-                BrowserWindow.getAllWindows().forEach((w) =>
+            .then((message: MessageBoxReturnValue) => {
+              if (!message.response) {
+                BrowserWindow.getAllWindows().forEach((w: BrowserWindow) =>
                   w.webContents.reloadIgnoringCache()
                 );
               }

@@ -5,10 +5,6 @@ export const devMenuTemplate = (): MenuItem | MenuItemConstructorOptions => {
     label: 'Development',
     submenu: [
       {
-        label: "Reset",
-        role: 'reload'
-      },
-      {
         label: 'Quit',
         accelerator: 'CmdOrCtrl+Q',
         click() {
