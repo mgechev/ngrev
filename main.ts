@@ -92,7 +92,8 @@ function createWindow(): BrowserWindow {
     win = null;
   });
 
-  win.on('show', checkForUpdates);
+  // Enable auto updates
+  // win.on('show', checkForUpdates);
 
   const backgroundApp = new BackgroundApp();
   backgroundApp.init(getConfig());
