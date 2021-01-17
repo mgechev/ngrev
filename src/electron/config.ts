@@ -34,19 +34,19 @@ export const getConfig = (): Config => {
   } catch (_) {
     console.log('Themes not found', _);
     return {
-      showLibs: !!(config as any).showLibs,
-      showModules: !!(config as any).showModules,
-      theme: (config as any).theme,
+      showLibs: config.showLibs,
+      showModules: config.showModules,
+      theme: config.theme,
       themes: builtInThemesMap
     };
   }
   return {
-    showLibs: !!(config as any).showLibs,
-    showModules: !!(config as any).showModules,
-    theme: (config as any).theme,
+    showLibs: config.showLibs,
+    showModules: config.showModules,
+    theme: config.theme,
     themes: Object.assign(
       themes.reduce((a, t) => {
-        a[t.name] = t as Theme;
+        a[t.name] = t;
         return a;
       }, {}),
       builtInThemesMap
@@ -54,12 +54,14 @@ export const getConfig = (): Config => {
   };
 };
 
-export const setConfigProps = (config: Partial<Config>) => {
+export const setConfigProps = (config: Partial<Config>): void => {
   const path = app.getPath('userData');
   let storedConfig: Partial<Config> = {};
   try {
     storedConfig = JSON.parse(readFileSync(join(path, 'config.json')).toString());
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
   try {
     Object.assign(storedConfig, config);
     writeFileSync(join(path, 'config.json'), JSON.stringify(storedConfig, null, 2));

@@ -1,0 +1,41 @@
+# Keep up to date with electron-builder.yml
+# https://www.json2yaml.com/
+---
+productName: ngrev
+asar: false
+owner: mgechev
+repo: ngrev
+provider: github
+directories:
+  output: release/
+files:
+- "**/*"
+- "!**/*.ts"
+- "!*.code-workspace"
+- "!LICENSE.md"
+- "!package.json"
+- "!package-lock.json"
+- "!yarn.json"
+- "!src/"
+- src/assets/
+- src/electron/**/*.js
+- src/shared/**/*.js
+- "!e2e/"
+- "!hooks/"
+- "!angular.json"
+- "!_config.yml"
+- "!karma.conf.js"
+- "!tsconfig.json"
+- "!tslint.json"
+win:
+  icon: dist/assets/icons
+  target:
+  - portable
+mac:
+  icon: dist/assets/icons
+  target:
+  - dmg
+linux:
+  icon: dist/assets/icons
+  target:
+  - AppImage
