@@ -33,18 +33,6 @@ export const getInjectableMetadata = (injectable: InjectableSymbol): Metadata =>
   };
 };
 
-// TODO: Implement it, when Provider is gonna be provided by ngast
-// export const getProviderMetadata = (provider: Provider): Metadata => {
-//   return {
-//     filePath: `...`,
-//     properties: [
-//       { key: 'Name', value: provider.name },
-//       { key: 'UseKey', value: provider.metadata.useKey },
-//       { key: 'Value', value: provider.metadata.value },
-//     ],
-//   };
-// }
-
 export const getPipeMetadata = (pipe: PipeSymbol): Metadata => {
   return {
     filePath: pipe.path,
