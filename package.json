@@ -1,6 +1,6 @@
 {
   "name": "ngrev",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "description": "Reverse engineering of Angular apps",
   "homepage": "https://github.com/mgechev/ngrev",
   "author": {
