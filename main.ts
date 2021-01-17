@@ -3,18 +3,17 @@ import { getConfig, setConfigProps } from './src/electron/config';
 import { devMenuTemplate } from './src/electron/menu/dev_menu_template';
 import { applicationMenuTemplate } from './src/electron/menu/application_menu_template';
 import { BackgroundApp } from './src/electron/model/background-app';
+import { checkForUpdates } from './auto-update';
+import { isDev } from './utils';
 import * as path from 'path';
 import * as url from 'url';
 
 let win: BrowserWindow = null;
-const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
-
 
 // Save userData in separate folders for each environment.
 // Thanks to this you can use production and development versions of the app
 // on same machine like those are two separate apps.
-if (serve) {
+if (isDev) {
   const userDataPath = app.getPath('userData').toString();
   app.setPath('userData', userDataPath + ' (development)');
 }
@@ -40,7 +39,7 @@ const menuItems = [
     modulesOnlyToggle
   )
 ];
-if (serve) {
+if (isDev) {
   menuItems.push(devMenuTemplate());
 }
 
@@ -60,7 +59,7 @@ function createWindow(): BrowserWindow {
     height: size.height,
     webPreferences: {
       nodeIntegration: true,
-      allowRunningInsecureContent: (serve) ? true : false,
+      allowRunningInsecureContent: (isDev) ? true : false,
       contextIsolation: false,  // false if you want to run 2e2 test with Spectron
       enableRemoteModule : true // true if you want to run 2e2 test  with Spectron or use remote module in renderer context (ie. Angular)
     },
@@ -68,7 +67,7 @@ function createWindow(): BrowserWindow {
 
   win.setTitle(require('./package.json').name);
 
-  if (serve) {
+  if (isDev) {
 
     win.webContents.openDevTools();
 
@@ -92,6 +91,8 @@ function createWindow(): BrowserWindow {
     // when you should delete the corresponding element.
     win = null;
   });
+
+  win.on('show', checkForUpdates);
 
   const backgroundApp = new BackgroundApp();
   backgroundApp.init(getConfig());
