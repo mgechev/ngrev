@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Theme } from '../../../shared/themes/color-map';
 
 @Component({
   selector: 'ngrev-spinner',
@@ -6,4 +7,13 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   styleUrls: ['./spinner.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SpinnerComponent {}
+export class SpinnerComponent {
+  @Input() theme!: Theme;
+
+  get backgroundColor(): string | undefined {
+    if (!this.theme) {
+      return;
+    }
+    return this.theme.background;
+  }
+}
