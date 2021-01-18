@@ -1,11 +1,10 @@
 import { expect } from 'chai';
-import { app } from 'electron';
 import { join } from 'path';
 import { SpectronClient } from 'spectron';
 
 import commonSetup from './common-setup';
 
-describe('angular-electron App', function () {
+describe('ngrev', function () {
 
   commonSetup.apply(this);
 
@@ -33,5 +32,4 @@ describe('angular-electron App', function () {
     const breadcrumbLabel = await client.$('ngrev-app h2');
     expect(await breadcrumbLabel.getText()).to.equal('History');
   });
-
 });
