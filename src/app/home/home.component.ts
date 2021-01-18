@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ProjectLoadEvent } from './home';
 import { FileDialogService } from './file-dialog.service';
+import { Theme } from '../../shared/themes/color-map';
 
 @Component({
   selector: 'ngrev-home',
@@ -9,6 +10,7 @@ import { FileDialogService } from './file-dialog.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent {
+  @Input() theme!: Theme;
   @Output() project: EventEmitter<ProjectLoadEvent> = new EventEmitter<ProjectLoadEvent>();
 
   constructor(private _dialog: FileDialogService) {}
@@ -20,5 +22,12 @@ export class HomeComponent {
           this.project.emit({ tsconfig: filePaths[0] });
         }
       });
+  }
+
+  get backgroundColor(): string | undefined {
+    if (!this.theme) {
+      return;
+    }
+    return this.theme.background;
   }
 }

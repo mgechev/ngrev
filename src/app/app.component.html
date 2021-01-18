@@ -12,7 +12,7 @@
 </ngrev-state-navigation>
 
 <!--TODO: Create separated route?-->
-<ngrev-home *ngIf="!projectSet" (project)="onProject($event)"></ngrev-home>
+<ngrev-home *ngIf="!projectSet" [theme]="theme" (project)="onProject($event)"></ngrev-home>
 
 <ngrev-visualizer
   *ngIf="initialized"

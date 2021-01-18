@@ -5,7 +5,7 @@ import { Config } from '../../shared/data-format';
 import { DefaultTheme } from '../../shared/themes/color-map';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class Configuration {
   constructor(private ipcBus: IPCBus) {}

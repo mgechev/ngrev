@@ -3,7 +3,7 @@ import { getConfig, setConfigProps } from './src/electron/config';
 import { devMenuTemplate } from './src/electron/menu/dev_menu_template';
 import { applicationMenuTemplate } from './src/electron/menu/application_menu_template';
 import { BackgroundApp } from './src/electron/model/background-app';
-import { checkForUpdates } from './auto-update';
+// import { checkForUpdates } from './auto-update';
 import { isDev } from './utils';
 import * as path from 'path';
 import * as url from 'url';

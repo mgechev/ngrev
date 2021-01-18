@@ -1,4 +1,4 @@
-import { Component, NgZone, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, NgZone, ViewChild, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ProjectProxy } from './model/project-proxy';
 import { Config, IdentifiedStaticSymbol, VisualizationConfig } from '../shared/data-format';
 import { formatError } from './shared/utils';
@@ -44,6 +44,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     public manager: StateManager,
+    private _cd: ChangeDetectorRef,
     private _ngZone: NgZone,
     private _project: ProjectProxy,
     private _ipcBus: IPCBus,
@@ -75,6 +76,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this._ipcBus.on(Message.ChangeTheme, (_: any, theme: string) => {
       this.theme = this.themes[theme];
+      this._cd.detectChanges();
     });
     this._ipcBus.on(Message.ToggleLibsMenuAction, () => {
       this.manager.toggleLibs().then(() => {
