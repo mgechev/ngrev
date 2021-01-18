@@ -85,7 +85,7 @@ export class StateManager {
     this.history[0].dirty = true;
   }
 
-  getCurrentState(refreshOnReady?: () => void) {
+  getCurrentState(refreshOnReady?: () => void): VisualizationConfig<any> | null {
     const last = this.history[this.history.length - 1];
     if (last) {
       if (last.dirty) {

@@ -1,0 +1,26 @@
+{
+  "name": "ng-11",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "ngcc"
+  },
+  "dependencies": {
+    "@angular/animations": "11.0.3",
+    "@angular/cdk": "11.0.3",
+    "@angular/common": "11.0.3",
+    "@angular/core": "11.0.3",
+    "@angular/forms": "11.0.3",
+    "@angular/material": "11.0.3",
+    "@angular/platform-browser": "11.0.3",
+    "rxjs": "6.6.3",
+    "zone.js": "0.10.3"
+  },
+  "devDependencies": {
+    "@angular/compiler": "11.0.9",
+    "@angular/compiler-cli": "11.0.9"
+  }
+}

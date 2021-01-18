@@ -1,19 +1,16 @@
-import { StaticSymbol } from '@angular/compiler';
-import { AnnotationNames } from 'ngast';
-
-export const formatError = (error: any) => {
+export const formatError = (error: unknown): string => {
   if (typeof error === 'string') {
     return error;
   } else {
     try {
-      error = JSON.stringify(error);
+      return JSON.stringify(error);
     } catch (e) {
       console.log('Cannot serialize the error', e);
     }
-    return error;
   }
+  return '';
 };
 
-export const isMetaNodeId = (id: string) => {
+export const isMetaNodeId = (id: string): boolean => {
   return id.split('#').length !== 2;
 };

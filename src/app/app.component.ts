@@ -1,6 +1,6 @@
-import { Component, ChangeDetectorRef, NgZone, ViewChild, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
+import { Component, NgZone, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { ProjectProxy } from './model/project-proxy';
-import { Config, IdentifiedStaticSymbol } from '../shared/data-format';
+import { Config, IdentifiedStaticSymbol, VisualizationConfig } from '../shared/data-format';
 import { formatError } from './shared/utils';
 import { StateManager, Memento } from './model/state-manager';
 import { Theme } from '../shared/themes/color-map';
@@ -46,7 +46,6 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     public manager: StateManager,
     private _ngZone: NgZone,
     private _project: ProjectProxy,
-    private _changeDetectorRef: ChangeDetectorRef,
     private _ipcBus: IPCBus,
     private _configuration: Configuration
   ) {
@@ -67,22 +66,22 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       filter((event: KeyboardEvent): boolean => !!(event.keyCode === BACKSPACE && this.quickAccess?.hidden)),
       tap({
         next: () => {
-          this.prevState()
+          this.prevState();
         }
       })
     ).subscribe();
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this._ipcBus.on(Message.ChangeTheme, (_: any, theme: string) => {
       this.theme = this.themes[theme];
     });
-    this._ipcBus.on(Message.ToggleLibsMenuAction, (_: any) => {
+    this._ipcBus.on(Message.ToggleLibsMenuAction, () => {
       this.manager.toggleLibs().then(() => {
         this.manager.reloadAppState();
       });
     });
-    this._ipcBus.on(Message.ToggleModulesMenuAction, (_: any) => {
+    this._ipcBus.on(Message.ToggleModulesMenuAction, () => {
       this.manager.toggleModules().then(() => {
         this.manager.reloadAppState();
       });
@@ -93,7 +92,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     this._keyDownSubscription.unsubscribe();
   }
 
-  onProject({ tsconfig }: ProjectLoadEvent) {
+  onProject({ tsconfig }: ProjectLoadEvent): void {
     this.projectSet = true;
     this._startLoading();
     this.manager
@@ -106,15 +105,14 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       .catch((error: any) => {
         window.require('electron').remote.dialog.showErrorBox(
           'Error while parsing project',
-          "Cannot parse your project. Make sure it's " +
-            "compatible with the Angular's AoT compiler. Error during parsing:\n\n" +
-            formatError(error)
+          `Cannot parse your project. Make sure it's compatible with
+the Angular's AoT compiler. Error during parsing:\n\n${formatError(error)}`
         );
         this._stopLoading();
       });
   }
 
-  tryChangeState(id: string) {
+  tryChangeState(id: string): void {
     this._ngZone.run(() => {
       this._startLoading();
       this.manager
@@ -128,24 +126,24 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  selectSymbol(symbolPair: KeyValue<string, IdentifiedStaticSymbol>) {
+  selectSymbol(symbolPair: KeyValue<string, IdentifiedStaticSymbol>): void {
     if (symbolPair && symbolPair.value) {
       this.tryChangeState(symbolPair.value.id);
     }
   }
 
-  restoreMemento(memento: Memento) {
+  restoreMemento(memento: Memento): void {
     this.manager
       .restoreMemento(memento)
       .then(this._stopLoading)
       .catch(this._stopLoading);
   }
 
-  get initialized() {
+  get initialized(): VisualizationConfig<any> | null {
     return this.manager.getCurrentState();
   }
 
-  prevState() {
+  prevState(): void {
     const mementos = this.manager.getHistory();
     if (mementos.length > 1) {
       this.restoreMemento(mementos[mementos.length - 2]);
