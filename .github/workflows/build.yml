@@ -15,6 +15,15 @@ jobs:
         with:
           node-version: 12
 
+      - name: Install dependencies
+        run: yarn && cd fixtures/ng-11 && yarn
+
+      - name: gabrielbb/xvfb-action
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          working-directory: ./
+          run: yarn e2e
+
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
