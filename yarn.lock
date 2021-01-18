@@ -367,6 +367,27 @@
     tslib "^2.0.0"
     yargs "^16.1.1"
 
+"@angular/compiler-cli@11.0.9":
+  version "11.0.9"
+  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-11.0.9.tgz#a3e9a554fecbdf23f83303704861aae52a9bdae9"
+  integrity sha512-ctqT4k5FJpFDUmH05WVVvzcDEHi2ZAgxbdrPtirQXHvjZ7s16WDBsdOQPlrSnsi3HmBD3rqxFf7c305boEI9Rw==
+  dependencies:
+    "@babel/core" "^7.8.6"
+    "@babel/types" "^7.8.6"
+    canonical-path "1.0.0"
+    chokidar "^3.0.0"
+    convert-source-map "^1.5.1"
+    dependency-graph "^0.7.2"
+    fs-extra "4.0.2"
+    magic-string "^0.25.0"
+    minimist "^1.2.0"
+    reflect-metadata "^0.1.2"
+    semver "^6.3.0"
+    source-map "^0.6.1"
+    sourcemap-codec "^1.4.8"
+    tslib "^2.0.0"
+    yargs "^16.1.1"
+
 "@angular/compiler@11.0.3":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-11.0.3.tgz#1bf9d1d58acb12f02c16d97155de9063246a3c23"
@@ -374,10 +395,24 @@
   dependencies:
     tslib "^2.0.0"
 
+"@angular/compiler@11.0.9":
+  version "11.0.9"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-11.0.9.tgz#524757eac7c9915605c3579f12b2a80cb9d4d783"
+  integrity sha512-H2IfS6ciPWN0kmKhbwDuvS8ry5GcRFKfoyA/HGk+nQwCE2nAHC8VNwldbtoisO7XfRWr/uaTrh6z/vdfxsAiHw==
+  dependencies:
+    tslib "^2.0.0"
+
 "@angular/core@11.0.3":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-11.0.3.tgz#3c85d6bb9e899f35a35f4a435f8c37bc6529160a"
   integrity sha512-bxo5euE7+Q2ThowkVRwwvKyF5vQEyo9V14JM3GW8k2THbk7LfNctyNkTeuvkTBWfLF17Nd7b5+BdNttNKNlCuQ==
+  dependencies:
+    tslib "^2.0.0"
+
+"@angular/core@11.0.9":
+  version "11.0.9"
+  resolved "https://registry.yarnpkg.com/@angular/core/-/core-11.0.9.tgz#5e509af2d2580a07f9ddfe3b99ce86ae67689daf"
+  integrity sha512-J0ff3UK2Cw7Z0eNLtUXrpMFvmmkvPPZWLYIwimyc1pZys7qsIVT6cy2ybGEOhbJgC6qt3fo0DoJV3pGXTalb8A==
   dependencies:
     tslib "^2.0.0"
 
@@ -8490,10 +8525,14 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-ngast@0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/ngast/-/ngast-0.6.1.tgz#23db182c775266659236cc0c7901ef9b9fd2078f"
-  integrity sha512-R0EMFCuZ8G3ZYbg0VxR1Flua2HlE5g4n8jYCk2BSvzf4L31D3691YcUsSA2yCLkUSIEa+MbFwRTAJZgBWAuN+Q==
+ngast@0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/ngast/-/ngast-0.6.2.tgz#a2501a9f5b668d68ff01689c2a4bdbf47b3f21b8"
+  integrity sha512-qTJR6ajrT6Ojg/lyp9Hex0SfRDFiFqYXaVoC8tsCliNzuGdr5TgsGFity2OoK9oA2N42xvgbS4Q3HNaz5SRkZw==
+  dependencies:
+    "@angular/compiler" "11.0.9"
+    "@angular/compiler-cli" "11.0.9"
+    "@angular/core" "11.0.9"
 
 nice-try@^1.0.4:
   version "1.0.5"

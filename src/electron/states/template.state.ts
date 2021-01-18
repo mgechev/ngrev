@@ -11,7 +11,6 @@ import {
   getId,
   Node,
   SymbolTypes,
-  isAngularSymbol,
   isThirdParty
 } from '../../shared/data-format';
 import {
@@ -99,7 +98,7 @@ export class TemplateState extends State {
     edges: any[]
   ) {
     const rootNodes = this.directive.getTemplateAst();
-    if (rootNodes === 'error') {
+    if (!rootNodes) {
       return;
     }
     let currentNode = 0;
