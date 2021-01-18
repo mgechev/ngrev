@@ -9,6 +9,7 @@ export default function setup(): void {
       // i.e for OSX an example path could be '/Applications/MyApp.app/Contents/MacOS/MyApp'
       // But for the sake of the example we fetch it from our node_modules.
       path: electronPath,
+      env: { RUNNING_IN_SPECTRON: '1' },
 
       // Assuming you have the following directory structure
 

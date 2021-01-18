@@ -1,4 +1,6 @@
 import { expect } from 'chai';
+import { app } from 'electron';
+import { join } from 'path';
 import { SpectronClient } from 'spectron';
 
 import commonSetup from './common-setup';
@@ -18,10 +20,18 @@ describe('angular-electron App', function () {
     expect(count).to.equal(1);
   });
 
-  it('should display message saying App works !', async function () {
-    const elem = await client.$('app-home h1');
+  it('should display a button saying "Select Project"', async function () {
+    const elem = await client.$('ngrev-home button');
     const text = await elem.getText();
-    expect(text).to.equal('App works !');
+    expect(text).to.equal('Select Project');
+  });
+
+  it('should parse the project',async function() {
+    const project = join(__dirname, '..', 'fixtures', 'ng-11', 'tsconfig.json');
+    await this.app.electron.clipboard.writeText(project);
+    await (await client.$('ngrev-home button')).click();
+    const breadcrumbLabel = await client.$('ngrev-app h2');
+    expect(await breadcrumbLabel.getText()).to.equal('History');
   });
 
 });
