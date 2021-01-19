@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnDestroy,
+  Output
+} from '@angular/core';
 import { NetworkConfig } from './network';
 import { Network } from 'vis';
 import { ExportToImage } from '../export-to-image.service';
@@ -18,23 +27,25 @@ export class NetworkComponent implements OnDestroy {
     if (!value) {
       return;
     }
-    const scale: number = this._instance.getScale();
-    const position: {x: number, y: number} = this._instance.getViewPosition();
+    this._ngZone.runOutsideAngular(() => {
+      const scale: number = this._instance.getScale();
+      const position: {x: number, y: number} = this._instance.getViewPosition();
 
-    this._instance.setData({
-      nodes: value.nodes, edges: value.edges
-    });
-
-    this._instance.setOptions(value.options);
-
-    if (this._network?.title === value.title) {
-      this._instance.moveTo({
-        scale,
-        position
+      this._instance.setData({
+        nodes: value.nodes, edges: value.edges
       });
-    } else {
-      this._instance.fit();
-    }
+
+      this._instance.setOptions(value.options);
+
+      if (this._network?.title === value.title) {
+        this._instance.moveTo({
+          scale,
+          position
+        });
+      } else {
+        this._instance.fit();
+      }
+    });
 
     this._exportToImage.enable({
       title: value.title,
@@ -49,19 +60,24 @@ export class NetworkComponent implements OnDestroy {
   @Output() contextMenu: EventEmitter<string> = new EventEmitter<string>();
 
   private _network?: NetworkConfig;
-  private _instance: Network;
+  private _instance!: Network;
   private _clickTimeout: any;
-  private _fitViewListener: () => void;
+  private _fitViewListener!: () => void;
 
-  constructor(private _elementRef: ElementRef, private _exportToImage: ExportToImage, private _ipcBus: IPCBus) {
-    this._instance = new Network(this._elementRef.nativeElement, {});
+  constructor(private _elementRef: ElementRef,
+              private _exportToImage: ExportToImage,
+              private _ipcBus: IPCBus,
+              private _ngZone: NgZone) {
+    this._ngZone.runOutsideAngular(() => {
+      this._instance = new Network(this._elementRef.nativeElement, {});
 
-    this._instance.on('doubleClick', this.selectNode.bind(this));
-    this._instance.on('click', this.highlightNode.bind(this));
-    this._instance.on('oncontext', this.nodeContext.bind(this));
+      this._instance.on('doubleClick', this.selectNode.bind(this));
+      this._instance.on('click', this.highlightNode.bind(this));
+      this._instance.on('oncontext', this.nodeContext.bind(this));
 
-    this._fitViewListener = this._ipcBus.on(Message.FitView, () => {
-      this._instance.fit();
+      this._fitViewListener = this._ipcBus.on(Message.FitView, () => {
+        this._instance.fit();
+      });
     });
   }
 
@@ -77,14 +93,18 @@ export class NetworkComponent implements OnDestroy {
     clearTimeout(this._clickTimeout);
     e.event.preventDefault();
     if (e.nodes && e.nodes[0]) {
-      this.select.emit(e.nodes[0]);
+      this._ngZone.run(() => {
+        this.select.emit(e.nodes[0]);
+      });
     }
   }
 
   highlightNode(e: any): void {
     this._clickTimeout = setTimeout(() => {
       if (e.nodes && e.nodes[0]) {
-        this.highlight.emit(e.nodes[0]);
+        this._ngZone.run(() => {
+          this.highlight.emit(e.nodes[0]);
+        });
       }
     }, 200) as any;
   }
@@ -94,6 +114,8 @@ export class NetworkComponent implements OnDestroy {
       x: e.event.layerX,
       y: e.event.layerY
     }) as string;
-    this.contextMenu.emit(node);
+    this._ngZone.run(() => {
+      this.contextMenu.emit(node);
+    });
   }
 }
