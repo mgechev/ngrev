@@ -28,11 +28,14 @@ export class PipeState extends State {
 
   getMetadata(id: string): Metadata {
     const s = this.symbols[id];
-    if (s instanceof InjectableSymbol) {
-      return getInjectableMetadata(s);
-    } else {
-      return getPipeMetadata(s);
+    if (s) {
+      if (s instanceof InjectableSymbol) {
+        return getInjectableMetadata(s);
+      } else {
+        return getPipeMetadata(s);
+      }
     }
+    return null;
   }
 
   nextState(nodeId: string): State {

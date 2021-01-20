@@ -26,7 +26,11 @@ export class ProviderState extends State {
   }
 
   getMetadata(id: string): Metadata {
-    return getInjectableMetadata(this.symbols[id]);
+    const s = this.symbols[id];
+    if (s) {
+      return getInjectableMetadata(this.symbols[id]);
+    }
+    return null;
   }
 
   nextState(nodeId: string): State {

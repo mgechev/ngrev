@@ -10,5 +10,5 @@ import { Theme } from '../../../../shared/themes/color-map';
 })
 export class MetadataComponent {
   @Input() theme!: Theme;
-  @Input() metadata?: Metadata;
+  @Input() metadata!: Metadata | null;
 }

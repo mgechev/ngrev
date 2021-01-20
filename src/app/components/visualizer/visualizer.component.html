@@ -4,6 +4,6 @@
                  (highlight)="highlightNode($event)"
                  (select)="selectNode($event)"
                  (contextMenu)="nodeContext($event)"></ngrev-network>
-  <ngrev-metadata-view [theme]="theme" [metadata]="(metadata || {}).properties"></ngrev-metadata-view>
-  <ngrev-color-legend [theme]="theme" [colors]="usedColors"></ngrev-color-legend>
+  <ngrev-metadata-view [theme]="theme" [metadata]="metadata"></ngrev-metadata-view>
+  <ngrev-color-legend [theme]="theme" [colors]="usedColors" *ngIf="usedColors"></ngrev-color-legend>
 </ng-container>
