@@ -4,12 +4,14 @@
         (click)="prevState()"
         *ngIf="initialized && !loading && manager.getHistory().length > 1">Back</button>
 
-<ngrev-state-navigation
-  [maxWidth]="maxWidth$ | async"
-  [states]="manager.getHistory()"
-  [theme]="theme"
-  (select)="restoreMemento($event)">
-</ngrev-state-navigation>
+<ng-container *ngIf="maxWidth$ | async as maxWidth">
+  <ngrev-state-navigation
+    [maxWidth]="maxWidth"
+    [states]="manager.getHistory()"
+    [theme]="theme"
+    (select)="restoreMemento($event)">
+  </ngrev-state-navigation>
+</ng-container>
 
 <!--TODO: Create separated route?-->
 <ngrev-home *ngIf="!projectSet" [theme]="theme" (project)="onProject($event)"></ngrev-home>
