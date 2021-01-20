@@ -32,7 +32,7 @@ The application is not signed, so you may have to explicitly allow your mac to r
 
 ## Creating a custom theme
 
-You can add your own theme by creating a `[theme-name].theme.json` file in Electron `[userData]/themes`. For a sample theme see [Dark](https://github.com/mgechev/ngrev/blob/master/app/dark.theme.json).
+You can add your own theme by creating a `[theme-name].theme.json` file in Electron `[userData]/themes`. For a sample theme see [Dark](https://github.com/mgechev/ngrev/blob/master/src/assets/dark.theme.json).
 
 ### Application Requirements
 
