@@ -40,6 +40,9 @@ export class DirectiveState extends State {
   }
 
   getMetadata(id: string): Metadata | null {
+    if (id === this.stateSymbolId) {
+      return getDirectiveMetadata(this.directive);
+    }
     const s = this.symbols[id];
     if (s) {
       if (s instanceof DirectiveSymbol || s instanceof ComponentSymbol) {
