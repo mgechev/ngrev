@@ -81,11 +81,13 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     this._ipcBus.on(Message.ToggleLibsMenuAction, () => {
       this.manager.toggleLibs().then(() => {
         this.manager.reloadAppState();
+        this._cd.detectChanges();
       });
     });
     this._ipcBus.on(Message.ToggleModulesMenuAction, () => {
       this.manager.toggleModules().then(() => {
         this.manager.reloadAppState();
+        this._cd.detectChanges();
       });
     });
   }
@@ -142,7 +144,9 @@ the Angular's AoT compiler. Error during parsing:\n\n${formatError(error)}`
   }
 
   get initialized(): VisualizationConfig<any> | null {
-    return this.manager.getCurrentState();
+    return this.manager.getCurrentState(() => {
+      this._cd.detectChanges();
+    });
   }
 
   prevState(): void {
