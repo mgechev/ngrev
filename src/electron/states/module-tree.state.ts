@@ -89,7 +89,7 @@ export class ModuleTreeState extends State {
   }
 
   private _getModuleGraph(module: NgModuleSymbol): Graph<NgModuleSymbol> {
-    const imports = module.getImports();
+    const imports = module.getImports().filter((m?: NgModuleSymbol) => !!m);
     const nodes: Node<NgModuleSymbol>[] = [
       {
         id: getId(module),
