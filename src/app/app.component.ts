@@ -1,8 +1,15 @@
-import { Component, NgZone, ViewChild, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  NgZone,
+  OnDestroy,
+  ViewChild
+} from '@angular/core';
 import { ProjectProxy } from './model/project-proxy';
 import { Config, IdentifiedStaticSymbol, VisualizationConfig } from '../shared/data-format';
 import { formatError } from './shared/utils';
-import { StateManager, Memento } from './model/state-manager';
+import { Memento, StateManager } from './model/state-manager';
 import { Theme } from '../shared/themes/color-map';
 import { IPCBus } from './model/ipc-bus';
 import { Message } from '../shared/ipc-constants';
@@ -17,9 +24,10 @@ import { KeyValue } from '@angular/common';
 @Component({
   selector: 'ngrev-app',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements AfterViewInit, OnDestroy {
+export class AppComponent implements OnDestroy {
   projectSet = false;
   loading = false;
   queryList: KeyValue<string, IdentifiedStaticSymbol>[] = [];
@@ -35,9 +43,11 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
   private _stopLoading = () => {
     this.loading = false;
+    this._cd.markForCheck();
   };
   private _startLoading = () => {
     this.loading = true;
+    this._cd.markForCheck();
   };
 
   private _keyDownSubscription: Subscription;
@@ -55,6 +65,30 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       this.theme = config.themes[config.theme];
       this.showLibs = config.showLibs;
       this.showModules = config.showModules;
+      this._cd.markForCheck();
+    });
+
+    this._ipcBus.on(Message.ChangeTheme, (_: any, theme: string) => {
+      this._ngZone.run(() => {
+        this.theme = this.themes[theme];
+        this._cd.markForCheck();
+      });
+    });
+    this._ipcBus.on(Message.ToggleLibsMenuAction, () => {
+      this._ngZone.run(() => {
+        this.manager.toggleLibs().then(() => {
+          this.manager.reloadAppState();
+          this._cd.markForCheck();
+        });
+      });
+    });
+    this._ipcBus.on(Message.ToggleModulesMenuAction, () => {
+      this._ngZone.run(() => {
+        this.manager.toggleModules().then(() => {
+          this.manager.reloadAppState();
+          this._cd.markForCheck();
+        });
+      });
     });
 
     this.maxWidth$ = fromEvent(window, 'resize').pipe(
@@ -71,25 +105,6 @@ export class AppComponent implements AfterViewInit, OnDestroy {
         }
       })
     ).subscribe();
-  }
-
-  ngAfterViewInit(): void {
-    this._ipcBus.on(Message.ChangeTheme, (_: any, theme: string) => {
-      this.theme = this.themes[theme];
-      this._cd.detectChanges();
-    });
-    this._ipcBus.on(Message.ToggleLibsMenuAction, () => {
-      this.manager.toggleLibs().then(() => {
-        this.manager.reloadAppState();
-        this._cd.detectChanges();
-      });
-    });
-    this._ipcBus.on(Message.ToggleModulesMenuAction, () => {
-      this.manager.toggleModules().then(() => {
-        this.manager.reloadAppState();
-        this._cd.detectChanges();
-      });
-    });
   }
 
   ngOnDestroy(): void {
@@ -137,15 +152,17 @@ the Angular's AoT compiler. Error during parsing:\n\n${formatError(error)}`
   }
 
   restoreMemento(memento: Memento): void {
-    this.manager
-      .restoreMemento(memento)
-      .then(this._stopLoading)
-      .catch(this._stopLoading);
+    this._ngZone.run(() => {
+      this.manager
+        .restoreMemento(memento)
+        .then(this._stopLoading)
+        .catch(this._stopLoading);
+    });
   }
 
   get initialized(): VisualizationConfig<any> | null {
     return this.manager.getCurrentState(() => {
-      this._cd.detectChanges();
+      this._cd.markForCheck();
     });
   }
 
