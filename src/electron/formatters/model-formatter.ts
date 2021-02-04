@@ -45,11 +45,15 @@ export const getPipeMetadata = (pipe: PipeSymbol): Metadata => {
 
 export const getDirectiveMetadata = (
   dir: DirectiveSymbol | ComponentSymbol
-): Metadata => {
+): Metadata | null => {
   const meta = dir.metadata;
+  if (!meta) {
+    return null;
+  }
   const getChangeDetection = () => {
     if (dir instanceof ComponentSymbol) {
-      return dir.metadata.changeDetection;
+      // TODO: ngast doesn't export ComponentMetadata
+      return (meta as ComponentSymbol['metadata'])?.changeDetection;
     }
     return undefined;
   };

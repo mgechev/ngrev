@@ -26,7 +26,7 @@ export class PipeState extends State {
     super(getId(pipe), context);
   }
 
-  getMetadata(id: string): Metadata {
+  getMetadata(id: string): Metadata | null {
     const s = this.symbols[id];
     if (s) {
       if (s instanceof InjectableSymbol) {
@@ -38,7 +38,7 @@ export class PipeState extends State {
     return null;
   }
 
-  nextState(nodeId: string): State {
+  nextState(nodeId: string): State | null {
     if (nodeId === this.symbolId) {
       return null;
     }

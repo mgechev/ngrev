@@ -1,16 +1,21 @@
-import { SlaveProcess } from '../helpers/process';
-import { ipcMain, MenuItem } from 'electron';
+import {
+  DirectStateTransitionResponse, GetDataResponse, GetMetadataResponse, GetSymbolsResponse,
+  LoadProjectResponse,
+  PrevStateResponse,
+  SlaveProcess, ToggleLibsResponse, ToggleModulesResponse
+} from '../helpers/process';
+import { ipcMain, IpcMainEvent, WebContents } from 'electron';
 import { Message, Status } from '../../shared/ipc-constants';
-import { State } from '../states/state';
 import { Config } from '../../shared/data-format';
 import { menus } from '../../../main';
 import { join } from 'path';
+import { MenuIndex, SubmenuIndex } from '../menu/application_menu_template';
 
-const success = (sender, msg, payload) => {
+const success = (sender: WebContents, msg: Message, payload: any) => {
   sender.send(msg, Status.Success, payload);
 };
 
-const error = (sender, msg, payload) => {
+const error = (sender: WebContents, msg: Message, payload: any) => {
   sender.send(msg, Status.Failure, payload);
 };
 
@@ -37,182 +42,177 @@ class TaskQueue {
 }
 
 export class BackgroundApp {
-  private states: State[] = [];
-  private slaveProcess: SlaveProcess;
-  private taskQueue: TaskQueue;
+  private slaveProcess!: SlaveProcess;
+  private taskQueue!: TaskQueue;
 
   init(config: Partial<Config>): void {
     this.slaveProcess = SlaveProcess.create(join(__dirname, '..', 'parser.js'));
     this.taskQueue = new TaskQueue();
 
-    ipcMain.on(Message.Config, e => {
-      success(e.sender, Message.Config, config);
+    ipcMain.on(Message.Config, (event: IpcMainEvent) => {
+      success(event.sender, Message.Config, config);
     });
 
-    ipcMain.on(Message.LoadProject, (e, { tsconfig, showLibs, showModules }: { tsconfig: string; showLibs: boolean; showModules: boolean }) => {
+    ipcMain.on(Message.LoadProject, (event: IpcMainEvent, { tsconfig, showLibs, showModules }: { tsconfig: string; showLibs: boolean; showModules: boolean }) => {
       if (!this.slaveProcess.connected) {
         console.log('The slave process is not ready yet');
+        return;
       } else {
         console.log('The slave process is connected');
       }
       console.log('Loading project. Forwarding message to the background process.');
       this.taskQueue.push(() => {
         return this.slaveProcess
-          .send({
+          .send<LoadProjectResponse>({
             topic: Message.LoadProject,
             tsconfig,
             showLibs,
             showModules
           })
-          // TODO(mgechev) proper type
-          .then((data: any) => {
+          .then((data: LoadProjectResponse) => {
             if (data.err) {
               console.log('Got error message while loading the project: ', data.err);
-              error(e.sender, Message.LoadProject, data.err);
+              error(event.sender, Message.LoadProject, data.err);
             } else {
               console.log('The project was successfully loaded');
-              success(e.sender, Message.LoadProject, null);
+              success(event.sender, Message.LoadProject, null);
             }
           });
       });
     });
 
-    ipcMain.on(Message.PrevState, e => {
+    ipcMain.on(Message.PrevState, (event: IpcMainEvent) => {
       console.log('Requesting previous state');
       this.taskQueue.push(() => {
         return this.slaveProcess
-          .send({
+          .send<PrevStateResponse>({
             topic: Message.PrevState
           })
-          // TODO(mgechev) proper type
-          .then((data: any) => {
+          .then((data: PrevStateResponse) => {
             console.log('Got previous state');
             if (data.available) {
-              success(e.sender, Message.PrevState, data.available);
+              success(event.sender, Message.PrevState, data.available);
             } else {
-              error(e.sender, Message.PrevState, data.available);
+              error(event.sender, Message.PrevState, data.available);
             }
           });
       });
     });
 
-    ipcMain.on(Message.DirectStateTransition, (e, id: string) => {
+    ipcMain.on(Message.DirectStateTransition, (event: IpcMainEvent, id: string) => {
       console.log('Requesting direct state transition');
       this.taskQueue.push(() => {
         return this.slaveProcess
-          .send({
+          .send<DirectStateTransitionResponse>({
             topic: Message.DirectStateTransition,
             id
           })
-          // TODO(mgechev) proper type
-          .then((data: any) => {
+          .then((data: DirectStateTransitionResponse) => {
             console.log('Got response for direct state transition', id, data.available);
             if (data.available) {
-              success(e.sender, Message.DirectStateTransition, data.available);
+              success(event.sender, Message.DirectStateTransition, data.available);
             } else {
-              error(e.sender, Message.DirectStateTransition, data.available);
+              error(event.sender, Message.DirectStateTransition, data.available);
             }
           });
       });
     });
 
-    ipcMain.on(Message.GetSymbols, e => {
+    ipcMain.on(Message.GetSymbols, (event: IpcMainEvent) => {
       console.log('Requesting symbols...');
       this.taskQueue.push(() => {
         return this.slaveProcess
-          .send({
+          .send<GetSymbolsResponse>({
             topic: Message.GetSymbols
           })
-          // TODO(mgechev) proper type
-          .then((data: any) => {
+          .then((data: GetSymbolsResponse) => {
             console.log('Got symbols response');
             if (data.symbols) {
-              success(e.sender, Message.GetSymbols, data.symbols);
+              success(event.sender, Message.GetSymbols, data.symbols);
             }
           });
       });
     });
 
-    ipcMain.on(Message.GetMetadata, (e, id: string) => {
+    ipcMain.on(Message.GetMetadata, (event: IpcMainEvent, id: string) => {
       console.log('Requesting metadata...');
       this.taskQueue.push(() => {
         return this.slaveProcess
-          .send({
+          .send<GetMetadataResponse>({
             topic: Message.GetMetadata,
             id
           })
-          // TODO(mgechev) proper type
-          .then((response: any) => {
+          .then((response: GetMetadataResponse) => {
             console.log('Got metadata from the child process');
             if (response.data) {
-              success(e.sender, Message.GetMetadata, response.data);
+              success(event.sender, Message.GetMetadata, response.data);
             } else {
-              error(e.sender, Message.GetMetadata, null);
+              error(event.sender, Message.GetMetadata, null);
             }
           });
       });
     });
 
-    ipcMain.on(Message.GetData, e => {
+    ipcMain.on(Message.GetData, (event: IpcMainEvent) => {
       console.log('Requesting data');
       this.taskQueue.push(() => {
         return this.slaveProcess
-          .send({
+          .send<GetDataResponse>({
             topic: Message.GetData
           })
-          // TODO(mgechev) proper type
-          .then((response: any) => {
+          .then((response: GetDataResponse) => {
             console.log('Got data response', response.data);
             if (response.data) {
-              success(e.sender, Message.GetData, response.data);
+              success(event.sender, Message.GetData, response.data);
             } else {
-              error(e.sender, Message.GetData, null);
+              error(event.sender, Message.GetData, null);
             }
           });
       });
     });
 
-    ipcMain.on(Message.ToggleLibs, e => {
+    ipcMain.on(Message.ToggleLibs, (event: IpcMainEvent) => {
       console.log('Toggle libs!');
       this.taskQueue.push(() => {
         return this.slaveProcess
-          .send({
+          .send<ToggleLibsResponse>({
             topic: Message.ToggleLibs
           })
           .then(() => {
             console.log('The slave process toggled the libs');
-            success(e.sender, Message.ToggleLibs, true);
+            success(event.sender, Message.ToggleLibs, true);
           });
       });
     });
 
-    ipcMain.on(Message.ToggleModules, e => {
+    ipcMain.on(Message.ToggleModules, (event: IpcMainEvent) => {
       console.log('Toggle modules!');
       this.taskQueue.push(() => {
         return this.slaveProcess
-          .send({
+          .send<ToggleModulesResponse>({
             topic: Message.ToggleModules
           })
           .then(() => {
             console.log('The slave process toggled the modules');
-            success(e.sender, Message.ToggleModules, true);
+            success(event.sender, Message.ToggleModules, true);
           });
       });
     });
 
-    ipcMain.on(Message.DisableExport, e => {
-      menus.items[0].submenu.items[4].enabled = false;
-      success(e.sender, Message.DisableExport, true);
+    ipcMain.on(Message.DisableExport, (event: IpcMainEvent) => {
+      const exportMenuItem = menus.items[MenuIndex.Ngrev].submenu;
+      if (exportMenuItem) {
+        exportMenuItem.items[SubmenuIndex.Export].enabled = false;
+        success(event.sender, Message.DisableExport, true);
+      }
     });
 
-    ipcMain.on(Message.EnableExport, e => {
-      menus.items[0].submenu.items[4].enabled = true;
-      console.log('Enable!');
-      success(e.sender, Message.EnableExport, true);
+    ipcMain.on(Message.EnableExport, (event: IpcMainEvent) => {
+      const exportMenuItem = menus.items[MenuIndex.Ngrev].submenu;
+      if (exportMenuItem) {
+        menus.items[MenuIndex.Ngrev].submenu!.items[SubmenuIndex.Export].enabled = true;
+      }
+      success(event.sender, Message.EnableExport, true);
     });
-  }
-
-  get state(): State | undefined {
-    return this.states[this.states.length - 1];
   }
 }

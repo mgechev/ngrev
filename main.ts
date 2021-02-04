@@ -8,7 +8,7 @@ import { isDev } from './utils';
 import * as path from 'path';
 import * as url from 'url';
 
-let win: BrowserWindow = null;
+let win: BrowserWindow | null = null;
 
 // Save userData in separate folders for each environment.
 // Thanks to this you can use production and development versions of the app
@@ -48,8 +48,7 @@ export const menus = Menu.buildFromTemplate(menuItems);
 function createWindow(): BrowserWindow {
   Menu.setApplicationMenu(menus);
 
-  const electronScreen = screen;
-  const size = electronScreen.getPrimaryDisplay().workAreaSize;
+  const size = screen.getPrimaryDisplay().workAreaSize;
 
   // Create the browser window.
   win = new BrowserWindow({
@@ -59,7 +58,7 @@ function createWindow(): BrowserWindow {
     height: size.height,
     webPreferences: {
       nodeIntegration: true,
-      allowRunningInsecureContent: (isDev) ? true : false,
+      allowRunningInsecureContent: !!isDev,
       contextIsolation: false,  // false if you want to run 2e2 test with Spectron
       enableRemoteModule : true // true if you want to run 2e2 test  with Spectron or use remote module in renderer context (ie. Angular)
     },
