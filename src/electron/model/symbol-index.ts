@@ -12,7 +12,6 @@ export interface StateFactory {
 
 export interface SymbolData<T extends AnnotationNames> {
   stateFactory: StateFactory;
-  // eslint-disable-next-line @typescript-eslint/ban-types
   symbol: Symbol<T>;
 }
 
@@ -24,13 +23,13 @@ export interface ISymbolIndex {
 }
 
 class SymbolIndexImpl {
-  private symbolsIndex: Index;
+  private symbolsIndex: Index = new Map<string, SymbolData<AnnotationNames>>();
 
   getIndex(context: WorkspaceSymbols) {
     if (this.symbolsIndex && this.symbolsIndex.size) {
       return this.symbolsIndex;
     }
-    this.symbolsIndex = new Map<string, SymbolData<AnnotationNames>>();
+    this.symbolsIndex.clear();
     context.getAllInjectable().forEach(symbol => {
       this.symbolsIndex.set(getId(symbol), {
         symbol,
@@ -75,7 +74,7 @@ class SymbolIndexImpl {
   }
 
   clear() {
-    this.symbolsIndex = new Map<string, SymbolData<AnnotationNames>>();
+    this.symbolsIndex.clear();
   }
 }
 

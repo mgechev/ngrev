@@ -2,6 +2,20 @@ import { app, BrowserWindow, dialog, MenuItem, MenuItemConstructorOptions, Messa
 import { Message } from "../../shared/ipc-constants";
 import { getConfig } from "../config";
 
+export enum MenuIndex {
+  Ngrev
+}
+
+export enum SubmenuIndex {
+  Themes = 0,
+  ShowLibs = 1,
+  ShowModulesOnly = 2,
+  Export = 4,
+  FitView = 6,
+  Reset = 7,
+  Quit = 8
+}
+
 export const applicationMenuTemplate = (
   themeChange: (name: string) => void,
   libsToggle: () => void,
@@ -74,8 +88,12 @@ export const applicationMenuTemplate = (
         label: "Reset",
         accelerator: "CmdOrCtrl+R",
         click() {
+          const focusedWindow: BrowserWindow | null = BrowserWindow.getFocusedWindow();
+          if (!focusedWindow) {
+            return;
+          }
           dialog
-            .showMessageBox(BrowserWindow.getFocusedWindow(), {
+            .showMessageBox(focusedWindow, {
               type: "warning",
               buttons: ["OK", "Cancel"],
               title: "Are you sure?",

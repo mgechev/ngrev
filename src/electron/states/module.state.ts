@@ -34,7 +34,7 @@ const ExportsId = '$$exports';
 const ProvidersId = '$$providers';
 
 export class ModuleState extends State {
-  private symbols: NodeMap;
+  private symbols: NodeMap = {};
 
   constructor(context: WorkspaceSymbols, protected module: NgModuleSymbol) {
     super(getId(module), context);
@@ -62,7 +62,7 @@ export class ModuleState extends State {
       return null;
     }
     const data = this.symbols[nodeId].data;
-    if (!data) {
+    if (!data || !data.symbol) {
       return null;
     }
     // ngtsc does not allow us to resolve many of the properties
@@ -98,7 +98,7 @@ export class ModuleState extends State {
     };
     const edges: Edge[] = [];
     const declarations = this.module.getDeclarations();
-    if (declarations.length) {
+    if (declarations?.length) {
       declarations.forEach(s => {
         const node = s;
         if (node instanceof PipeSymbol) {
@@ -123,7 +123,7 @@ export class ModuleState extends State {
     }
 
     const bootstrap = this.module.getBootstap();
-    if (bootstrap.length) {
+    if (bootstrap?.length) {
       bootstrap.forEach(s => {
         this._appendSet(BootstrapId, s, nodes, SymbolTypes.ComponentOrDirective, edges);
       });
@@ -143,7 +143,7 @@ export class ModuleState extends State {
     }
 
     const exports = this.module.getExports();
-    if (exports.length) {
+    if (exports?.length) {
       exports.forEach(node => {
         if (node instanceof PipeSymbol) {
           this._appendSet(ExportsId, node, nodes, SymbolTypes.Pipe, edges);

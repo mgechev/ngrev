@@ -25,7 +25,7 @@ interface NodeMap {
 }
 
 export class AppModuleState extends State {
-  private symbols: NodeMap;
+  private symbols: NodeMap = {};
 
   constructor(context: WorkspaceSymbols, protected module: NgModuleSymbol) {
     super(getId(module), context);
@@ -55,13 +55,13 @@ export class AppModuleState extends State {
       return null;
     }
     const data = this.symbols[nodeId].data;
-    if (!data) {
+    if (!data || !data.symbol) {
       return null;
     }
     // ngtsc does not allow us to resolve many of the properties
     // we need for third-party symbols so we don't allow the navigation.
     if (isThirdParty(data.symbol)) {
-      return;
+      return null;
     }
     if (data.symbol instanceof DirectiveSymbol || data.symbol instanceof ComponentSymbol) {
       return new DirectiveState(this.context, data.symbol);
@@ -91,7 +91,7 @@ export class AppModuleState extends State {
     };
     const edges: Edge[] = [];
 
-    this.module.getDeclarations().forEach(node => {
+    (this.module.getDeclarations() || []).forEach(node => {
       if (node instanceof PipeSymbol) {
         this._appendSet(currentModuleId, node, nodes, SymbolTypes.Pipe, edges);
       } else if (node instanceof DirectiveSymbol) {
@@ -101,7 +101,7 @@ export class AppModuleState extends State {
       }
     });
 
-    this.module.getExports().forEach(node => {
+    (this.module.getExports() || []).forEach(node => {
       if (node instanceof PipeSymbol) {
         this._appendSet(currentModuleId, node, nodes, SymbolTypes.Pipe, edges);
       } else if (node instanceof DirectiveSymbol) {
@@ -111,7 +111,7 @@ export class AppModuleState extends State {
       }
     });
 
-    this.module.getProviders().forEach(provider => {
+    (this.module.getProviders() || []).forEach(provider => {
       if (!(provider instanceof InjectableSymbol)) {
         return;
       }

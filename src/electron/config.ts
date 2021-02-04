@@ -4,12 +4,11 @@ import { readFileSync, readdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { app } from 'electron';
 
-
 // Handle the case when the theme is not there
 const builtInThemesMap = readdirSync(join(__dirname, '..', 'assets'))
   .filter(f => f.endsWith('.theme.json'))
   .map(f => JSON.parse(readFileSync(join(__dirname, '..', 'assets', f)).toString()))
-  .reduce((a, theme) => {
+  .reduce((a: Config['themes'], theme: Theme) => {
     a[theme.name] = theme;
     return a;
   }, {});
@@ -45,7 +44,7 @@ export const getConfig = (): Config => {
     showModules: config.showModules,
     theme: config.theme,
     themes: Object.assign(
-      themes.reduce((a, t) => {
+      themes.reduce((a: Config['themes'], t: Theme) => {
         a[t.name] = t;
         return a;
       }, {}),

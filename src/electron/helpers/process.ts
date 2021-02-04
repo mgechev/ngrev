@@ -110,12 +110,12 @@ export type IPCResponse =
   | ToggleLibsResponse
   | ToggleModulesResponse;
 
-export interface Responder {
-  (data: IPCResponse): void;
+export interface Responder<R> {
+  (data: R): void;
 }
 
-export interface RequestHandler {
-  (request: IPCRequest, responder: Responder): void;
+export interface RequestHandler<T, R> {
+  (request: T, responder: Responder<R>): void;
 }
 
 export class ParentProcess {
@@ -127,12 +127,12 @@ export class ParentProcess {
       this.emitter.emit(request.topic, request, ((response: IPCResponse) => {
         console.log('Sending response for message:', request.topic);
         (process as any).send(response);
-      }) as Responder);
+      }) as Responder<IPCRequest>);
     });
   }
 
-  on(topic: Message, cb: RequestHandler): void {
-    this.emitter.on(topic, (request: IPCRequest, responder: Responder) => {
+  on<T extends IPCRequest, R extends IPCResponse>(topic: Message, cb: RequestHandler<T, R>): void {
+    this.emitter.on(topic, (request: T, responder: Responder<R>) => {
       try {
         cb(request, responder);
       } catch (e) {
@@ -167,9 +167,9 @@ export class SlaveProcess {
     this.emitter.on('ready', cb);
   }
 
-  send(request: IPCRequest): Promise<IPCResponse> {
+  send<R extends IPCResponse>(request: IPCRequest): Promise<R> {
     return new Promise((resolve) => {
-      this.process.once('message', (data: IPCResponse) => {
+      this.process.once('message', (data: R) => {
         console.log('Got message with topic', data.topic);
         resolve(data);
       });

@@ -11,7 +11,7 @@ import {
   getId,
   Node,
   SymbolTypes,
-  isThirdParty
+  isThirdParty, Edge
 } from '../../shared/data-format';
 import {
   getDirectiveMetadata,
@@ -45,7 +45,7 @@ export class TemplateState extends State {
     return null;
   }
 
-  nextState(id: string): State {
+  nextState(id: string): State | null {
     if (id === this.symbolId) {
       return null;
     }
@@ -78,7 +78,7 @@ export class TemplateState extends State {
         },
       },
     ];
-    const edges = [];
+    const edges: Edge[] = [];
     this.addTemplateNodes(nodes, edges);
     return {
       title: label,
@@ -95,7 +95,7 @@ export class TemplateState extends State {
 
   private addTemplateNodes(
     resNodes: Node<ComponentSymbol | TemplateNode>[],
-    edges: any[]
+    edges: Edge[]
   ) {
     const rootNodes = this.directive.getTemplateAst();
     if (!rootNodes) {

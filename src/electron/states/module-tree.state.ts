@@ -70,7 +70,7 @@ export class ModuleTreeState extends State {
   }
 
   // Switch to binary search if gets too slow.
-  nextState(id: string): State {
+  nextState(id: string): State | null {
     const module = this.symbols[id];
     // ngtsc does not allow us to resolve many of the properties
     // we need for third-party symbols so we don't allow the navigation.
@@ -89,7 +89,7 @@ export class ModuleTreeState extends State {
   }
 
   private _getModuleGraph(module: NgModuleSymbol): Graph<NgModuleSymbol> {
-    const imports = module.getImports().filter((m?: NgModuleSymbol) => !!m);
+    const imports = (module.getImports() || []).filter((m?: NgModuleSymbol) => !!m);
     const nodes: Node<NgModuleSymbol>[] = [
       {
         id: getId(module),

@@ -1,6 +1,6 @@
 export class Node<T> {
   children: { [key: string]: Node<T> } = {};
-  data: T;
+  data?: T;
 }
 
 export interface SplitFunction {
@@ -28,10 +28,7 @@ export class Trie<T> {
 
   get(key: string): T | null {
     const node = this.findNode(key);
-    if (node.data) {
-      return node.data;
-    }
-    return null;
+    return node.data || null;
   }
 
   clear() {

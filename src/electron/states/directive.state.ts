@@ -162,14 +162,14 @@ export class DirectiveState extends State {
         to: rootId,
       });
     }
-    const existing = {};
+    const existing: { [key: string]: number } = {};
     const directiveId = getId(this.directive);
     providers.forEach((p) => {
       const id = getId(p);
       if (id === null) {
         return;
       }
-      existing[id] = parseInt((existing[id] || 0)) + 1;
+      existing[id] = (existing[id] || 0) + 1;
       const node: Node<any> = {
         id,
         data: p,
