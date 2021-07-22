@@ -27,7 +27,7 @@ import { KeyValue } from '@angular/common';
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements AfterViewInit, OnDestroy {
   projectSet = false;
   loading = false;
   queryList: KeyValue<string, IdentifiedStaticSymbol>[] = [];
@@ -68,6 +68,23 @@ export class AppComponent implements OnDestroy {
       this._cd.markForCheck();
     });
 
+    this.maxWidth$ = fromEvent(window, 'resize').pipe(
+      debounceTime(100),
+      map(() => window.innerWidth),
+      startWith(window.innerWidth)
+    );
+
+    this._keyDownSubscription = fromEvent<KeyboardEvent>(document, 'keydown').pipe(
+      filter((event: KeyboardEvent): boolean => !!(event.keyCode === BACKSPACE && this.quickAccess?.hidden)),
+      tap({
+        next: () => {
+          this.prevState();
+        }
+      })
+    ).subscribe();
+  }
+
+  ngAfterViewInit(): void {
     this._ipcBus.on(Message.ChangeTheme, (_: any, theme: string) => {
       this._ngZone.run(() => {
         this.theme = this.themes[theme];
@@ -90,21 +107,6 @@ export class AppComponent implements OnDestroy {
         });
       });
     });
-
-    this.maxWidth$ = fromEvent(window, 'resize').pipe(
-      debounceTime(100),
-      map(() => window.innerWidth),
-      startWith(window.innerWidth)
-    );
-
-    this._keyDownSubscription = fromEvent<KeyboardEvent>(document, 'keydown').pipe(
-      filter((event: KeyboardEvent): boolean => !!(event.keyCode === BACKSPACE && this.quickAccess?.hidden)),
-      tap({
-        next: () => {
-          this.prevState();
-        }
-      })
-    ).subscribe();
   }
 
   ngOnDestroy(): void {
